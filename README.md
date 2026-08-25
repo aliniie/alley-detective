@@ -1,2 +1,2 @@
-# alley-detective
-alley detective
+# outdoor escape game
+비밀
