@@ -1,0 +1,418 @@
+<title>방탈출 프로그램</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700&display=swap">
+
+<style>
+  :root {
+    --bg: #07090F;
+    --surface: #0E1521;
+    --surface-hover: #121C2E;
+    --border: #1A2840;
+    --border-hover: #2A4070;
+    --accent: #4D85C9;
+    --accent-bright: #6BA3E3;
+    --accent-glow: rgba(77, 133, 201, 0.12);
+    --text-primary: #DCE6F5;
+    --text-secondary: #6A7E9E;
+    --text-muted: #3D5070;
+    --sold-out-surface: #0B0F18;
+    --sold-out-border: #141C2A;
+    --sold-out-text: #3D4F68;
+    --tag-open: #162240;
+    --tag-open-text: #5A9AE0;
+    --tag-sold: #12151E;
+    --tag-sold-text: #3D5070;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #F0F4FB;
+      --surface: #FFFFFF;
+      --surface-hover: #F5F8FF;
+      --border: #D0DCF0;
+      --border-hover: #A0BCE0;
+      --accent: #3A74BC;
+      --accent-bright: #2D62A8;
+      --accent-glow: rgba(58, 116, 188, 0.08);
+      --text-primary: #0D1828;
+      --text-secondary: #4A6080;
+      --text-muted: #8AA0C0;
+      --sold-out-surface: #F5F7FA;
+      --sold-out-border: #E0E8F0;
+      --sold-out-text: #A0B4CC;
+      --tag-open: #E0EEFF;
+      --tag-open-text: #2D62A8;
+      --tag-sold: #EEF0F5;
+      --tag-sold-text: #9AAAC0;
+    }
+  }
+
+  :root[data-theme="light"] {
+    --bg: #F0F4FB;
+    --surface: #FFFFFF;
+    --surface-hover: #F5F8FF;
+    --border: #D0DCF0;
+    --border-hover: #A0BCE0;
+    --accent: #3A74BC;
+    --accent-bright: #2D62A8;
+    --accent-glow: rgba(58, 116, 188, 0.08);
+    --text-primary: #0D1828;
+    --text-secondary: #4A6080;
+    --text-muted: #8AA0C0;
+    --sold-out-surface: #F5F7FA;
+    --sold-out-border: #E0E8F0;
+    --sold-out-text: #A0B4CC;
+    --tag-open: #E0EEFF;
+    --tag-open-text: #2D62A8;
+    --tag-sold: #EEF0F5;
+    --tag-sold-text: #9AAAC0;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px 80px;
+  }
+
+  /* subtle grid texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(77, 133, 201, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77, 133, 201, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .eyebrow::before,
+  .eyebrow::after {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  .header-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.2;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+  }
+
+  .header-title span {
+    color: var(--accent);
+  }
+
+  .header-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ── CARDS ── */
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:not(.card--disabled):hover {
+    background: var(--surface-hover);
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px var(--accent-glow);
+  }
+
+  .card:not(.card--disabled):hover .card-icon {
+    color: var(--accent-bright);
+  }
+
+  .card--disabled {
+    background: var(--sold-out-surface);
+    border-color: var(--sold-out-border);
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .card-number {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card--disabled .card-number {
+    color: var(--sold-out-text);
+  }
+
+  .card-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-glow);
+    border-radius: 10px;
+    color: var(--accent);
+    transition: color 0.2s;
+  }
+
+  .card--disabled .card-icon {
+    background: rgba(60, 80, 112, 0.08);
+    color: var(--sold-out-text);
+  }
+
+  .card-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin-bottom: 6px;
+  }
+
+  .card-tag--open {
+    background: var(--tag-open);
+    color: var(--tag-open-text);
+  }
+
+  .card-tag--sold {
+    background: var(--tag-sold);
+    color: var(--tag-sold-text);
+  }
+
+  .card-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .card--disabled .card-title {
+    color: var(--sold-out-text);
+  }
+
+  .card-sub {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .card--disabled .card-sub {
+    color: var(--sold-out-text);
+  }
+
+  .card-arrow {
+    font-size: 18px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: color 0.2s, transform 0.2s;
+  }
+
+  .card:not(.card--disabled):hover .card-arrow {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  .card--disabled .card-arrow {
+    opacity: 0;
+  }
+
+  /* sold-out diagonal stripe */
+  .card--disabled::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 4px,
+      rgba(60, 80, 112, 0.06) 4px,
+      rgba(60, 80, 112, 0.06) 8px
+    );
+    border-radius: 0 12px 0 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 48px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+    opacity: 0.7;
+  }
+
+  .footer a:hover {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .card-arrow, .card-icon {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 520px) {
+    body { padding: 40px 16px 60px; }
+    .header-title { font-size: 26px; }
+    .card { padding: 18px 18px; gap: 14px; }
+    .card-icon { width: 38px; height: 38px; font-size: 22px; }
+    .card-title { font-size: 15px; }
+  }
+</style>
+
+<div class="container">
+
+  <header class="header">
+    <div class="eyebrow">Urban Escape Program</div>
+    <h1 class="header-title">부산을 무대로 한<br><span>방탈출</span> 프로그램</h1>
+    <p class="header-desc">도시 곳곳을 탐험하는 몰입형 야외 방탈출 시리즈<br>링크를 통해 예약 및 정보를 확인하세요.</p>
+  </header>
+
+  <ul class="card-list" role="list" style="list-style:none; padding:0;">
+
+    <!-- 1. 소막마을 — 매진 -->
+    <li>
+      <div class="card card--disabled" aria-disabled="true" tabindex="0">
+        <span class="card-number">01</span>
+        <div class="card-icon" aria-hidden="true">🏚️</div>
+        <div class="card-body">
+          <span class="card-tag card-tag--sold">매진 마감</span>
+          <div class="card-title">소막마을 방탈출</div>
+          <div class="card-sub">부산 소막마을 일원 · 종료된 프로그램</div>
+        </div>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </div>
+    </li>
+
+    <!-- 2. 부산대자율상권 — 오픈 예정 -->
+    <li>
+      <a class="card" href="https://escape.dawoom.io/alley.detectives.html" target="_blank" rel="noopener noreferrer" aria-label="부산대자율상권구역 방탈출 — 오픈 예정">
+        <span class="card-number">02</span>
+        <div class="card-icon" aria-hidden="true">🔍</div>
+        <div class="card-body">
+          <span class="card-tag card-tag--open">오픈 예정</span>
+          <div class="card-title">부산대자율상권구역 방탈출</div>
+          <div class="card-sub">부산대 자율상권 일원 · 링크 업데이트 예정</div>
+        </div>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+    </li>
+
+    <!-- 3. 피란수도 — 오픈 예정 -->
+    <li>
+      <a class="card" href="#" onclick="return false;" aria-label="피란수도 부산 : 잃어버린 소포 — 오픈 예정">
+        <span class="card-number">03</span>
+        <div class="card-icon" aria-hidden="true">📦</div>
+        <div class="card-body">
+          <span class="card-tag card-tag--open">오픈 예정</span>
+          <div class="card-title">피란수도 부산 : 잃어버린 소포</div>
+          <div class="card-sub">부산 피란수도 유산 일원 · 링크 업데이트 예정</div>
+        </div>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+    </li>
+
+  </ul>
+
+  <footer class="footer">
+    <p>링크는 프로그램 오픈 시 업데이트됩니다.</p>
+    <p style="margin-top:6px;">문의 · 업무 제휴는 별도 채널로 연락 부탁드립니다.</p>
+  </footer>
+
+</div>
