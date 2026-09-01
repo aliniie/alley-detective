@@ -1,3 +1,5 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta property="og:title" content="방탈출 프로그램">
 <meta property="og:description" content="부산을 무대로 한 몰입형 야외 방탈출 시리즈">
 <meta property="og:url" content="https://escape.dawoom.io/">
@@ -93,7 +95,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 60px 20px 80px;
+    padding: clamp(32px, 10vw, 60px) clamp(16px, 5vw, 20px) clamp(48px, 12vw, 80px);
   }
 
   /* subtle grid texture */
@@ -148,7 +150,7 @@
 
   .header-title {
     font-family: 'Black Han Sans', sans-serif;
-    font-size: 32px;
+    font-size: clamp(24px, 7vw, 32px);
     font-weight: 400;
     color: var(--text-primary);
     line-height: 1.2;
