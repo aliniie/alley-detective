@@ -363,17 +363,17 @@ const STEPS = [
       "아차, 그걸 확인안했네옹.",
       "하지만 걱정마세옹, CCTV에 찍힌 사진이 있으니까옹!",
     ],
-    hints: ["바깥에 간판이 어쩐지 다르지 않냐옹!", "11시 45분이라옹"], 
+    hints: ["바깥에 간판이 어쩐지 다르지 않냐옹!", "11시 15분이라옹"], 
     answer: true,
     answerLabel: "정답",
     answerPlaceholder: "몇 시 몇 분에 훔쳐간걸까옹?",
-    answers: ["11시 45분","11시45분","1145"]
+    answers: ["11시 15분","11시15분","1115"]
   },
 
     {
     location: "바비수",
     lines: [
-      { speaker: "yeoul", text: "그러니까... 효원도장이 사라진 그 날, 금요일 밤 11시 45분이라는거지?" },
+      { speaker: "yeoul", text: "그러니까... 효원도장이 사라진 그 날, 금요일 밤 11시 15분이라는거지?" },
       { speaker: "yeoul", text: "그 땐, 몽실이랑 같이 밥먹고 있었어." },
       { speaker: "yeoul", text: "몽실이한테 물어보라고!" },
       { speaker: "cheese", text: "좋다옹, 몽실이도 용의자 중 한 마리니까옹" },
@@ -382,7 +382,6 @@ const STEPS = [
   },
   {
     location: "골목",
-    scene: ASSETS.mihoMap,
     lines: [
       "어라라...길을 잃었어옹",
       "몽실이네 가게가 어디였을까옹..?",
@@ -584,6 +583,7 @@ const STEPS = [
 
 
 let stepIndex = 0;
+let lastSceneSrc = ASSETS.shopScene; // fallback so a fresh reload never shows a broken image
 
 // progress is tracked by number of quizzes (answer steps) reached, not raw step count
 const TOTAL_QUIZZES = STEPS.filter(s => s.answer).length;
@@ -629,7 +629,8 @@ function renderStep(){
   const quizProgress = quizProgressAt(stepIndex);
   document.getElementById('progress-bar').style.width = Math.round((quizProgress / TOTAL_QUIZZES) * 100) + '%';
   document.getElementById('step-counter').textContent = quizProgress + '/' + TOTAL_QUIZZES;
-  if (step.scene) { document.getElementById('scene-img').src = step.scene; }
+  lastSceneSrc = step.scene || lastSceneSrc;
+  document.getElementById('scene-img').src = lastSceneSrc;
 
   const dialogueEl = document.getElementById('dialogue-text');
   let dialogueHtml = '';
