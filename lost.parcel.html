@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>부산역 미제소포 사건 - 체험 데모</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8E%3C/text%3E%3C/svg%3E">
 <style>
   /* ===== SUIT : the one typeface used everywhere ===== */
   @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Thin.woff2') format('woff2');font-weight:100;font-display:swap;}
@@ -49,12 +50,15 @@
     padding:0;
   }
 
-  /* ===== Stage : fills the entire viewport ===== */
+  /* ===== Stage : full-screen on phones, phone-width column on desktop ===== */
   .stage{
     position:relative;
-    width:100vw;
+    width:min(100vw, 520px);
     height:100dvh;
     overflow:hidden;
+  }
+  @media (min-width:560px){
+    .stage{ box-shadow:0 0 0 1px var(--gray), 0 24px 70px rgba(0,0,0,0.45); }
   }
 
   .view{
