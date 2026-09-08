@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부산역 미제소포 사건 - 체험 데모</title>
+<style>
+  /* ===== SUIT : the one typeface used everywhere ===== */
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Thin.woff2') format('woff2');font-weight:100;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraLight.woff2') format('woff2');font-weight:200;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Light.woff2') format('woff2');font-weight:300;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');font-weight:normal;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Medium.woff2') format('woff2');font-weight:500;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Bold.woff2') format('woff2');font-weight:700;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraBold.woff2') format('woff2');font-weight:800;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Heavy.woff2') format('woff2');font-weight:900;font-display:swap;}
+
+  :root{
+    --blue:#4169E1;        /* royal blue : primary accent */
+    --blue-deep:#2F4FC4;   /* pressed / hover */
+    --red:#E1332E;         /* 미요 red : secondary accent */
+    --red-deep:#C42723;
+    --gray:#E0E0E0;        /* light gray : borders & subtle fills */
+    --panel:#F5F6F8;       /* near-white panel */
+    --ink:#141414;         /* near-black text */
+    --ink-soft:#5B6B82;    /* muted text */
+
+    /* legacy aliases kept so existing rules stay on-palette */
+    --paper:#F5F6F8;
+    --paper-dark:#E0E0E0;
+    --rust:#4169E1;
+    --brass:#4169E1;
+    --sea:#4169E1;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html, body{
+    height:100%;
+  }
+  body{
+    background:#0C1219;
+    color:var(--ink);
+    font-family:'Suit', -apple-system, 'Apple SD Gothic Neo', sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:0;
+  }
+
+  /* ===== Stage : fills the entire viewport ===== */
+  .stage{
+    position:relative;
+    width:100vw;
+    height:100dvh;
+    overflow:hidden;
+  }
+
+  .view{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .35s ease;
+  }
+  .view.active{opacity:1; pointer-events:auto;}
+
+  /* ===== Intro : scene 1 is a 2-frame loop, then scene 2 pushes in on the parcel ===== */
+  #intro{
+    position:absolute;
+    inset:0;
+    z-index:100;
+    background:#0C1219;
+    overflow:hidden;
+    cursor:pointer;
+    transition:opacity .7s ease;
+  }
+  #intro.gone{opacity:0; pointer-events:none;}
+  #intro .frames{
+    position:absolute;
+    inset:0;
+  }
+  #intro .if{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    image-rendering:pixelated;
+    opacity:0;
+    transform:scale(1);
+    transition:opacity 1s ease;
+    will-change:opacity, transform;
+  }
+  #intro .if.on{opacity:1;}
+
+  /* Scene 1 : frame 2 fades in and out over frame 1 (keep in sync with JS) */
+  #intro #if1.on{opacity:1;}
+  #intro #if2.play{
+    animation:frameFlip 1.3s ease-in-out 5 both;
+  }
+  @keyframes frameFlip{
+    0%, 38%   {opacity:0;}
+    50%, 88%  {opacity:1;}
+    100%      {opacity:0;}
+  }
+
+  /* Scene 2 : intro-3 slowly pushes in toward the parcel, then hands off to intro-4 */
+  #intro #if3{
+    transform-origin:58% 60%;
+    transition:opacity .7s ease, transform 2.6s ease-out;
+  }
+  #intro #if3.zoom{transform:scale(1.2);}
+  #intro #if4{
+    transform:scale(1.06);
+    transform-origin:52% 55%;
+    transition:opacity 1s ease, transform 3.4s ease-out;
+  }
+  #intro #if4.zoom{transform:scale(1.13);}
+
+  #intro .skip{
+    position:absolute;
+    left:0; right:0; bottom:30px;
+    text-align:center;
+    color:rgba(255,255,255,0.7);
+    font-size:12px;
+    letter-spacing:.02em;
+    z-index:2;
+    animation:skipBlink 2s ease-in-out infinite;
+  }
+  @keyframes skipBlink{0%,100%{opacity:.35;} 50%{opacity:.85;}}
+  @media (prefers-reduced-motion:reduce){
+    #intro .if{transition:opacity .4s ease;}
+    #intro #if2{animation:none;}
+    #intro #if3.zoom, #intro #if4.zoom{transform:none;}
+  }
+
+  /* ---- Lock/idle screen (notification arrives here) ---- */
+  #view-lock{
+    background:
+      radial-gradient(circle at 20% 0%, rgba(65,105,225,0.22), transparent 55%),
+      radial-gradient(circle at 85% 15%, rgba(65,105,225,0.12), transparent 50%),
+      linear-gradient(180deg, #16213A 0%, #0F1626 60%, #0B0F1A 100%);
+  }
+
+  /* dim behind the centred alert */
+  .notif-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(8,12,20,0.5);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .45s ease;
+    z-index:24;
+  }
+  .notif-backdrop.show{opacity:1;}
+
+  .notif-banner{
+    position:absolute;
+    top:50%; left:50%;
+    width:min(330px, calc(100% - 44px));
+    transform:translate(-50%,-50%) scale(0.88);
+    background:#ffffff;
+    border:1px solid #cfcfcf;
+    border-radius:18px;
+    padding:14px 15px;
+    display:flex;
+    gap:11px;
+    align-items:flex-start;
+    box-shadow:0 24px 60px rgba(0,0,0,0.45);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .38s ease, transform .42s cubic-bezier(.34,1.55,.5,1);
+    z-index:25;
+    cursor:pointer;
+  }
+  .notif-banner.show{opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto;}
+  .notif-banner .ic{
+    width:34px; height:34px;
+    border-radius:10px;
+    background:linear-gradient(160deg,#4169E1,#2F4FC4);
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:16px;
+  }
+  .notif-banner .body{flex:1; min-width:0;}
+  .notif-banner .sender{
+    font-size:13.5px; font-weight:700; color:var(--ink);
+  }
+  .notif-banner .subject{
+    font-size:12.5px; color:#666; margin-top:2px; line-height:1.35;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  .hint-tap{
+    position:absolute;
+    bottom:34px; left:0; right:0;
+    text-align:center;
+    color:rgba(255,255,255,0.55);
+    font-size:12px;
+    letter-spacing:.02em;
+  }
+
+  /* ---- Language switcher : lives on the lock screen, by the mail alert ---- */
+  .lang-switch{
+    position:absolute;
+    top:18px; right:16px;
+    z-index:30;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
+  }
+  .lang-globe{
+    width:40px; height:40px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.28);
+    background:rgba(255,255,255,0.12);
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+    color:#fff;
+    font-size:18px;
+    line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .lang-globe:hover{background:rgba(255,255,255,0.22);}
+  .lang-menu{
+    display:none;
+    flex-direction:column;
+    gap:3px;
+    background:#fff;
+    border-radius:12px;
+    padding:6px;
+    box-shadow:0 16px 40px rgba(0,0,0,0.4);
+    min-width:134px;
+  }
+  .lang-menu.open{display:flex;}
+  .lang-opt{
+    border:none;
+    background:transparent;
+    color:var(--ink);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+    text-align:left;
+    padding:9px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .lang-opt:hover{background:var(--panel);}
+  .lang-opt.active{background:var(--blue); color:#fff;}
+
+  /* ---- Email detail (opens full-screen like the Mail app) ---- */
+  #view-email{background:#fff; overflow-y:auto;}
+  .nav{
+    position:absolute; top:0; left:0; right:0;
+    height:48px;
+    display:flex;
+    align-items:center;
+    padding:0 14px;
+    border-bottom:1px solid var(--gray);
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(10px);
+    z-index:20;
+  }
+  .nav .back{font-size:14px; color:var(--sea); font-weight:600; cursor:pointer;}
+  .nav .title{flex:1; text-align:center; font-size:14.5px; font-weight:700; margin-right:34px;}
+
+  .email-head{
+    padding:64px 18px 14px;
+    border-bottom:1px solid var(--gray);
+  }
+  .email-head .subj{font-size:16px; font-weight:700; color:var(--ink); line-height:1.4;}
+  .email-head .meta{
+    display:flex; gap:10px; align-items:center;
+    margin-top:12px;
+  }
+  .email-head .avatar{
+    width:34px; height:34px; border-radius:50%;
+    background:linear-gradient(160deg,#4169E1,#2F4FC4);
+    color:#fff; font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .email-head .from-name{font-size:13px; font-weight:700; color:var(--ink);}
+  .email-head .from-addr{font-size:11px; color:#98A2B3;}
+
+  .email-body{
+    padding:18px;
+    font-size:14px;
+    line-height:1.85;
+    color:var(--ink);
+  }
+  .email-body p{margin-bottom:14px;}
+  .parcel-code{
+    display:inline-block;
+    background:var(--gray);
+    border-radius:6px;
+    padding:2px 8px;
+    font-weight:700;
+    color:var(--blue);
+    letter-spacing:.03em;
+  }
+  .sign{font-weight:700; margin-top:6px;}
+
+  .attachment-chip{
+    margin:6px 18px 90px;
+    display:inline-flex;
+    max-width:calc(100% - 36px);
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    background:var(--panel);
+    border:1px solid var(--gray);
+    border-radius:12px;
+    cursor:pointer;
+  }
+  .attachment-chip .ic{
+    width:34px; height:34px;
+    border-radius:8px;
+    background:var(--blue);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    flex-shrink:0;
+  }
+  .attachment-chip .name{font-size:12.5px; font-weight:700; color:var(--ink);}
+  .attachment-chip .size{font-size:11px; color:#98A2B3;}
+  .attachment-chip .go{margin-left:6px; color:var(--sea); font-weight:700; font-size:16px;}
+
+  /* ---- Character overlay : stays pinned bottom-left across views ---- */
+  .hojong{
+    position:absolute;
+    left:14px; right:14px; bottom:16px;
+    max-width:760px;
+    margin:0 auto;
+    z-index:35;
+    display:flex;
+    align-items:flex-end;
+    gap:12px;
+    opacity:0;
+    transform:translateY(20px);
+    pointer-events:none;
+    transition:opacity .5s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .hojong.show{opacity:1; transform:translateY(0); pointer-events:auto;}
+  .hojong .avatar{
+    width:66px; height:66px;
+    flex-shrink:0;
+    object-fit:contain;
+    /* 미요 red glow */
+    filter:drop-shadow(0 6px 14px rgba(230, 226, 226, 0.8));
+  }
+  .hojong .bubble{
+    flex:1;
+    background:var(--red);
+    color:#fff;
+    border-radius:16px 16px 16px 4px;
+    padding:14px 16px;
+    font-size:15px;
+    line-height:1.6;
+    box-shadow:0 8px 18px rgba(0,0,0,0.28);
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .hojong .bubble #hojongText{flex:1;}
+  .next-btn{
+    flex-shrink:0;
+    border:none;
+    background:#fff;
+    color:var(--blue);
+    font-family:inherit;
+    font-weight:700;
+    font-size:13px;
+    padding:9px 15px;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:0 0 0 0 rgba(255,255,255,0.6);
+    animation:nextPulse 1.4s ease-out infinite;
+  }
+  .next-btn:hover{background:#EEF1FF;}
+  @keyframes nextPulse{
+    0%{transform:scale(1); box-shadow:0 0 0 0 rgba(255,255,255,0.55);}
+    70%{transform:scale(1.06); box-shadow:0 0 0 12px rgba(255,255,255,0);}
+    100%{transform:scale(1); box-shadow:0 0 0 0 rgba(255,255,255,0);}
+  }
+  .hojong .bubble b{color:#fff; text-decoration:underline; text-underline-offset:2px;}
+
+  /* ---- Attachment view (light, like the Mail app) ---- */
+  #view-attach{
+    background:#fff;
+    padding:64px 18px 40px;
+    overflow-y:auto;
+  }
+  #view-attach .file-title{
+    color:var(--ink); font-size:14px; font-weight:700; text-align:center; margin-bottom:14px;
+  }
+  /* two cipher images : 1 = key table, 2 = the cipher */
+  .cipher-doc{margin-bottom:4px;}
+  .cipher-block{margin-bottom:14px;}
+  .cipher-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.06em;
+    color:var(--blue);
+    margin-bottom:6px;
+  }
+  .cipher-slot{
+    background:var(--panel);
+    border:1px solid var(--gray);
+    border-radius:10px;
+    padding:10px;
+    min-height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 6px 16px rgba(20,30,60,0.08);
+    color:var(--ink-soft);
+    font-size:12px;
+  }
+  .cipher-slot img{
+    display:block;
+    max-width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    border-radius:6px;
+  }
+  .cipher-note{
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+    line-height:1.55;
+    margin-top:8px;
+  }
+
+  #view-attach .back-btn{
+    display:block;
+    text-align:center;
+    margin-top:16px;
+    color:var(--sea);
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+  }
+
+  /* ===== Answer input : sits at the bottom of the attachment view ===== */
+  .answer-row{display:flex; gap:8px; margin-top:16px;}
+  .answer-row input{
+    flex:1;
+    border:1.5px solid var(--gray);
+    background:#fff;
+    border-radius:10px;
+    padding:12px 13px;
+    font-size:14px;
+    font-family:inherit;
+    outline:none;
+    color:var(--ink);
+  }
+  .answer-row input::placeholder{color:#9AA3B2;}
+  .answer-row input:focus{border-color:var(--blue);}
+  .answer-row button{
+    border:none;
+    background:var(--blue);
+    color:#fff;
+    font-weight:700;
+    font-size:13.5px;
+    padding:0 18px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  .answer-row button:hover{background:var(--blue-deep);}
+  .feedback{
+    margin-top:10px;
+    font-size:12.5px;
+    font-weight:600;
+    min-height:16px;
+    color:var(--ink-soft);
+  }
+  .feedback.wrong{color:var(--red);}
+  .feedback.right{color:var(--blue);}
+
+  /* ===== Result / purchase block ===== */
+  .result-block{
+    width:100%;
+    margin-top:18px;
+    display:none;
+  }
+  .result-block.show{display:block; animation:fadeUp .5s ease;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);}}
+
+  .ticket{
+    background:linear-gradient(160deg,#22317A,#16225A);
+    color:#EEF1F8;
+    border-radius:16px;
+    padding:22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .ticket .caseclose{font-size:11px; color:#C3CEFF; font-weight:700; letter-spacing:.04em;}
+  .ticket h3{font-weight:800; font-size:18px; margin-top:6px; line-height:1.4;}
+  .ticket p{font-size:12.5px; color:#C2CAE0; margin-top:8px; line-height:1.6;}
+  .ticket .price-row{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:22px;
+  }
+  .ticket .price{font-size:20px; font-weight:900;}
+  .ticket .price small{font-size:12px; font-weight:500; color:#C2CAE0;}
+  .ticket a.buy{
+    display:inline-block;
+    margin-top:14px;
+    width:100%;
+    text-align:center;
+    background:#fff;
+    color:var(--blue);
+    font-weight:700;
+    font-size:14px;
+    padding:13px 0;
+    border-radius:10px;
+    text-decoration:none;
+  }
+  .ticket a.buy:hover{background:#EEF1FF;}
+
+  .credit-block{
+    margin-top:16px;
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+  .credit-block .lead{margin-bottom:14px;}
+  .credit-group{margin-top:14px;}
+  .credit-group > b{
+    display:block;
+    color:var(--ink);
+    font-size:11px;
+    letter-spacing:.04em;
+    margin-bottom:7px;
+  }
+  .credit-group .logos{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .credit-group .logos img{
+    height:46px;
+    width:auto;
+    max-width:150px;
+    object-fit:contain;
+    background:#fff;
+    border:1px solid var(--gray);
+    border-radius:8px;
+    padding:9px 14px;
+  }
+
+  /* Constrain the reading content on wide screens so lines aren't too long */
+  .email-head, .email-body{
+    max-width:640px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  #view-attach .answer-row,
+  #view-attach .feedback,
+  #view-attach .result-block,
+  #view-attach .file-title{
+    max-width:560px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  /* keep the cipher box noticeably narrower than the rest */
+  #view-attach .cipher-doc{
+    max-width:640px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage">
+
+    <!-- INTRO : plays first, loops the 2-frame scene, then fades to the lock screen -->
+    <div id="intro">
+      <div class="frames">
+        <img id="if1" class="if" src="intro-1.png" alt="" />
+        <img id="if2" class="if" src="intro-2.png" alt="" />
+        <img id="if3" class="if" src="intro-3.png" alt="" />
+        <img id="if4" class="if" src="intro-4.png" alt="" />
+      </div>
+      <div class="skip" data-i18n="skip">화면을 탭하면 바로 시작합니다</div>
+    </div>
+
+    <!-- LOCK / IDLE SCREEN : notification lands here -->
+    <div class="view active" id="view-lock">
+      <div class="notif-backdrop" id="notifBackdrop"></div>
+
+      <div class="lang-switch" id="langSwitch">
+        <button class="lang-globe" id="langGlobe" onclick="toggleLangMenu(event)" aria-label="Language">🌐</button>
+        <div class="lang-menu" id="langMenu">
+          <button class="lang-opt" data-lang="ko">한국어</button>
+          <button class="lang-opt" data-lang="en">English</button>
+          <button class="lang-opt" data-lang="ja">日本語</button>
+          <button class="lang-opt" data-lang="zh-Hans">简体中文</button>
+          <button class="lang-opt" data-lang="zh-Hant">繁體中文</button>
+        </div>
+      </div>
+
+      <div class="notif-banner" id="notifBanner" onclick="openEmail()">
+        <div class="ic">✉️</div>
+        <div class="body">
+          <div class="sender" data-i18n="sender">명란브랜드연구소</div>
+          <div class="subject" data-i18n="subject">잃어버린 소포를 찾습니다</div>
+        </div>
+      </div>
+
+      <div class="hint-tap" id="lockHint" data-i18n="lockHint">✉️ 알림을 눌러 메일을 확인해보세요</div>
+    </div>
+
+    <!-- EMAIL DETAIL -->
+    <div class="view" id="view-email">
+      <div class="nav">
+        <span class="back" onclick="backToLock()" data-i18n="navBack">‹ 뒤로</span>
+        <span class="title" data-i18n="navMail">메일</span>
+      </div>
+      <div class="email-head">
+        <div class="subj" data-i18n="subject">잃어버린 소포를 찾습니다</div>
+        <div class="meta">
+          <div class="avatar" data-i18n="avatarInitial">명</div>
+          <div>
+            <div class="from-name" data-i18n="sender">명란브랜드연구소</div>
+            <div class="from-addr" data-i18n="fromAddr">from. 김초량 소장</div>
+          </div>
+        </div>
+      </div>
+      <div class="email-body">
+        <p data-i18n-html="body1">안녕하세요, 탐정님.<br>저는 명란브랜드연구소 소장, 김초량입니다.</p>
+        <p data-i18n-html="body2">저희 연구소 리모델링 공사 중에 인부들이 낡은 소포 하나를 발견했습니다.<br>그냥 버리자고 하니 사연이 깊은 물건인 듯 해<br>주인을 찾아주고 싶었습니다.<br>하지만, 아직도 주인이 누구인지 이 소포는 무엇인지 정체를 알 수가 없습니다.</p>
+        <p data-i18n-html="body3">탐정님의 명석한 두뇌로 소포의 비밀을 파헤쳐 주세요.<br>탐정님의 회색 뇌세포를 깨우실 수 있게 비밀의 장소에 숨겨뒀습니다.<br>암호를 풀어 소포가 맡겨진 장소로 가서<br>소포를 찾고 그 정체를 밝혀주세요.</p>
+        <p class="sign" data-i18n="sign">— 김초량 드림</p>
+      </div>
+      <div class="attachment-chip" onclick="openAttach()">
+        <div class="ic">📎</div>
+        <div style="flex:1;">
+          <div class="name" data-i18n="fileName">붙임_소포보관코드.txt</div>
+          <div class="size">4KB</div>
+        </div>
+        <div class="go">›</div>
+      </div>
+    </div>
+
+    <!-- ATTACHMENT -->
+    <div class="view" id="view-attach">
+      <div class="nav">
+        <span class="back" onclick="backToEmail()" data-i18n="navMailbox">‹ 메일함</span>
+        <span class="title" data-i18n="navAttach">첨부파일</span>
+      </div>
+      <div class="file-title" data-i18n="fileName">붙임_소포보관코드.txt</div>
+      <div class="cipher-doc">
+        <div class="cipher-block">
+          <div class="cipher-label" data-i18n="cipherKey">암호표</div>
+          <div class="cipher-slot"><img src="CODE-01.png" alt="암호표" /></div>
+        </div>
+        <div class="cipher-block">
+          <div class="cipher-label" data-i18n="cipherMsg">암호</div>
+          <div class="cipher-slot"><img src="CODE-02.png" alt="암호" /></div>
+        </div>
+        <p class="cipher-note" data-i18n="cipherNote">암호표로 암호를 풀어 소포가 맡겨진 장소를 알아내세요.</p>
+      </div>
+
+      <div class="answer-row">
+        <input type="text" id="answerInput" placeholder="정답 입력" data-i18n-ph="answerPlaceholder" />
+        <button onclick="checkAnswer()" data-i18n="confirm">확인</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+
+      <div class="result-block" id="resultBlock">
+        <div class="ticket">
+          <div class="caseclose">CASE SOLVED</div>
+          <h3 data-i18n="ticketTitle">정답입니다, 탐정님.</h3>
+          <p data-i18n="ticketP1">이제 부산역 곳곳에 숨겨진 단서를 직접 찾아</p>
+          <p data-i18n="ticketP2">잃어버린 소포의 정체를 찾아주세요!</p>
+          <div class="price-row">
+            <div class="price">5,000<small data-i18n="won"> 원</small></div>
+          </div>
+          <a class="buy" href="#" target="_blank" rel="noopener" data-i18n="buyBtn">「잃어버린 소포」 방탈출 구매하기</a>
+        </div>
+        <div class="credit-block">
+          <div class="lead" data-i18n="creditLead">이 프로그램은 한국관광공사 부산울산경남지사와 부산 동구청이 함께합니다.</div>
+          <div class="credit-group">
+            <b data-i18n="creditHost">주최 · 주관</b>
+            <div class="logos">
+              <img src="kto.png" alt="한국관광공사" />
+              <img src="donggu.png" alt="부산 동구청" />
+            </div>
+          </div>
+          <div class="credit-group">
+            <b data-i18n="creditSponsor">후원</b>
+            <div class="logos">
+              <img src="zimcarry.svg" alt="짐캐리" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="back-btn" onclick="backToEmail()" data-i18n="backToMail">‹ 메일로 돌아가기</div>
+    </div>
+
+    <div class="hojong" id="hojong">
+      <img class="avatar" src="miyo.png" alt="미요" />
+      <div class="bubble">
+        <span id="hojongText" data-i18n-html="miyo1">안녕하세요!<br>명란 삼남매의 귀염둥이 <b>미요</b>예요!<br>탐정님을 위한 몸풀기 문제가 있네요?</span>
+        <button class="next-btn" id="hojongNext" onclick="hojongNext()" data-i18n="nextBtn">다음 ›</button>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  const views = {
+    lock: document.getElementById('view-lock'),
+    email: document.getElementById('view-email'),
+    attach: document.getElementById('view-attach'),
+  };
+  function show(name){
+    Object.values(views).forEach(v=>v.classList.remove('active'));
+    views[name].classList.add('active');
+  }
+
+  /* ==================== i18n ==================== */
+  const I18N = {
+    ko: {
+      title:'부산역 미제소포 사건 - 체험 데모',
+      skip:'화면을 탭하면 바로 시작합니다',
+      sender:'명란브랜드연구소',
+      avatarInitial:'명',
+      subject:'잃어버린 소포를 찾습니다',
+      lockHint:'✉️ 알림을 눌러 메일을 확인해보세요',
+      navBack:'‹ 뒤로',
+      navMail:'메일',
+      fromAddr:'from. 김초량 소장',
+      body1:'안녕하세요, 탐정님.<br>저는 명란브랜드연구소 소장, 김초량입니다.',
+      body2:'저희 연구소 리모델링 공사 중에 인부들이 낡은 소포 하나를 발견했습니다.<br>그냥 버리자고 하니 사연이 깊은 물건인 듯 해<br>주인을 찾아주고 싶었습니다.<br>하지만, 아직도 주인이 누구인지 이 소포는 무엇인지 정체를 알 수가 없습니다.',
+      body3:'탐정님의 명석한 두뇌로 소포의 비밀을 파헤쳐 주세요.<br>탐정님의 회색 뇌세포를 깨우실 수 있게 비밀의 장소에 숨겨뒀습니다.<br>암호를 풀어 소포가 맡겨진 장소로 가서<br>소포를 찾고 그 정체를 밝혀주세요.',
+      sign:'— 김초량 드림',
+      fileName:'붙임_소포보관코드.txt',
+      navMailbox:'‹ 메일함',
+      navAttach:'첨부파일',
+      cipherKey:'암호표',
+      cipherMsg:'암호',
+      cipherNote:'암호표로 암호를 풀어 소포가 맡겨진 장소를 알아내세요.',
+      answerPlaceholder:'정답 입력',
+      confirm:'확인',
+      wrongMsg:'음, 다시 한 번 코드를 확인해볼까요?',
+      ticketTitle:'정답입니다, 탐정님.',
+      ticketP1:'이제 부산역 곳곳에 숨겨진 단서를 직접 찾아',
+      ticketP2:'잃어버린 소포의 정체를 찾아주세요!',
+      won:' 원',
+      buyBtn:'「잃어버린 소포」 방탈출 구매하기',
+      creditLead:'이 프로그램은 한국관광공사 부산울산경남지사와 부산 동구청이 함께합니다.',
+      creditHost:'주최 · 주관',
+      creditSponsor:'후원',
+      backToMail:'‹ 메일로 돌아가기',
+      miyo1:'안녕하세요!<br>명란 삼남매의 귀염둥이 <b>미요</b>예요!<br>탐정님을 위한 몸풀기 문제가 있네요?',
+      miyo2:'첨부된 붙임 파일을 확인해봐요!',
+      nextBtn:'다음 ›'
+    },
+    en: {
+      title:'Busan Station: The Cold Parcel Case — Demo',
+      skip:'Tap the screen to start',
+      sender:'Myeongnan Brand Laboratory',
+      avatarInitial:'M',
+      subject:'Looking for a lost parcel',
+      lockHint:'✉️ Tap the notification to open the mail',
+      navBack:'‹ Back',
+      navMail:'Mail',
+      fromAddr:'from. Director Kim Cho-ryang',
+      body1:'Hello, Detective.<br>I am Kim Cho-ryang, director of Myeongnan Brand Laboratory.',
+      body2:'During renovation work at our lab, the workers found an old parcel.<br>It seemed too meaningful to simply throw away,<br>so I wanted to find its owner.<br>But I still have no idea who owns it, or what this parcel even is.',
+      body3:'Please use your brilliant mind to uncover the secret of this parcel.<br>To put your little grey cells to work, I have hidden it in a secret place.<br>Solve the cipher, go to where the parcel is kept,<br>find it, and reveal what it truly is.',
+      sign:'— Kim Cho-ryang',
+      fileName:'parcel_storage_code.txt',
+      navMailbox:'‹ Mailbox',
+      navAttach:'Attachment',
+      cipherKey:'Cipher key',
+      cipherMsg:'Cipher',
+      cipherNote:'Use the key to crack the cipher and find where the parcel is kept.',
+      answerPlaceholder:'Enter your answer',
+      confirm:'OK',
+      wrongMsg:'Hmm, want to check the code once more?',
+      ticketTitle:'Correct, Detective.',
+      ticketP1:'Now go find the clues hidden around Busan Station',
+      ticketP2:'and reveal the identity of the lost parcel!',
+      won:' KRW',
+      buyBtn:'Buy the “Lost Parcel” escape game',
+      creditLead:'This program is presented together by the Korea Tourism Organization Busan·Ulsan·Gyeongnam Office and Busan Dong-gu Office.',
+      creditHost:'HOST · ORGANIZER',
+      creditSponsor:'SPONSOR',
+      backToMail:'‹ Back to mail',
+      miyo1:'Hello!<br>I\'m <b>Miyo</b>, the little darling of The Myeongnan Siblings!<br>There\'s a warm-up puzzle for you, Detective.',
+      miyo2:'Let\'s check the attached file!',
+      nextBtn:'Next ›'
+    },
+    ja: {
+      title:'釜山駅 未解決小包事件 — 体験デモ',
+      skip:'画面をタップしてスタート',
+      sender:'明卵ブランド研究所',
+      avatarInitial:'明',
+      subject:'なくした小包を探しています',
+      lockHint:'✉️ 通知をタップしてメールを確認しましょう',
+      navBack:'‹ 戻る',
+      navMail:'メール',
+      fromAddr:'from. 金草梁 所長',
+      body1:'こんにちは、探偵さん。<br>明卵ブランド研究所の所長、金草梁と申します。',
+      body2:'当研究所のリフォーム工事中に、作業員が古い小包を一つ見つけました。<br>そのまま捨てるには事情の深い品のようで、<br>持ち主を探してあげたいと思いました。<br>ですが、いまだに持ち主が誰なのか、この小包が何なのか、正体が分かりません。',
+      body3:'探偵さんの明晰な頭脳で、小包の秘密を解き明かしてください。<br>探偵さんの灰色の脳細胞を働かせられるよう、秘密の場所に隠しておきました。<br>暗号を解いて小包が預けられた場所へ行き、<br>小包を見つけてその正体を明らかにしてください。',
+      sign:'— 金草梁',
+      fileName:'小包保管コード.txt',
+      navMailbox:'‹ メールボックス',
+      navAttach:'添付ファイル',
+      cipherKey:'暗号表',
+      cipherMsg:'暗号',
+      cipherNote:'暗号表で暗号を解き、小包が預けられた場所を突き止めてください。',
+      answerPlaceholder:'答えを入力',
+      confirm:'確認',
+      wrongMsg:'うーん、もう一度コードを確認してみる？',
+      ticketTitle:'正解です、探偵さん。',
+      ticketP1:'さあ、釜山駅のあちこちに隠された手がかりを自分で探し出し',
+      ticketP2:'なくした小包の正体を突き止めてください！',
+      won:' ウォン',
+      buyBtn:'「なくした小包」脱出ゲームを購入する',
+      creditLead:'このプログラムは韓国観光公社 釜山蔚山慶南支社と釜山東区庁が共催しています。',
+      creditHost:'主催・主管',
+      creditSponsor:'後援',
+      backToMail:'‹ メールに戻る',
+      miyo1:'こんにちは！<br>明卵三兄妹の愛されん坊、<b>ミヨ</b>だよ！<br>探偵さんへのウォームアップ問題があるみたい？',
+      miyo2:'添付ファイルを確認してみよう！',
+      nextBtn:'次へ ›'
+    },
+    'zh-Hans': {
+      title:'釜山站 悬案包裹事件 — 体验演示',
+      skip:'点击屏幕即可开始',
+      sender:'明卵品牌研究所',
+      avatarInitial:'明',
+      subject:'寻找一件遗失的包裹',
+      lockHint:'✉️ 点击通知查看邮件',
+      navBack:'‹ 返回',
+      navMail:'邮件',
+      fromAddr:'from. 金草梁 所长',
+      body1:'您好，侦探。<br>我是明卵品牌研究所所长金草梁。',
+      body2:'我们研究所在装修施工时，工人发现了一个旧包裹。<br>直接扔掉又觉得它似乎大有来头，<br>所以我想帮它找到主人。<br>但直到现在，我仍不知道主人是谁，也不知道这个包裹究竟是什么。',
+      body3:'请用您聪慧的头脑揭开这个包裹的秘密。<br>为了让您的灰色脑细胞好好运转，我把它藏在了一个秘密的地方。<br>解开密码，前往包裹寄存的地点，<br>找到它，揭开它真正的身份。',
+      sign:'— 金草梁',
+      fileName:'包裹寄存密码.txt',
+      navMailbox:'‹ 邮箱',
+      navAttach:'附件',
+      cipherKey:'密码表',
+      cipherMsg:'密码',
+      cipherNote:'用密码表破解密码，找出包裹寄存的地点。',
+      answerPlaceholder:'输入答案',
+      confirm:'确认',
+      wrongMsg:'嗯，要不要再核对一次密码？',
+      ticketTitle:'回答正确，侦探。',
+      ticketP1:'现在就去亲自寻找藏在釜山站各处的线索',
+      ticketP2:'揭开这件遗失包裹的真实身份吧！',
+      won:' 韩元',
+      buyBtn:'购买《遗失的包裹》密室逃脱',
+      creditLead:'本项目由韩国观光公社釜山蔚山庆南支社与釜山东区厅共同举办。',
+      creditHost:'主办 · 承办',
+      creditSponsor:'赞助',
+      backToMail:'‹ 返回邮件',
+      miyo1:'你好！<br>我是明卵三兄妹里的小可爱<b>咪哟</b>！<br>有一道给侦探的热身谜题哦？',
+      miyo2:'一起来看看附件吧！',
+      nextBtn:'下一步 ›'
+    },
+    'zh-Hant': {
+      title:'釜山站 懸案包裹事件 — 體驗展示',
+      skip:'點擊螢幕即可開始',
+      sender:'明卵品牌研究所',
+      avatarInitial:'明',
+      subject:'尋找一件遺失的包裹',
+      lockHint:'✉️ 點擊通知查看郵件',
+      navBack:'‹ 返回',
+      navMail:'郵件',
+      fromAddr:'from. 金草梁 所長',
+      body1:'您好，偵探。<br>我是明卵品牌研究所所長金草梁。',
+      body2:'我們研究所在裝修施工時，工人發現了一個舊包裹。<br>直接丟掉又覺得它似乎大有來頭，<br>所以我想幫它找到主人。<br>但直到現在，我仍不知道主人是誰，也不知道這個包裹究竟是什麼。',
+      body3:'請用您聰慧的頭腦揭開這個包裹的祕密。<br>為了讓您的灰色腦細胞好好運轉，我把它藏在了一個祕密的地方。<br>解開密碼，前往包裹寄放的地點，<br>找到它，揭開它真正的身分。',
+      sign:'— 金草梁',
+      fileName:'包裹寄放密碼.txt',
+      navMailbox:'‹ 信箱',
+      navAttach:'附件',
+      cipherKey:'密碼表',
+      cipherMsg:'密碼',
+      cipherNote:'用密碼表破解密碼，找出包裹寄放的地點。',
+      answerPlaceholder:'輸入答案',
+      confirm:'確認',
+      wrongMsg:'嗯，要不要再核對一次密碼？',
+      ticketTitle:'回答正確，偵探。',
+      ticketP1:'現在就去親自尋找藏在釜山站各處的線索',
+      ticketP2:'揭開這件遺失包裹的真實身分吧！',
+      won:' 韓元',
+      buyBtn:'購買《遺失的包裹》密室逃脫',
+      creditLead:'本專案由韓國觀光公社釜山蔚山慶南支社與釜山東區廳共同舉辦。',
+      creditHost:'主辦 · 承辦',
+      creditSponsor:'贊助',
+      backToMail:'‹ 返回郵件',
+      miyo1:'你好！<br>我是明卵三兄妹裡的小可愛<b>咪喲</b>！<br>有一道給偵探的暖身謎題喔？',
+      miyo2:'一起來看看附件吧！',
+      nextBtn:'下一步 ›'
+    }
+  };
+
+  let curLang = 'ko';
+  function t(key){
+    return (I18N[curLang] && I18N[curLang][key] != null) ? I18N[curLang][key] : (I18N.ko[key] || '');
+  }
+  function applyLang(lang){
+    if(!I18N[lang]) lang = 'ko';
+    curLang = lang;
+    document.documentElement.lang = lang;
+    document.title = t('title');
+    document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = t(el.dataset.i18nHtml); });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.setAttribute('placeholder', t(el.dataset.i18nPh)); });
+    hojongLines[0] = t('miyo1');
+    hojongLines[1] = t('miyo2');
+    const ht = document.getElementById('hojongText');
+    if(ht) ht.innerHTML = hojongLines[Math.min(hojongStep, hojongLines.length - 1)];
+    document.querySelectorAll('.lang-opt').forEach(o=>o.classList.toggle('active', o.dataset.lang === lang));
+    try{ localStorage.setItem('demoLang', lang); }catch(e){}
+  }
+  function toggleLangMenu(e){
+    if(e) e.stopPropagation();
+    document.getElementById('langMenu').classList.toggle('open');
+  }
+  document.querySelectorAll('.lang-opt').forEach(o=>{
+    o.addEventListener('click', ()=>{
+      applyLang(o.dataset.lang);
+      document.getElementById('langMenu').classList.remove('open');
+    });
+  });
+  document.addEventListener('click', (e)=>{
+    const sw = document.getElementById('langSwitch');
+    if(sw && !sw.contains(e.target)) document.getElementById('langMenu').classList.remove('open');
+  });
+
+  const hojongLines = [
+    '안녕하세요!<br>명란 삼남매의 귀염둥이 <b>미요</b>예요!<br>탐정님을 위한 몸풀기 문제가 있네요?',
+    '첨부된 붙임 파일을 확인해봐요!'
+  ];
+  let hojongStep = 0;
+  function hojongNext(){
+    hojongStep = Math.min(hojongStep + 1, hojongLines.length - 1);
+    document.getElementById('hojongText').innerHTML = hojongLines[hojongStep];
+    if(hojongStep >= hojongLines.length - 1){
+      document.getElementById('hojongNext').style.display = 'none';
+    }
+  }
+  function resetHojong(){
+    hojongStep = 0;
+    document.getElementById('hojongText').innerHTML = hojongLines[0];
+    document.getElementById('hojongNext').style.display = '';
+  }
+
+  function openEmail(){
+    show('email');
+    resetHojong();
+    setTimeout(()=>{ document.getElementById('hojong').classList.add('show'); }, 3000);
+  }
+  function backToLock(){
+    show('lock');
+    document.getElementById('hojong').classList.remove('show');
+  }
+  function openAttach(){ show('attach'); }
+  function backToEmail(){ show('email'); }
+
+  // ---- Intro sequence ----
+  //  Scene 1  : intro-1 <-> intro-2, 2-frame loop  (SCENE1_LOOPS x SCENE1_CYCLE_MS)
+  //  Scene 2  : intro-3 slowly pushes in on the parcel ...
+  //  Scene 3  : ... then cross-fades into the intro-4 close-up
+  //  then     : intro fades out and the lock-screen alert pops up
+  //  NOTE: keep SCENE1_LOOPS / SCENE1_CYCLE_MS in sync with the CSS
+  //        "#intro #if2.play" animation (iteration count / duration).
+  const SCENE1_LOOPS    = 5;      // number of intro-1/intro-2 cycles
+  const SCENE1_CYCLE_MS = 1300;   // one cycle (matches CSS frameFlip duration)
+  const SCENE1_MS       = SCENE1_CYCLE_MS * SCENE1_LOOPS;
+  const SCENE3_PUSH_MS  = 2200;   // how long intro-3 pushes in before intro-4
+  const SCENE4_HOLD_MS  = 2200;   // how long the intro-4 close-up holds
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  let introDone = false;
+  const introTimers = [];
+  const later = (fn, ms) => introTimers.push(setTimeout(fn, ms));
+
+  function endIntro(){
+    if(introDone) return;
+    introDone = true;
+    introTimers.forEach(clearTimeout);
+    const intro = document.getElementById('intro');
+    intro.classList.add('gone');
+    setTimeout(()=>{ intro.style.display = 'none'; }, 600);
+    // alert pops up shortly after the intro clears, like a real push notification
+    setTimeout(()=>{
+      document.getElementById('notifBackdrop').classList.add('show');
+      document.getElementById('notifBanner').classList.add('show');
+      document.getElementById('lockHint').style.opacity = '0';
+    }, 800);
+  }
+
+  function runIntro(){
+    const if1 = document.getElementById('if1');
+    const if3 = document.getElementById('if3');
+    const if4 = document.getElementById('if4');
+
+    if(reduceMotion){
+      if4.classList.add('on');
+      later(endIntro, 2200);
+      return;
+    }
+
+    if1.classList.add('on');                       // scene 1 base frame
+    document.getElementById('if2').classList.add('play');   // start the 2-frame flip
+
+    later(()=>{                                     // scene 2 : bring in intro-3, start push-in
+      if3.classList.add('on');
+      if1.classList.remove('on');
+      requestAnimationFrame(()=> if3.classList.add('zoom'));
+    }, SCENE1_MS);
+
+    later(()=>{                                     // scene 3 : cross-fade to intro-4, keep moving in
+      if4.classList.add('on');
+      if3.classList.remove('on');
+      requestAnimationFrame(()=> if4.classList.add('zoom'));
+    }, SCENE1_MS + SCENE3_PUSH_MS);
+
+    later(endIntro, SCENE1_MS + SCENE3_PUSH_MS + SCENE4_HOLD_MS);
+  }
+
+  document.getElementById('intro').addEventListener('click', endIntro);
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', runIntro);
+  } else {
+    runIntro();
+  }
+
+  function normalize(s){
+    return s.replace(/\s+/g,'').toUpperCase();
+  }
+
+  function checkAnswer(){
+    const val = normalize(document.getElementById('answerInput').value);
+    const feedback = document.getElementById('feedback');
+    const accepted = ['ZIMCARRY', 'ZIM CARRY'];
+    if(accepted.includes(val)){
+      feedback.textContent = '';
+      feedback.className = 'feedback';
+      document.getElementById('resultBlock').classList.add('show');
+      document.getElementById('resultBlock').scrollIntoView({behavior:'smooth', block:'center'});
+    } else if(val.length === 0){
+      feedback.textContent = '';
+    } else {
+      feedback.textContent = t('wrongMsg');
+      feedback.className = 'feedback wrong';
+    }
+  }
+
+  document.getElementById('answerInput').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') checkAnswer();
+  });
+
+  // ---- init language (saved choice, else Korean) ----
+  let _savedLang = 'ko';
+  try{ _savedLang = localStorage.getItem('demoLang') || 'ko'; }catch(e){}
+  applyLang(_savedLang);
+</script>
+
+</body>
+</html>
