@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>잃어버린 소포 — 미션투어</title>
+<link rel="icon" href="assets/icons/busan_station.png">
+<style>
+@font-face {
+    font-family: 'DosMyungjo';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSMyungjo.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+@font-face{
+  font-family:'ZLabsRoundPix_12px_M_CN';
+  src:url('ZLabsRoundPix_12px_M_CN.ttf.woff2') format('woff2');
+  font-weight:normal;
+  font-display:swap;
+}
+
+:root{
+  --blue:#4169E1; --blue-deep:#28398f; --red:#E1332E; --red-deep:#9e211d; --gray:#E0E0E0;
+  --ink:#141414; --ink-soft:#5B6B82;
+  --wood:#6b4f3a; --wood-dark:#4a3323; --wood-deep:#241a14;
+  --parchment:#f2ead9; --parchment-deep:#e8ddc8;
+  --gold:#e8b25c; --gold-deep:#a87526; --sepia:#8c2f1f;
+  --navy:#33445f; --navy-deep:#161e2b;
+  --coral:#e0637a; --coral-deep:#8f2f42;
+  --teal:#2f8f83; --teal-deep:#154842;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'DosMyungjo','Courier New',monospace;
+  background:#0c1219;
+  color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  overscroll-behavior:none;
+}
+.zh{font-family:'ZLabsRoundPix_12px_M_CN','DosMyungjo',monospace;}
+button{cursor:pointer}
+
+/* ---------------- 레트로 버튼 시스템 ---------------- */
+.rbtn{
+  font-family:'DosMyungjo';border:3px solid var(--wood-deep);
+  position:relative;transition:transform .07s ease,box-shadow .07s ease;
+  outline:none;
+}
+.rbtn:active{transform:translate(3px,3px)}
+.rbtn:disabled{opacity:.55;box-shadow:none!important;transform:none!important;cursor:default}
+
+.rbtn--primary{background:var(--red);color:#fff;box-shadow:3px 3px 0 var(--red-deep)}
+.rbtn--primary:active{box-shadow:0 0 0 var(--red-deep)}
+.rbtn--secondary{background:var(--blue);color:#fff;box-shadow:3px 3px 0 var(--blue-deep)}
+.rbtn--secondary:active{box-shadow:0 0 0 var(--blue-deep)}
+.rbtn--wood{background:var(--wood);color:#fff4e6;box-shadow:3px 3px 0 var(--wood-deep)}
+.rbtn--wood:active{box-shadow:0 0 0 var(--wood-deep)}
+.rbtn--ghost{background:transparent;color:#f2ead9;border-color:rgba(255,255,255,.4);box-shadow:3px 3px 0 rgba(255,255,255,.18)}
+.rbtn--ghost:active{box-shadow:0 0 0 rgba(255,255,255,.18)}
+.rbtn--choice{background:#f5f6f8;color:var(--ink);border-color:var(--gray);box-shadow:3px 3px 0 #b9bcc2}
+.rbtn--choice:active{box-shadow:0 0 0 #b9bcc2}
+
+/* ---------------- 회전 안내 ---------------- */
+#rotate-prompt{
+  display:none;position:fixed;inset:0;z-index:999;background:#0c1219;color:#f2ead9;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:30px;
+}
+#rotate-prompt .icon{font-size:44px;animation:rotateHint 1.6s ease-in-out infinite}
+#rotate-prompt p{font-size:14px;line-height:1.7;color:#dfe6f5}
+@keyframes rotateHint{0%,100%{transform:rotate(0deg)}50%{transform:rotate(90deg)}}
+@media (orientation:portrait){
+  #rotate-prompt{display:flex}
+  #app{display:none}
+}
+
+#app{width:100vw;height:100dvh;display:flex;align-items:center;justify-content:center}
+#stage{
+  position:relative;width:100vw;height:100dvh;overflow:hidden;background:var(--parchment);
+}
+@media (min-width:860px) and (min-height:520px){
+  #stage{width:min(100vw,860px);height:min(100dvh,480px);box-shadow:0 0 0 1px var(--gray),0 24px 70px rgba(0,0,0,.5);}
+}
+
+.screen{position:absolute;inset:0;display:none;opacity:0;transition:opacity .3s ease}
+.screen.on{display:flex;opacity:1}
+
+/* ---------------- 타이틀 화면 ---------------- */
+#title{
+  background:url('intro-4.png') center/cover no-repeat;
+  align-items:center;justify-content:center;text-align:center;
+}
+#title::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,7,5,.3),rgba(10,7,5,.55));}
+#title-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:20px}
+#title-logo{width:min(58vw,300px);height:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.6));animation:titlePulse 2.6s ease-in-out infinite;}
+@keyframes titlePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+#play-btn{width:min(15vw,75px);height:auto;border:none;background:none;padding:0;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));transition:transform .15s}
+#play-btn:active{transform:scale(.94)}
+
+/* ---------------- 등록증 화면 ---------------- */
+#register{
+  background:radial-gradient(circle at 30% 20%,rgba(65,105,225,.15),transparent 55%),linear-gradient(180deg,#1c2740,#0c1219);
+  align-items:center;justify-content:center;padding:18px;overflow:auto;
+}
+#card{
+  width:min(94%,620px);max-height:100%;overflow:auto;
+  background:linear-gradient(180deg,#eef1f7,#d9e0ec);
+  border:3px solid var(--navy);border-radius:14px;box-shadow:0 0 0 3px var(--navy-deep),0 16px 34px rgba(0,0,0,.5);
+  padding:16px 20px;color:#2b2018;
+}
+#card h2{text-align:center;font-size:19px;color:var(--navy);letter-spacing:.08em;margin-bottom:2px}
+#card .badge-stamp{width:48px;height:48px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center}
+#card .badge-stamp img{width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 3px 8px rgba(0,0,0,.3))}
+#fields{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 10px}
+.field{flex:1 1 150px;min-width:130px;display:flex;flex-direction:column;gap:4px}
+.field span{font-size:11px;color:var(--navy)}
+.field input{
+  border:1.5px solid var(--gray);border-radius:8px;padding:8px 10px;font-family:'DosMyungjo';
+  font-size:13px;background:#fff;color:var(--ink);
+}
+.field input:focus{outline:none;border-color:var(--blue)}
+#consent-box{background:#fff8ea;border:1.5px dashed var(--gold);border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.7;color:#5c4a30;margin-bottom:8px}
+#consent-box .ttl{font-size:12px;font-weight:700;color:var(--sepia);margin-bottom:3px}
+.chk{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:12px;color:var(--navy);cursor:pointer}
+.chk input{width:15px;height:15px}
+#tip{font-size:11px;color:var(--sepia);margin-bottom:10px}
+#register-btn{width:100%;border-radius:10px;font-size:15px;letter-spacing:.04em;padding:11px}
+#register-btn:disabled{background:#b8a99a;border-color:#8a7d6a}
+
+/* ---------------- 게임 화면 (장면 전체화면) ---------------- */
+#game{padding:8px}
+#scene-wrap{position:relative;flex:1;border-radius:14px;overflow:hidden;border:1.5px solid var(--gray);background:#333}
+#scene{position:absolute;inset:0;background-size:cover;background-position:center;transition:background-image .25s}
+.bg-lab{background:linear-gradient(180deg,#eef1f7 0%,#dfe6f3 55%,#cdd8ea 100%)}
+.bg-lab-evening{background:linear-gradient(180deg,#f3e6d2 0%,#e7cfae 55%,#d3b48c 100%)}
+.bg-gallery{background:linear-gradient(180deg,#f1e6d2 0%,#e3d2b3 60%,#cbb384 100%)}
+.bg-wall{background:linear-gradient(180deg,#e7d9c2 0%,#cdb98f 55%,#a98f66 100%)}
+.bg-steps{background:linear-gradient(180deg,#bcdcf0 0%,#eef6ea 45%,#d9d2b8 100%)}
+.bg-hall{background:radial-gradient(ellipse at 50% 20%,rgba(232,178,92,.35),transparent 60%),linear-gradient(180deg,#2c2620 0%,#1b1613 100%)}
+.scene-deco{position:absolute;inset:0;pointer-events:none;opacity:.5}
+.deco-frames{background-image:
+  linear-gradient(0deg,transparent 72%,rgba(0,0,0,.05) 72%),
+  repeating-linear-gradient(90deg,rgba(74,51,35,.18) 0 46px,transparent 46px 130px);
+  background-position:0 18%;background-size:100% 30%,100% 100%;background-repeat:no-repeat,repeat-x}
+.deco-bricks{background-image:repeating-linear-gradient(0deg,rgba(74,51,35,.15) 0 2px,transparent 2px 26px),
+  repeating-linear-gradient(90deg,rgba(74,51,35,.12) 0 2px,transparent 2px 58px)}
+.deco-stairs{background-image:repeating-linear-gradient(115deg,rgba(90,90,70,.16) 0 10px,transparent 10px 34px);background-position:0 55%;background-size:100% 45%;background-repeat:no-repeat}
+.deco-hall{background-image:radial-gradient(circle at 30% 75%,rgba(0,0,0,.35),transparent 45%),radial-gradient(circle at 75% 80%,rgba(0,0,0,.3),transparent 40%)}
+
+#npc-shadow{position:absolute;left:50%;bottom:14%;width:70px;height:13px;
+  background:radial-gradient(ellipse,rgba(0,0,0,.35),transparent 70%);transform:translateX(-50%)}
+#npc-img{
+  position:absolute;left:50%;bottom:15%;width:86px;height:86px;transform:translateX(-50%);
+  image-rendering:pixelated;filter:drop-shadow(0 6px 4px rgba(0,0,0,.25));
+  animation:npcBob 2.6s ease-in-out infinite;cursor:pointer;
+}
+@keyframes npcBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+#quest-mark{
+  position:absolute;left:50%;bottom:calc(15% + 74px);width:24px;height:auto;transform:translateX(-50%);
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,.35));cursor:pointer;animation:questBob 1s ease-in-out infinite;
+}
+@keyframes questBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+
+#tap-hint{position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:10px;color:rgba(255,255,255,.85);
+  text-shadow:0 1px 3px rgba(0,0,0,.6);pointer-events:none;transition:opacity .25s}
+#tap-hint.hide{opacity:0}
+
+/* 오른쪽 위 퀘스트 배지 */
+#quest-badge{position:absolute;top:8px;right:8px;z-index:55;width:40px;height:40px;border:none;background:none;padding:0;transition:transform .15s}
+#quest-badge img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))}
+#quest-badge:active{transform:scale(.92)}
+
+/* 퀘스트 버튼 왼쪽에 붙는 힌트 아이콘 */
+#hint-icon{position:absolute;top:8px;right:58px;z-index:55;width:56px;height:auto;border:none;background:none;padding:0;
+  display:none;filter:drop-shadow(0 3px 8px rgba(0,0,0,.35));transition:transform .15s}
+#hint-icon.show{display:block}
+#hint-icon:active{transform:scale(.92)}
+
+/* ---------------- 대화창 (메이플스토리풍) ---------------- */
+#dlg{
+  position:absolute;left:6px;right:6px;bottom:6px;z-index:20;
+  display:none;flex-direction:column;
+  background:linear-gradient(180deg,var(--parchment),var(--parchment-deep));
+  border:3px solid var(--wood);border-radius:12px;
+  box-shadow:0 0 0 3px var(--wood-deep),0 10px 24px rgba(0,0,0,.45);
+  padding:8px 10px 8px 58px;min-height:92px;max-height:56%;overflow:auto;
+}
+#dlg.on{display:flex}
+#dlg-title{font-size:10.5px;color:var(--sepia);letter-spacing:.03em;margin-bottom:3px}
+#dlg-body{font-size:13px;line-height:1.5;color:#2b2018;min-height:36px;white-space:pre-wrap;word-break:keep-all}
+#dlg-foot{display:flex;align-items:center;justify-content:flex-end;margin-top:5px}
+#dlg-next{font-size:20px;color:var(--wood-dark);animation:dlgArrowBob 1s infinite;line-height:1}
+@keyframes dlgArrowBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+#dlg-choices{display:none;flex-direction:column;gap:3px;margin-top:6px}
+#dlg-choices.show{display:flex}
+.dlg-choice-btn{
+  font-family:inherit;font-size:13px;color:var(--wood-dark);
+  background:rgba(255,255,255,.35);border:1.5px solid transparent;border-radius:7px;
+  text-align:left;padding:5px 9px;cursor:pointer;transition:background .12s,border-color .12s,color .12s;
+}
+.dlg-choice-btn:hover,.dlg-choice-btn:active{
+  background:var(--wood);color:#fff4e6;border-color:var(--wood-dark);
+}
+#dlg-portrait-wrap{
+  position:absolute;left:5px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:4px;width:54px;
+}
+#dlg-portrait{
+  width:54px;height:54px;background:center/contain no-repeat;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));image-rendering:pixelated;
+}
+#dlg-name{
+  font-size:10px;color:#fff4e6;background:var(--wood-deep);border:1.5px solid var(--wood);
+  border-radius:5px;padding:2px 7px;white-space:nowrap;box-shadow:2px 2px 0 rgba(0,0,0,.25);
+}
+
+/* ---------------- 공통 팝업 ---------------- */
+.modal{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+  background:rgba(8,6,5,.72);padding:16px}
+.modal.on{display:flex}
+.modal-card{position:relative;width:min(92%,420px);max-height:92%;overflow:auto;
+  background:linear-gradient(180deg,var(--parchment),var(--parchment-deep));
+  border:3px solid var(--wood);border-radius:14px;box-shadow:0 0 0 3px var(--wood-deep),0 14px 30px rgba(0,0,0,.5);
+  padding:14px 16px;color:#2b2018}
+.modal-close{position:absolute;top:8px;right:8px;z-index:2;width:26px;height:26px;
+  background:var(--parchment-deep);color:var(--wood-dark);font-size:13px;line-height:1;font-family:'DosMyungjo';
+  border:2px solid var(--wood-deep);box-shadow:2px 2px 0 var(--wood-deep);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;transition:transform .07s ease,box-shadow .07s ease}
+.modal-close:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--wood-deep)}
+
+/* 문제 팝업 — 남색 톤 */
+#puzzle-modal .modal-card{background:linear-gradient(180deg,#eef1f7,#d9e0ec);border-color:var(--navy);
+  box-shadow:0 0 0 3px var(--navy-deep),0 14px 30px rgba(0,0,0,.5)}
+#pz-q{font-size:13px;font-weight:700;color:var(--navy);line-height:1.5;margin-bottom:9px}
+.pz-row{display:flex;gap:7px}
+#pz-input{flex:1;min-width:0;border:1.5px solid var(--gray);border-radius:9px;padding:9px 11px;
+  font-family:'DosMyungjo';font-size:15px;color:var(--ink);background:#faf8f4}
+#pz-input:focus{outline:none;border-color:var(--blue)}
+#pz-submit{flex:none;border-radius:9px;padding:0 15px;font-size:13.5px}
+#pz-choices{display:flex;flex-direction:column;gap:7px}
+.pz-choice{border-radius:9px;padding:9px 11px;font-size:13.5px;text-align:left}
+.pz-choice:active{background:var(--blue);color:#fff}
+#pz-feed{min-height:15px;font-size:11.5px;color:var(--red-deep);margin-top:7px}
+#pz-feed:not(:empty){background:#f8d7da;border:2px solid var(--red-deep);border-radius:7px;padding:5px 8px}
+
+/* 힌트(미요) 팝업 — 코랄 톤 */
+#hint-modal .modal-card{display:flex;gap:11px;align-items:flex-start;padding:14px;
+  background:linear-gradient(180deg,#fdedf0,#f6d3d9);border-color:var(--coral-deep);
+  box-shadow:0 0 0 3px var(--coral-deep),0 14px 30px rgba(0,0,0,.5)}
+#hint-portrait{flex:none;width:52px;height:52px;background:center/contain no-repeat;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+#hint-body-wrap{flex:1;min-width:0}
+#hint-name{font-size:11.5px;color:var(--coral-deep);margin-bottom:3px}
+#hint-text{font-size:13px;line-height:1.55;color:#2b2018}
+#hint-close{margin-top:10px;width:100%;border-radius:10px;font-size:12.5px;padding:9px;
+  background:var(--coral-deep);border-color:var(--coral-deep);box-shadow:3px 3px 0 #5c1c28}
+#hint-close:active{box-shadow:0 0 0 #5c1c28}
+
+/* 퀘스트 목록 팝업 (2단 구성) — 골드 톤 */
+#quest-modal .modal-card{width:min(94%,540px);border-color:var(--gold-deep);
+  box-shadow:0 0 0 3px var(--wood-deep),0 14px 30px rgba(0,0,0,.5)}
+#quest-modal h3{font-size:14px;color:var(--wood-dark);margin-bottom:8px;letter-spacing:.03em;text-align:center}
+#quest-modal .modal-close{background:#f2e4c4;border-color:var(--gold-deep);box-shadow:2px 2px 0 var(--gold-deep);color:var(--wood-dark)}
+#quest-modal .modal-close:active{box-shadow:0 0 0 var(--gold-deep)}
+.quest-split{display:flex;gap:10px;align-items:stretch}
+.quest-left{flex:0 0 38%;max-height:min(56vh,280px);overflow:auto;border-right:1px solid rgba(107,79,58,.25);padding-right:8px}
+.qitem{padding:8px 6px;border-radius:8px;font-size:11.5px;line-height:1.4;color:#c2b49a}
+.qitem.clickable{cursor:pointer;color:#a89880}
+.qitem.clickable:active{background:rgba(107,79,58,.12)}
+.qitem.done{color:var(--blue);font-weight:700}
+.qitem.selected{background:rgba(140,47,31,.12);color:var(--sepia);font-weight:700}
+.quest-right{flex:1;min-width:0;max-height:min(56vh,280px);overflow:auto;padding-left:2px}
+.qd-empty{font-size:12px;color:#a89880;padding:10px 4px}
+.qd-npc-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.qd-npc-img{flex:none;width:34px;height:34px;background:center/contain no-repeat;
+  image-rendering:pixelated;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3))}
+.qd-npc-name{font-size:12.5px;color:var(--ink-soft);font-weight:700}
+.qd-title{font-size:14.5px;font-weight:700;color:var(--wood-dark);padding-bottom:7px;margin-bottom:8px;border-bottom:2px solid var(--gold)}
+.qd-desc{font-size:12px;line-height:1.6;color:#2b2018;margin-bottom:10px}
+.qd-desc--solved{color:var(--blue);font-weight:700}
+.qd-btn{width:100%;border-radius:10px;font-size:12.5px;padding:10px}
+
+/* 퀘스트 완료 → 다음 장소 안내 팝업 — 틸 톤 */
+#nav-modal .modal-card{background:linear-gradient(180deg,#eaf5f2,#cfe8e2);border-color:var(--teal-deep);
+  box-shadow:0 0 0 3px var(--teal-deep),0 14px 30px rgba(0,0,0,.5)}
+#nav-modal .modal-close{background:#cfe8e2;border-color:var(--teal-deep);box-shadow:2px 2px 0 var(--teal-deep);color:var(--teal-deep)}
+#nav-modal .modal-close:active{box-shadow:0 0 0 var(--teal-deep)}
+#nav-title{font-size:14px;color:var(--teal-deep);margin-bottom:8px;letter-spacing:.03em;text-align:center}
+#nav-map{width:100%;border-radius:10px;border:1.5px solid var(--gray);margin-bottom:9px;background:#556}
+#nav-obj{font-size:12px;line-height:1.55;color:#2b2018;margin-bottom:10px;text-align:center}
+#nav-go{width:100%;border-radius:10px;font-size:13.5px;padding:11px}
+
+/* ---------------- 엔딩 화면 ---------------- */
+#ending{
+  background:linear-gradient(180deg,#1c2740,#0c1219);color:#f2ead9;
+  align-items:center;justify-content:center;text-align:center;padding:20px 26px;overflow:auto;
+}
+#ending-inner{display:flex;flex-direction:column;align-items:center;gap:9px;max-width:560px}
+#ending .stamp{width:46px;height:46px;border-radius:50%;background:var(--gold);color:#3a2a1c;
+  display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 10px 26px rgba(0,0,0,.4)}
+#ending h2{font-size:16px;color:var(--gold);text-shadow:2px 2px 0 var(--wood-deep)}
+#ending p{font-size:11.5px;line-height:1.6;color:#dfe6f5}
+#ending .fam{margin-top:2px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);
+  border-radius:10px;padding:9px 13px;font-size:11px;line-height:1.7;text-align:left}
+#ending .fam b{color:var(--gold)}
+#replay-btn{margin-top:2px;border-radius:10px;font-size:12px;padding:9px 22px}
+</style>
+</head>
+<body>
+<div id="rotate-prompt"><div class="icon">📱</div><p>화면을 <b>가로</b>로 돌려주세요<br>Please rotate your device to landscape</p></div>
+
+<div id="app"><div id="stage">
+
+  <!-- ===== 타이틀 ===== -->
+  <div id="title" class="screen on">
+    <div id="title-inner">
+      <img id="title-logo" src="title.svg" alt="잃어버린 소포">
+      <button id="play-btn"><img src="play.svg" alt="PLAY" style="width:100%"></button>
+    </div>
+  </div>
+
+  <!-- ===== 탐정등록증 ===== -->
+  <div id="register" class="screen">
+    <div id="card">
+      <div class="badge-stamp"><img src="detective.svg" alt="탐정"></div>
+      <h2>탐 정 방 문 기 록</h2>
+      <div id="fields">
+        <div class="field"><span>탐정명</span><input id="f-name" placeholder="이름을 적어주세요" maxlength="12"></div>
+        <div class="field"><span>사는곳</span><input id="f-addr" placeholder="예: 부산 동구" maxlength="20"></div>
+        <div class="field"><span>메일주소</span><input id="f-email" type="email" placeholder="선택 입력"></div>
+      </div>
+      <div id="consent-box">
+        <div class="ttl">※ 개인정보 수집 및 이용 안내</div>
+        본 프로그램은 결과 보고(KPI) 통계 작성을 위해 거주 지역을 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.
+        <label class="chk"><input type="checkbox" id="f-consent"> 위 내용을 확인했으며 동의합니다</label>
+      </div>
+      <p id="tip">⚠️ 이동하실 때는 화면 대신 주변을 살펴주세요.</p>
+      <button id="register-btn" class="rbtn rbtn--primary" disabled>등록하고 시작하기</button>
+    </div>
+  </div>
+
+  <!-- ===== 게임 화면 ===== -->
+  <div id="game" class="screen">
+    <div id="scene-wrap">
+      <div id="scene"><div class="scene-deco" id="scene-deco"></div></div>
+      <div id="npc-shadow"></div>
+      <img id="npc-img" alt="">
+      <img id="quest-mark" src="assets/icons/quest.png" alt="퀘스트">
+      <div id="tap-hint">인물 위 느낌표를 눌러 대화를 시작하세요</div>
+
+      <button id="quest-badge"><img src="quest_list.png" alt="퀘스트 목록"></button>
+      <button id="hint-icon"><img src="hint.svg" alt="힌트" style="width:100%"></button>
+
+      <div id="dlg">
+        <div id="dlg-portrait-wrap">
+          <div id="dlg-portrait"></div>
+          <div id="dlg-name"></div>
+        </div>
+        <div id="dlg-title">이야기</div>
+        <div id="dlg-body"></div>
+        <div id="dlg-choices">
+          <button type="button" class="dlg-choice-btn" id="dlg-choice-yes">▶ 네</button>
+          <button type="button" class="dlg-choice-btn" id="dlg-choice-no">▶ 아니오</button>
+        </div>
+        <div id="dlg-foot"><span id="dlg-next">▼</span></div>
+      </div>
+
+      <!-- 문제 팝업 -->
+      <div id="puzzle-modal" class="modal">
+        <div class="modal-card">
+          <div id="pz-q"></div>
+          <div class="pz-row" id="pz-input-row">
+            <input id="pz-input" placeholder="정답 입력">
+            <button id="pz-submit" class="rbtn rbtn--secondary">확인</button>
+          </div>
+          <div id="pz-choices"></div>
+          <div id="pz-feed"></div>
+        </div>
+      </div>
+
+      <!-- 미요 힌트 팝업 -->
+      <div id="hint-modal" class="modal">
+        <div class="modal-card">
+          <div id="hint-portrait"></div>
+          <div id="hint-body-wrap">
+            <div id="hint-name">미요</div>
+            <div id="hint-text"></div>
+            <button id="hint-close" class="rbtn rbtn--wood">닫기</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 퀘스트 목록 팝업 -->
+      <div id="quest-modal" class="modal">
+        <div class="modal-card">
+          <button class="modal-close" id="quest-close">✕</button>
+          <h3>퀘스트 목록</h3>
+          <div class="quest-split">
+            <div class="quest-left" id="quest-left"></div>
+            <div class="quest-right" id="quest-right"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 퀘스트 완료 → 다음 장소 안내 팝업 (자동) -->
+      <div id="nav-modal" class="modal">
+        <div class="modal-card">
+          <button class="modal-close" id="nav-close">✕</button>
+          <h3 id="nav-title"></h3>
+          <img id="nav-map" src="" alt="이동 경로">
+          <p id="nav-obj"></p>
+          <button id="nav-go" class="rbtn rbtn--primary"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 엔딩 ===== -->
+  <div id="ending" class="screen">
+    <div id="ending-inner">
+      <div class="stamp">🕵️</div>
+      <h2>수사 완료</h2>
+      <p id="ending-text"></p>
+      <div class="fam" id="ending-fam"></div>
+      <button id="replay-btn" class="rbtn rbtn--ghost">처음부터 다시하기</button>
+    </div>
+  </div>
+
+</div></div>
+
+<script>
+"use strict";
+
+const PLAYER = { name:'', addr:'', email:'' };
+
+const STEPS = [
+{
+  id:'chinatown', location:'차이나타운', npc:'wangjian', npcName:'왕지안',
+  desc:'차이나타운에서 왕지안 사장님을 만나 소포 속 사진의 실마리를 찾는다.',
+  bg:{img:'map_1.png'},
+  lines:[
+    '어이, 거기 탐정 양반. 소포 들고 다니는 거 보니 연구소에서 왔구만.',
+    '(사진을 유심히 보며) 이 남자아이 얼굴이... 어딘가 낯이 익은데.',
+    '어릴 적 골목에서 나보다 나이 조금 많던 형이 하나 있었어. 늘 바쁘게 어딘가를 오가던 아이였지.',
+    '근데 너무 오래된 일이라 이름도 사연도 잘 기억이 안나. 기억이라는 게 꼭 만두피처럼 얇아서, 잘못 잡으면 찢어지거든.',
+    '이 소포가 언제 적 물건인지부터 알아봐야겠어. 초량근대역사갤러리로 가보자고.'
+  ],
+  puzzle:null,
+  nextLabel:'초량근대역사갤러리로 이동하기'
+},
+{
+  id:'gallery', location:'초량근대역사갤러리', npc:'wangjian', npcName:'왕지안',
+  desc:'전시된 부산역 사진과 비교해 소포가 남겨진 연도를 알아낸다.',
+  result:'사진은 1950년이었다.',
+  bg:{cls:'bg-gallery'}, deco:'deco-frames',
+  lines:[
+    '여기 시대별 부산역 사진들 좀 봐. 소포 속 사진이랑 비교해보자고.',
+    '피난민증명서에 남은 흔적, 수하물표까지 맞춰보니... 이거 꽤 오래된 물건 같은데.',
+    '그 시절 부모 없이 부산역에 내린 남매 이야기, 어디서 들어본 것 같기도 하고.',
+    '전시된 사진들을 잘 보고, 이 소포가 남겨진 해가 언제인지 한번 맞춰봐.'
+  ],
+  puzzle:{
+    type:'number', q:'소포 속 사진과 전시된 부산역 사진을 비교해서, 이 소포가 남겨진 해는 언제일까요?',
+    hint:'피난민증명서와 수하물표의 흔적이 같은 시기를 가리키고 있어요. 한국전쟁이 시작된 해예요.',
+    answers:['1950'],
+    confirmQ:'이 소포는 언젯적 것인지 알아냈는가?',
+    confirmNo:['그래? 그럼 사진들을 다시 한 번 꼼꼼히 비교해봐. 서두르지 않아도 괜찮아.'],
+    solvedLines:['맞아, 1950년. 그 해에 정말 많은 사람들이 피난민 신분으로 부산에 내려왔지. 이 남매도 그중 하나였을 거야.']
+  },
+  nextLabel:'삼국지벽화거리로 이동하기'
+},
+{
+  id:'mural', location:'삼국지벽화거리', npc:'wangjian', npcName:'왕지안',
+  desc:'삼국지벽화거리의 벽화를 살펴 옛 골목의 주소를 알아낸다.',
+  result:'그 주소는 초량동 1041번지였다.',
+  bg:{img:'map_3.png'},
+  lines:[
+    '남매가 이 벽화거리 앞 그림들을 하나씩 세면서 집으로 돌아갔다는 이야기를 들은 적이 있어.',
+    '삼국지 속 인물들이 전쟁통에도 서로 믿고 의지했던 것처럼, 이 남매도 서로에게 가족이자 집이었겠지.',
+    '수사노트에 적힌 순서대로 벽화 속 그림을 하나씩 짚어봐. 숫자가 나올 거야.'
+  ],
+  puzzle:{
+    type:'number', q:'벽화 속 그림과 단서를 맞춰보면 드러나는 네 자리 숫자는?',
+    hint:'수사노트의 순서를 따라 벽화 앞에서 하나씩 세어보세요.',
+    answers:['1041'],
+    confirmQ:'벽화 속 번지수를 알아냈는가?',
+    confirmNo:['아직인가. 벽화 앞에서 수사노트 순서를 다시 한번 따라가 봐.'],
+    solvedLines:['그래, 초량동 1041번지. 아주 좁은 골목이었지. 그 시절 피난민들이 정말 많이 모여 살았어.','자, 내 다리는 여기까지다. 골목 이야기는 담장에 더 잘 남아있으니 담장갤러리로 가봐.']
+  },
+  nextLabel:'담장갤러리로 이동하기'
+},
+{
+  id:'fence', location:'담장갤러리', npc:'yeongsuk', npcName:'김영숙',
+  desc:'담장에 적힌 시 속 글자를 조합해 소년의 이름을 알아낸다.',
+  result:'소년의 이름은 정수였다.',
+  bg:{cls:'bg-wall'}, deco:'deco-bricks',
+  lines:[
+    '1041번지에 살던 남매요? 아이고, 그 시절 그 골목엔 남매가 한둘이 아니었어요.',
+    '피난민이 워낙 많아서, 한 방에 여러 가족이 같이 살았죠. 누가 누구네 아이인지 헷갈릴 정도로요.',
+    '사실 제 아버지도 그 근처에 사셨대요. 어릴 때 늘 좁은 골목을 뛰어다니셨다고.',
+    '사진은 바래도, 글은 이상하게 오래 남아요. 이 담장에 적힌 시 속에 사람 사는 이야기가 숨어있거든요.',
+    '수사노트 속 규칙대로, 시 속에서 글자를 하나씩 모아봐요. 그럼 이름 하나가 나올 거예요.'
+  ],
+  puzzle:{
+    type:'text', q:'담장에 적힌 시 속에서 글자를 조합하면 드러나는 이름은?',
+    hint:'수사노트에 적힌 규칙을 따라 특정 단어의 글자를 짚어보세요.',
+    answers:['정수','황정수'],
+    confirmQ:'담장 속에 숨은 이름을 알아냈는가?',
+    confirmNo:['천천히 다시 봐요. 시가 원래 한 번에 안 읽히는 법이에요.'],
+    solvedLines:[
+      '정수... 우리 아버지도 정수였는데.',
+      '(사진을 한참 바라보며) 내 동생 어릴 때 모습이랑 똑같이 생겼어요. 이 사진 속 아이가... 우리 아버지일지도 모르겠네요.',
+      '아버지가 어릴 때 학교에 가고 싶어 하면서도, 일하러 매일 학교 앞만 지나가셨다고 했어요. 초량초등학교 쪽으로 한번 가보세요.'
+    ]
+  },
+  nextLabel:'초량초등학교 · 168계단으로 이동하기'
+},
+{
+  id:'steps168', location:'초량초등학교 · 168계단', npc:'lina', npcName:'한리나',
+  desc:'168계단 위에서 바라본 방향을 살펴 소년이 일하던 곳을 찾는다.',
+  result:'정수가 바라보던 곳은 부산항이었다.',
+  bg:{cls:'bg-steps'}, deco:'deco-stairs',
+  lines:[
+    '안녕하세요 탐정님! 저는 리나예요, 오늘 탐정 조수가 되어드릴게요!',
+    '예전엔 학교에 가고 싶어도 못 간 아이들이 많았대요. 어떤 아이는 매일 학교 앞을 지나서 이바구길, 168계단 쪽으로 갔다더라고요.',
+    '(168계단 위에서) 엘리베이터 타고 올라가서 보면... 예쁘죠? 근데 옛날엔 다들 이 계단을 오르락내리락하면서 물도 나르고, 짐도 나르고, 일하러 다녔대요.',
+    '어? 그거 피난민증명서죠? 이 증명서를 가진 사람은 어디서 일했을까요? 여기서 보이는 방향을 한번 살펴봐요.'
+  ],
+  puzzle:{
+    type:'choice', q:'계단 위에서 바라본 시선이 향하는 곳은 어디일까요?',
+    hint:'이 자리에서 보이는 건 교실이 아니라... 배가 드나드는 곳이에요.',
+    options:['학교','부산항','시장'], answerIndex:1,
+    confirmQ:'계단 위에서 바라본 곳을 알아냈는가?',
+    confirmNo:['괜찮아요, 다시 한번 이 자리에 서서 천천히 둘러보세요!'],
+    solvedLines:[
+      '맞아요, 부산항! 정수는 학교보다 먼저 해야 할 일이 있었나 봐요.',
+      '배가 들어오면 항구에 일거리가 생겼고, 정수는 거기서 짐을 나르며 작은 돈을 모았대요. 누나랑 같이, 언젠가 부모님을 만나러 갈 기차표를 위해서요.'
+    ]
+  },
+  nextLabel:'산복도로전시관으로 이동하기'
+},
+{
+  id:'hall', location:'망양로 산복도로전시관', npc:'ian', npcName:'박이안',
+  desc:'산복도로전시관의 전시물을 통해 누나가 일하던 곳을 알아낸다.',
+  result:'누나가 일하던 곳은 고무신 공장이었다.',
+  bg:{cls:'bg-hall'}, deco:'deco-hall',
+  lines:[
+    '안녕하세요, 저는 이곳 도슨트 박이안입니다.',
+    '산복도로는 그냥 전망 좋은 길이 아니었어요. 피난민들의 생활과 노동이 오가던 길이었죠.',
+    '정수가 아래쪽 항구를 바라봤다면, 누나는 반대로 이 산복도로를 넘어 일터로 향했을 거예요.',
+    '(기차표 조각을 살펴보며) 이건... 사용하지 않은 기차표네요. 그때는 표를 쓰면 개표가위로 구멍을 냈는데, 이 표는 너무 깨끗해요.',
+    '남매는 표를 마련해놓고도 끝내 쓰지 못했나 봐요. 전시를 잘 살펴보면, 누나가 어디서 일했는지 알 수 있을 거예요.'
+  ],
+  puzzle:{
+    type:'text', q:'전시 속 노동의 이미지와 단서를 연결하면, 누나는 어디에서 일했을까요?',
+    hint:'발밑에 신는 물건을 만드는 곳이에요.',
+    answers:['고무신 공장','고무신공장'],
+    confirmQ:'누나가 일하던 곳을 알아냈는가?',
+    confirmNo:['서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.'],
+    solvedLines:['맞아요, 고무신 공장. 지게꾼으로 일하던 동생과 고무신 공장에서 일하던 누나. 그 시절 피난민들은 다들 자기 자리에서 어떻게든 돈을 벌었어요.','이제 이 모든 단서를 모아 연구소로 돌아가 볼까요?']
+  },
+  nextLabel:'명란브랜드연구소로 복귀하기'
+},
+{
+  id:'lab-end', location:'명란브랜드연구소', npc:'choryang', npcName:'김초량',
+  desc:'모은 단서를 모두 맞춰 소포 속 남매의 정체를 밝혀낸다.',
+  result:'정수와 함께 있던 누나는 황정월이었다.',
+  bg:{cls:'bg-lab-evening'},
+  lines:[
+    '탐정님, 수고 많으셨어요. 모은 단서들을 한번 펼쳐볼까요?',
+    '1950년, 초량동 1041번지, 정수라는 이름, 항구를 바라보던 동생, 고무신 공장에서 일하던 누나, 그리고 한 번도 쓰이지 못한 기차표...',
+    '(놀라며) 잠깐만요... 황정수는 제 할아버지 성함이에요!',
+    '할아버지는 어릴 적 이야기를 잘 안 하셨지만, 일찍 세상을 떠난 누나 얘기는 가끔 하셨어요. 늘 다정했고, 힘든 날에도 동생을 먼저 챙기셨다고.',
+    '시장에서 구해온 명란젓을 밥 위에 올려주곤 하셨대요. 저도 할아버지가 해주시던 그 명란젓을 참 좋아했어요.',
+    '그게 할아버지에게는 누나를 떠올리게 하는 맛이었을지도 모르겠네요. 제가 명란을 연구하게 된 것도 우연은 아닌가 봐요.',
+    '마지막으로, 사진과 피난민증명서, 기차표 조각을 다시 맞춰봐 줄래요? 정수와 함께 있던 누나의 이름이 무엇인지.'
+  ],
+  puzzle:{
+    type:'text', q:'정수와 함께 부산역 사진에 찍혀있던 누나의 이름은?',
+    hint:'피난민증명서의 빈 칸을 마저 채워보세요.',
+    answers:['황정월','정월'],
+    confirmQ:'함께 있던 누나의 이름을 알아냈는가?',
+    confirmNo:['천천히 다시 맞춰봐요. 조각들이 곧 하나로 이어질 거예요.'],
+    solvedLines:['맞아요. 이분이 할아버지가 평생 그리워하던 누나, 황정월이에요.']
+  },
+  nextLabel:null
+}
+];
+
+/* 차이나타운(STEPS[0])은 문제/정답 팝업이 없는 이동 안내 구간이라 퀘스트로 세지 않는다.
+   실제 퀘스트는 문제가 있는 STEPS[1]~STEPS[6] 여섯 개뿐 — 배열 인덱스를 STEPS 인덱스에 그대로 맞춘다. */
+const QUEST_TITLES = [null,'소포의 시작','벽화 속 번지수','담장 위의 이름','계단 위의 시선','남매의 맹세','소포의 진실'];
+const ORDINALS = [null,'첫번째','두번째','세번째','네번째','다섯번째','여섯번째'];
+
+let idx = 0;
+let dlgLine = 0, dlgChar = 0, dlgTimer = null, dlgDone = false, dlgPlayingSolved = false;
+let dlgConfirmMode = false, dlgCustomLines = null;
+let solved = STEPS.map(()=>false);
+let dlgSeenOnce = STEPS.map(()=>false);
+
+const $ = id=>document.getElementById(id);
+const titleEl=$('title'), registerEl=$('register'), gameEl=$('game'), endingEl=$('ending');
+const sceneEl=$('scene'), decoEl=$('scene-deco'), npcImg=$('npc-img'),
+      questMark=$('quest-mark'), tapHint=$('tap-hint');
+const dlgEl=$('dlg'), dlgTitle=$('dlg-title'), dlgBody=$('dlg-body'), dlgName=$('dlg-name'), dlgPortrait=$('dlg-portrait'), dlgChoices=$('dlg-choices');
+const questBadge=$('quest-badge');
+const hintIcon=$('hint-icon'), hintModal=$('hint-modal'), hintText=$('hint-text'), hintPortrait=$('hint-portrait');
+const pzModal=$('puzzle-modal'), pzQ=$('pz-q'), pzInputRow=$('pz-input-row'), pzInput=$('pz-input'),
+      pzChoices=$('pz-choices'), pzFeed=$('pz-feed');
+const questModal=$('quest-modal'), questLeft=$('quest-left'), questRight=$('quest-right');
+const navModal=$('nav-modal'), navTitle=$('nav-title'), navMap=$('nav-map'), navObj=$('nav-obj'), navGo=$('nav-go');
+
+function showScreen(el){
+  [titleEl,registerEl,gameEl,endingEl].forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function P(text){
+  return PLAYER.name ? text.replace('탐정님', PLAYER.name+' 탐정님') : text;
+}
+
+$('play-btn').onclick=()=>{ showScreen(registerEl); };
+
+const fName=$('f-name'), fAddr=$('f-addr'), fEmail=$('f-email'), fConsent=$('f-consent'), regBtn=$('register-btn');
+function refreshRegBtn(){ regBtn.disabled = !(fName.value.trim() && fConsent.checked); }
+[fName,fConsent].forEach(el=>el.addEventListener('input',refreshRegBtn));
+fConsent.addEventListener('change',refreshRegBtn);
+regBtn.onclick=()=>{
+  PLAYER.name=fName.value.trim(); PLAYER.addr=fAddr.value.trim(); PLAYER.email=fEmail.value.trim();
+  showScreen(gameEl); showOpeningQuest();
+};
+
+$('replay-btn').onclick=()=>{
+  solved = STEPS.map(()=>false); dlgSeenOnce = STEPS.map(()=>false);
+  openingQuest=false;
+  fName.value=''; fAddr.value=''; fEmail.value=''; fConsent.checked=false; refreshRegBtn();
+  PLAYER.name=''; PLAYER.addr=''; PLAYER.email='';
+  showScreen(titleEl);
+};
+
+function loadStep(i){
+  idx=i;
+  const s=STEPS[i];
+  clearTimeout(dlgTimer);
+  dlgEl.classList.remove('on');
+  pzModal.classList.remove('on');
+  hintModal.classList.remove('on');
+  questModal.classList.remove('on');
+  navModal.classList.remove('on');
+  pzFeed.textContent='';
+  pzInput.value='';
+
+  sceneEl.className='';
+  if(s.bg.img){ sceneEl.style.backgroundImage="url('"+s.bg.img+"')"; }
+  else { sceneEl.style.backgroundImage=''; sceneEl.classList.add(s.bg.cls); }
+  decoEl.className='scene-deco'+(s.deco?' '+s.deco:'');
+
+  npcImg.src='assets/characters/'+s.npc+'/south.png';
+  npcImg.alt=s.npcName;
+
+  hintIcon.classList.toggle('show', !!s.puzzle && !solved[i]);
+
+  if(isStepClear(i)){
+    questMark.style.display='none';
+    tapHint.classList.add('hide');
+  } else {
+    questMark.style.display='block';
+    tapHint.classList.remove('hide');
+  }
+}
+
+function isStepClear(i){ return STEPS[i].puzzle ? solved[i] : dlgSeenOnce[i]; }
+
+function openDialogue(){
+  const s=STEPS[idx];
+  tapHint.classList.add('hide');
+  dlgEl.classList.add('on');
+  dlgTitle.textContent = s.location;
+  dlgName.textContent = s.npcName;
+  dlgPortrait.style.backgroundImage = "url('assets/characters/"+s.npc+"/south.png')";
+  dlgConfirmMode=false; dlgCustomLines=null;
+  dlgChoices.classList.remove('show');
+  $('dlg-next').style.display='';
+
+  if(isStepClear(idx)){
+    dlgPlayingSolved=false;
+    dlgLine=s.lines.length; dlgChar=0; dlgDone=true;
+    dlgBody.textContent = P(s.lines[s.lines.length-1]);
+    $('dlg-next').textContent='▼';
+    return;
+  }
+  if(s.puzzle && dlgSeenOnce[idx]){
+    showConfirmPrompt(s);
+    return;
+  }
+  dlgLine=0; dlgChar=0; dlgDone=false; dlgPlayingSolved=false;
+  typeLine(s.lines);
+}
+
+function showConfirmPrompt(s){
+  dlgConfirmMode=true;
+  dlgChoices.classList.remove('show');
+  $('dlg-next').style.display='none';
+  dlgChar=0; dlgDone=false;
+  const cur=P(s.puzzle.confirmQ);
+  clearTimeout(dlgTimer);
+  function tick(){
+    if(dlgChar<cur.length){
+      dlgChar++;
+      dlgBody.textContent=cur.slice(0,dlgChar);
+      dlgTimer=setTimeout(tick,20);
+    } else {
+      dlgDone=true;
+      dlgChoices.classList.add('show');
+    }
+  }
+  dlgBody.textContent=''; tick();
+}
+
+function typeLine(lines){
+  const cur=P(lines[dlgLine]||'');
+  clearTimeout(dlgTimer);
+  $('dlg-next').textContent='▼';
+  function tick(){
+    if(dlgChar<cur.length){
+      dlgChar++;
+      dlgBody.textContent=cur.slice(0,dlgChar);
+      dlgTimer=setTimeout(tick,20);
+    } else {
+      dlgDone=true;
+    }
+  }
+  dlgBody.textContent=''; dlgDone=false; tick();
+}
+
+function advanceDialogue(){
+  const s=STEPS[idx];
+  if(dlgConfirmMode){
+    if(!dlgDone){
+      clearTimeout(dlgTimer);
+      dlgChar=P(s.puzzle.confirmQ).length;
+      dlgBody.textContent=P(s.puzzle.confirmQ);
+      dlgDone=true;
+      dlgChoices.classList.add('show');
+    }
+    return;
+  }
+  const lines = dlgCustomLines || (dlgPlayingSolved ? s.puzzle.solvedLines : s.lines);
+  const cur=P(lines[dlgLine]||'');
+  if(!dlgDone){
+    clearTimeout(dlgTimer);
+    dlgChar=cur.length; dlgBody.textContent=cur; dlgDone=true;
+    return;
+  }
+  dlgLine++;
+  if(dlgLine>=lines.length){
+    if(dlgPlayingSolved){
+      dlgEl.classList.remove('on');
+      dlgSeenOnce[idx]=true;
+      markStepReady();
+      return;
+    }
+    if(dlgCustomLines){
+      dlgEl.classList.remove('on');
+      dlgCustomLines=null;
+      return;
+    }
+    dlgEl.classList.remove('on');
+    dlgSeenOnce[idx]=true;
+    if(!s.puzzle){ markStepReady(); }
+    return;
+  }
+  dlgChar=0; dlgDone=false;
+  typeLine(lines);
+}
+
+function playSolvedLines(){
+  const s=STEPS[idx];
+  dlgPlayingSolved=true; dlgLine=0; dlgChar=0; dlgDone=false;
+  dlgEl.classList.add('on');
+  dlgName.textContent=s.npcName;
+  typeLine(s.puzzle.solvedLines);
+}
+
+function markStepReady(){
+  hintIcon.classList.remove('show');
+  questMark.style.display='none';
+  showNavAuto();
+}
+
+function openPuzzleModal(s){
+  pzQ.textContent=s.puzzle.q;
+  pzFeed.textContent='';
+  if(s.puzzle.type==='choice'){
+    pzInputRow.style.display='none';
+    pzChoices.style.display='flex';
+    pzChoices.innerHTML='';
+    s.puzzle.options.forEach((opt,oi)=>{
+      const b=document.createElement('button');
+      b.className='pz-choice rbtn rbtn--choice'; b.textContent=opt;
+      b.onclick=()=>{ tryAnswer(oi===s.puzzle.answerIndex); };
+      pzChoices.appendChild(b);
+    });
+  } else {
+    pzChoices.style.display='none';
+    pzInputRow.style.display='flex';
+    pzInput.value='';
+    pzInput.type = s.puzzle.type==='number' ? 'tel' : 'text';
+    pzInput.maxLength = s.puzzle.type==='number' ? 4 : 20;
+    setTimeout(()=>pzInput.focus(),80);
+  }
+  pzModal.classList.add('on');
+}
+
+function normalize(v){ return v.trim().replace(/\s+/g,''); }
+function checkTextAnswer(){
+  const s=STEPS[idx];
+  const v=normalize(pzInput.value);
+  const ok = s.puzzle.answers.some(a=>normalize(a)===v);
+  tryAnswer(ok);
+}
+function tryAnswer(ok){
+  if(ok){
+    solved[idx]=true;
+    pzFeed.textContent='';
+    setTimeout(()=>{ pzModal.classList.remove('on'); playSolvedLines(); },200);
+  } else {
+    pzFeed.textContent='다시 한번 살펴봐 주세요.';
+  }
+}
+$('pz-submit').onclick=checkTextAnswer;
+pzInput.addEventListener('keydown',e=>{ if(e.key==='Enter') checkTextAnswer(); });
+
+/* 힌트 (미요) */
+hintIcon.addEventListener('click',()=>{
+  const s=STEPS[idx];
+  if(!s.puzzle) return;
+  hintPortrait.style.backgroundImage="url('assets/characters/miyo/portrait.png')";
+  hintText.textContent='💡 '+s.puzzle.hint;
+  hintModal.classList.add('on');
+});
+$('hint-close').onclick=()=>{ hintModal.classList.remove('on'); };
+
+/* 퀘스트 배지 → 퀘스트 목록 팝업
+   차이나타운(STEPS[0])은 이동 안내일 뿐 퀘스트가 아니라서 목록에서 완전히 제외한다. */
+function isQuestStep(i){ return !!STEPS[i].puzzle; }
+
+function questState(){
+  if(openingQuest) return {kind:'pre'};
+  if(!isStepClear(idx)) return isQuestStep(idx) ? {kind:'progress', index:idx} : {kind:'pre'};
+  if(idx>=STEPS.length-1) return {kind:'final', index:idx};
+  return {kind:'next', index:idx+1};
+}
+
+function questRowStatus(i, state){
+  if(state.kind==='pre') return 'locked';
+  if(state.kind==='progress' || state.kind==='final') return i<idx ? 'done' : (i===idx ? 'active' : 'locked');
+  return i<=idx ? 'done' : (i===state.index ? 'active' : 'locked');
+}
+
+function renderQuestDetail(i, state){
+  const s=STEPS[i];
+  questRight.innerHTML='';
+  const npcRow=document.createElement('div'); npcRow.className='qd-npc-row';
+  const npcImg=document.createElement('div'); npcImg.className='qd-npc-img';
+  npcImg.style.backgroundImage="url('assets/characters/"+s.npc+"/south.png')";
+  const npcName=document.createElement('span'); npcName.className='qd-npc-name'; npcName.textContent=s.npcName;
+  npcRow.appendChild(npcImg); npcRow.appendChild(npcName);
+  const title=document.createElement('div'); title.className='qd-title'; title.textContent=ORDINALS[i]+' 퀘스트: '+QUEST_TITLES[i];
+  const isSolved=solved[i];
+  const desc=document.createElement('div');
+  desc.className='qd-desc'+(isSolved?' qd-desc--solved':'');
+  desc.textContent=isSolved?s.result:s.desc;
+  questRight.appendChild(npcRow); questRight.appendChild(title); questRight.appendChild(desc);
+
+  if(i===state.index){
+    const btn=document.createElement('button'); btn.className='qd-btn rbtn rbtn--primary';
+    if(state.kind==='final'){
+      btn.textContent='결과 보기';
+      btn.onclick=()=>{ questModal.classList.remove('on'); showEnding(); };
+    } else if(state.kind==='next'){
+      btn.textContent='알아내보자';
+      btn.onclick=()=>{ questModal.classList.remove('on'); if(idx<STEPS.length-1) loadStep(idx+1); };
+    }
+    if(state.kind!=='progress') questRight.appendChild(btn);
+  }
+}
+
+function renderQuestModal(){
+  const state=questState();
+  questLeft.innerHTML='';
+  let activeShown=false;
+  for(let i=1;i<STEPS.length;i++){
+    const status=questRowStatus(i,state);
+    const item=document.createElement('div');
+    const label = status==='locked' ? '???' : QUEST_TITLES[i];
+    item.textContent=(status==='done'?'✓ ':'')+ORDINALS[i]+' 퀘스트: '+label;
+    item.className='qitem'+(status==='locked'?'':' clickable')+(status==='done'?' done':'')+(status==='active'?' selected':'');
+    if(status!=='locked'){
+      item.addEventListener('click',()=>{
+        questLeft.querySelectorAll('.qitem').forEach(el=>el.classList.remove('selected'));
+        item.classList.add('selected');
+        renderQuestDetail(i,state);
+      });
+    }
+    if(status==='active') activeShown=true;
+    questLeft.appendChild(item);
+  }
+  if(activeShown){ renderQuestDetail(state.index,state); }
+  else { questRight.innerHTML='<div class="qd-empty">아직 시작한 퀘스트가 없어요.<br>먼저 이동을 완료해주세요.</div>'; }
+  questModal.classList.add('on');
+}
+
+function mapForStep(i){ return 'map'+((i%5)+1)+'.svg'; }
+
+function showNavAuto(){
+  const s=STEPS[idx];
+  if(!s.nextLabel){
+    navTitle.textContent='사건 해결';
+    navMap.style.display='none';
+    navObj.textContent='모든 단서를 모았어요. 결과를 확인해볼까요?';
+    navGo.textContent='결과 보기';
+    navGo.onclick=()=>{ navModal.classList.remove('on'); showEnding(); };
+  } else {
+    navTitle.textContent=ORDINALS[idx+1]+' 퀘스트: '+QUEST_TITLES[idx+1];
+    navMap.style.display='block';
+    navMap.src=mapForStep(idx);
+    navObj.textContent=STEPS[idx+1].desc;
+    navGo.textContent=s.nextLabel;
+    navGo.onclick=()=>{ navModal.classList.remove('on'); if(idx<STEPS.length-1) loadStep(idx+1); };
+  }
+  navModal.classList.add('on');
+}
+
+let openingQuest=false;
+function showOpeningQuest(){
+  loadStep(0);
+  openingQuest=true;
+  navTitle.textContent=STEPS[0].location+'으로 이동하세요';
+  navMap.style.display='block';
+  navMap.src='map1.svg';
+  navObj.textContent=STEPS[0].desc;
+  navGo.textContent='확인했어요';
+  navGo.onclick=()=>{ navModal.classList.remove('on'); openingQuest=false; };
+  navModal.classList.add('on');
+}
+
+questBadge.addEventListener('click',renderQuestModal);
+$('quest-close').addEventListener('click',()=>{ questModal.classList.remove('on'); });
+$('nav-close').addEventListener('click',()=>{ navModal.classList.remove('on'); });
+
+questMark.addEventListener('click',openDialogue);
+npcImg.addEventListener('click',openDialogue);
+dlgEl.addEventListener('click',advanceDialogue);
+$('dlg-choice-yes').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  const s=STEPS[idx];
+  dlgConfirmMode=false;
+  dlgChoices.classList.remove('show');
+  dlgEl.classList.remove('on');
+  openPuzzleModal(s);
+});
+$('dlg-choice-no').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  const s=STEPS[idx];
+  dlgConfirmMode=false;
+  dlgChoices.classList.remove('show');
+  $('dlg-next').style.display='';
+  dlgCustomLines = s.puzzle.confirmNo || ['음... 조금 더 살펴봐야겠어.'];
+  dlgLine=0; dlgChar=0; dlgDone=false;
+  typeLine(dlgCustomLines);
+});
+
+function showEnding(){
+  showScreen(endingEl);
+  $('ending-text').textContent='황정월은 이 물건들을 버린 게 아니었어요. 너무 오래 품고 있던 기억을 잠시 내려놓고, 언젠가 누군가 다시 이 이야기를 찾아주길 바라며 조용히 소포에 담아둔 거였죠.\n\n탐정님이 찾아낸 건 오래된 종이 한 장이 아니에요. 돌아가고 싶었던 마음, 다시 만나고 싶었던 약속이었어요.';
+  $('ending-fam').innerHTML='<b>황정월</b> — 고무신 공장 노동자<br><b>황정수</b> — 부산항 짐꾼<br><br>1950년, 초량에 도착한 남매가 있었습니다. 그 표는 끝내 쓰이지 못했지만, 약속은 사라지지 않았습니다.';
+}
+</script>
+</body>
+</html>
