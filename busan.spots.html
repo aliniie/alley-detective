@@ -1,6 +1,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>🗺️ 부산역 인근 관광명소</title>
+<title>Busan attractions near the station </title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2250%22 font-size=%2280%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>🗺️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap">
@@ -312,6 +312,56 @@
 
   .spot-photo span { position: relative; z-index: 1; filter: drop-shadow(0 2px 10px rgba(0,0,0,0.4)); }
 
+  .spot-photo.has-img { height: 190px; }
+  .spot-photo.has-img::after { display: none; }
+  .spot-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .spot-num {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+    background: rgba(11, 27, 51, 0.6);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+
+  .spot-credit {
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .spot-now {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    margin: -4px 0 10px;
+  }
+
+  .spot-addr {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 6px;
+  }
+
   .spot-body { padding: 18px 20px 20px; }
 
   .spot-title {
@@ -345,6 +395,38 @@
   }
 
   .map-btn:hover { background: var(--accent-glow); border-color: var(--accent); }
+
+  /* ── TO TOP ── */
+  .to-top {
+    position: fixed;
+    right: 18px;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid var(--border-hover);
+    background: var(--surface);
+    color: var(--accent-bright);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 6px 20px var(--accent-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s, background 0.2s;
+  }
+
+  .to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+  .to-top:hover { background: var(--surface-hover); }
+
+  @media (max-width: 520px) {
+    .to-top { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  }
 
   /* ── FOOTER ── */
   .footer {
@@ -407,6 +489,8 @@
 
 </div>
 
+<button class="to-top" id="toTop" aria-label="맨 위로" title="맨 위로">↑</button>
+
 <script>
   const content = {
     ko: {
@@ -418,21 +502,41 @@
       mapBtn: '네이버지도에서 보기',
       footer: '방문 전 최신 운영시간을 다시 확인해 주세요.',
       cats: {
-        wartime: { title: '피란수도 부산', sub: '한국전쟁의 흔적이 남은 역사 유산' },
-        station: { title: '부산역 인근 관광지', sub: '걸어서 즐기는 원도심 명소' }
+        wartime: { title: '피란수도 부산 유산', sub: '한국전쟁 1,023일의 기억이 남은 11곳' },
+        station: { title: '부산역 인근 관광지', sub: '부산역에서 가까운 순으로 소개하는 16곳' }
       },
+      dist: km => `부산역에서 직선거리 약 ${km}km`,
       spots: {
         wartime: [
-          { icon: '🏛️', name: '임시수도기념관', desc: '한국전쟁 당시 대통령 관저로 사용된 붉은 벽돌 건물로, 피란수도 부산의 역사를 가장 가까이서 느낄 수 있는 곳입니다.', q: '부산 임시수도기념관' },
-          { icon: '🪦', name: '아미동 비석마을', desc: '일제강점기 공동묘지 위에 형성된 마을로, 골목 곳곳에 남아 있는 비석과 좁은 계단길이 독특한 풍경을 만듭니다.', q: '부산 아미동 비석마을' },
-          { icon: '🕊️', name: '유엔기념공원', desc: '6·25전쟁에 참전한 유엔군 전몰장병을 추모하는 세계 유일의 유엔군 묘지로, 푸른 잔디와 조용한 분위기가 인상적입니다.', q: '부산 유엔기념공원' },
-          { icon: '📚', name: '보수동 책방골목', desc: '피란 시절 헌책을 사고팔던 데서 시작된 골목으로, 지금도 오래된 서점들이 옛 정취를 그대로 간직하고 있습니다.', q: '부산 보수동책방골목' }
+          { name: '경무대', now: '현 임시수도기념관', desc: '1926년 경상남도지사 관사로 지어진 건물로, 한국전쟁 중 피란수도 부산의 대통령 관저로 사용되었습니다.' },
+          { name: '임시중앙청', now: '현 동아대학교 석당박물관', desc: '옛 경상남도청 건물로, 피란 시절 정부 청사인 임시중앙청으로 쓰이며 국정의 중심 역할을 했습니다.' },
+          { name: '국립중앙관상대', now: '현 부산기상관측소', desc: '배를 닮은 외관의 근대 건축물로, 전쟁 중 서울에서 옮겨온 국립중앙관상대가 이곳에서 기상 업무를 이어갔습니다.' },
+          { name: '부산항 제1부두', now: '', desc: '유엔군 병력과 구호물자가 들어오고 수많은 피란민이 내린 곳으로, 전쟁을 버텨낸 물자 보급의 관문이었습니다.' },
+          { name: '영도대교', now: '', desc: '1934년 개통한 도개교로, 피란길에 헤어진 가족들이 "영도다리에서 만나자"며 재회를 기약하던 장소입니다.' },
+          { name: '복병산배수지', now: '', desc: '1910년 완공된 근대 상수도 시설로, 피란민으로 인구가 급증한 시기에도 원도심에 물을 공급했습니다.' },
+          { name: '아미동 비석마을', now: '', desc: '피란민들이 일제강점기 공동묘지 위에 비석과 상석을 주춧돌 삼아 집을 짓고 삶을 일군 마을입니다.' },
+          { name: '우암동 소막마을', now: '', desc: '일제강점기 소 검역소 막사를 칸칸이 나눠 피란민의 보금자리로 삼았던 곳으로, 당시의 주거 형태가 남아 있습니다.' },
+          { name: '캠프 하야리아', now: '현 부산시민공원', desc: '옛 경마장 부지에 들어선 미군 기지로, 전쟁 중 유엔군 부산기지사령부가 자리했으며 반환 후 시민공원이 되었습니다.' },
+          { name: '미국대사관 겸 미국공보원', now: '현 부산근현대역사관 별관', desc: '옛 동양척식주식회사 부산지점 건물로, 피란수도 시기 미국대사관과 미국공보원으로 사용되었습니다.' },
+          { name: '유엔군 묘지', now: '재한유엔기념공원', desc: '1951년 조성된 세계 유일의 유엔군 묘지로, 한국전쟁에서 희생된 유엔군 전몰장병이 잠들어 있습니다.' }
         ],
         station: [
-          { icon: '🏮', name: '차이나타운 (텍사스거리)', desc: '부산역 바로 앞, 중국·러시아 문화가 뒤섞인 이국적인 거리로 중화요리와 다양한 먹거리를 즐길 수 있습니다.', q: '부산 차이나타운' },
-          { icon: '🌄', name: '초량이바구길', desc: '산복도로를 따라 이어지는 산책로로, 168계단과 전망대에서 부산항과 원도심을 한눈에 내려다볼 수 있습니다.', q: '초량이바구길' },
-          { icon: '🗼', name: '용두산공원 · 부산타워', desc: '부산 시내 한복판 언덕에 자리한 공원으로, 부산타워 전망대에 오르면 원도심과 바다가 파노라마로 펼쳐집니다.', q: '부산 용두산공원' },
-          { icon: '🐟', name: '자갈치시장', desc: '국내 최대 수산시장으로, 싱싱한 해산물을 직접 고르고 그 자리에서 맛볼 수 있는 부산 대표 먹거리 명소입니다.', q: '자갈치시장' }
+          { name: '구 백제병원', desc: '1922년 지어진 부산 최초의 근대식 개인 종합병원 건물로, 음식점·장교 숙소·영사관 등을 거쳐 지금은 카페와 갤러리로 쓰이고 있습니다.' },
+          { name: '북두칠성도서관', desc: '부산역 바로 옆 건물 1층에 자리한 도서관으로, 둥근 서가가 인상적인 공간에서 여행 중 잠시 쉬어가기 좋습니다.' },
+          { name: '북항친수공원', desc: '1876년 개항 이후 항만으로만 쓰이던 북항이 2022년 시민 공원으로 열린 곳으로, 바다를 따라 걷는 산책과 야경이 아름답습니다.' },
+          { name: '초량교회', desc: '1892년 세워진 부산 최초의 개신교회로, 한국 근현대사의 굴곡을 함께해 온 역사적인 장소입니다.' },
+          { name: '오초량', desc: '1925년 지어진 일본식 목조주택(국가등록문화유산)을 복합문화공간으로 되살린 곳입니다. 예약제로 운영되니 미리 확인하세요.' },
+          { name: '이바구캠프', desc: '초량 산복도로 마을에서 주민들이 함께 운영하는 게스트하우스 겸 커뮤니티 공간으로, 원도심과 북항 풍경이 내려다보입니다.' },
+          { name: '문화공감수정', desc: '1943년 지어진 일본식 가옥(구 정란각)으로, 국가등록문화유산으로 지정되어 문화공간과 찻집으로 운영되고 있습니다.' },
+          { name: '수정산꿈자람터', desc: '수정산 자락에 조성된 대규모 숲속 어린이 놀이터로, 생태·모험·에너지 놀이터와 함께 북항 바다를 조망할 수 있습니다.' },
+          { name: '동구문화플랫폼', desc: '옛 부산진역사를 고쳐 만든 복합문화공간으로, 전시와 공연 등 다양한 문화 프로그램이 열립니다.' },
+          { name: '국제커피박물관', desc: '옛 부산진역에 자리한 커피 박물관으로, 세계 각국의 커피 도구와 문화를 만날 수 있습니다. 2026년 12월 말 운영 종료 예정입니다.' },
+          { name: '용두산공원', desc: '원도심 한복판 언덕 위 공원으로, 부산타워 전망대에 오르면 도심과 바다가 파노라마로 펼쳐집니다.' },
+          { name: '이중섭 문화거리', desc: '화가 이중섭이 피란 시절 범일동에 머물렀던 인연으로 조성된 거리로, 전망대와 골목 곳곳에서 그의 작품을 만날 수 있습니다.' },
+          { name: '부산진성', desc: '임진왜란 첫 격전의 역사를 간직한 곳으로, 자성대공원 안에 성곽과 서문 금루관이 복원되어 있습니다.' },
+          { name: '부산아쿠아리움', desc: '해운대해수욕장 앞 대형 수족관으로, 바닷속을 걷는 듯한 해저터널에서 상어와 다양한 해양생물을 만날 수 있습니다.' },
+          { name: '회동수원지', desc: '부산 시민의 식수원인 호수로, 오랫동안 출입이 통제되다 개방된 수변 산책로와 황토숲길을 걸을 수 있습니다.' },
+          { name: '아홉산숲', desc: '한 가문이 400년 가까이 가꿔 온 기장의 숲으로, 하늘을 가릴 듯 빽빽한 대나무숲과 금강소나무 군락이 장관입니다.' }
         ]
       }
     },
@@ -445,21 +549,41 @@
       mapBtn: 'View on Naver Map',
       footer: 'Please check the latest opening hours before you visit.',
       cats: {
-        wartime: { title: 'Wartime Capital Heritage', sub: 'Traces of the Korean War' },
-        station: { title: 'Near Busan Station', sub: 'Old-town sights within walking distance' }
+        wartime: { title: 'Wartime Capital Heritage', sub: '11 sites from the 1,023 days of the Korean War' },
+        station: { title: 'Near Busan Station', sub: '16 spots, listed from nearest to farthest' }
       },
+      dist: km => `≈ ${km} km from Busan Station (straight line)`,
       spots: {
         wartime: [
-          { icon: '🏛️', name: 'Provisional Capital Memorial Hall', desc: "A red-brick building once used as the presidential residence during the Korean War — the closest you can get to Busan's history as Korea's wartime capital.", q: '부산 임시수도기념관' },
-          { icon: '🪦', name: 'Amidong Tombstone Village', desc: 'A hillside village built over a Japanese colonial-era cemetery, where gravestones still peek out between narrow stairways and alleys.', q: '부산 아미동 비석마을' },
-          { icon: '🕊️', name: 'UN Memorial Cemetery', desc: "The world's only UN cemetery, honoring soldiers who fell in the Korean War — a peaceful expanse of green lawns and quiet reflection.", q: '부산 유엔기념공원' },
-          { icon: '📚', name: 'Bosu-dong Book Street', desc: 'Born from wartime refugees trading used books, this alley is still lined with old bookshops that keep the past alive.', q: '부산 보수동책방골목' }
+          { name: 'Gyeongmudae (Presidential Residence)', now: 'Now the Provisional Capital Memorial Hall', desc: 'Built in 1926 as the Gyeongsangnam-do governor\'s residence, it served as the presidential residence while Busan was the wartime capital.' },
+          { name: 'Provisional Government Complex', now: 'Now Dong-A University Seokdang Museum', desc: 'The former Gyeongsangnam-do Provincial Office, used as the temporary seat of government during the war.' },
+          { name: 'National Central Meteorological Observatory', now: 'Now the Busan Meteorological Observatory', desc: 'A ship-shaped modern building where the national weather service, relocated from Seoul, kept working through the war.' },
+          { name: 'Pier 1 of Busan Port', now: '', desc: 'The gateway where UN troops and relief supplies arrived and countless refugees came ashore — the lifeline that sustained the war effort.' },
+          { name: 'Yeongdo Bridge', now: '', desc: 'A drawbridge opened in 1934, where families separated by the war promised: "Let\'s meet at Yeongdo Bridge."' },
+          { name: 'Bokbyeongsan Reservoir', now: '', desc: 'A modern waterworks completed in 1910 that kept the old town supplied with water as refugees swelled the population.' },
+          { name: 'Ami-dong Tombstone Village', now: '', desc: 'Refugees built homes atop a colonial-era cemetery, using gravestones as foundation stones.' },
+          { name: 'Uam-dong Cattle Shed Village', now: '', desc: 'Colonial-era cattle quarantine sheds partitioned into homes for refugees; the original housing layout still survives.' },
+          { name: 'Camp Hialeah', now: 'Now Busan Citizens Park', desc: 'A US military base on a former racetrack that hosted the UN forces\' Busan base command during the war, later returned and turned into a park.' },
+          { name: 'U.S. Embassy & USIS', now: 'Now the Busan Modern History Museum Annex', desc: 'The former Oriental Development Company Busan branch, used as the U.S. Embassy and U.S. Information Service in the wartime capital.' },
+          { name: 'UN Cemetery', now: 'United Nations Memorial Cemetery in Korea', desc: 'Established in 1951, the world\'s only UN cemetery, where UN soldiers who fell in the Korean War rest.' }
         ],
         station: [
-          { icon: '🏮', name: 'Chinatown (Texas Street)', desc: 'Right outside Busan Station, an exotic strip blending Chinese and Russian influences, packed with Chinese food and street eats.', q: '부산 차이나타운' },
-          { icon: '🌄', name: 'Choryang Ibagu-gil', desc: 'A hillside walking trail along the old mountain road, where the 168 Stairs and its observatory open up sweeping views of the harbor and old town.', q: '초량이바구길' },
-          { icon: '🗼', name: 'Yongdusan Park & Busan Tower', desc: "A hilltop park in the heart of downtown — climb Busan Tower's observation deck for a panoramic view of the old city and the sea.", q: '부산 용두산공원' },
-          { icon: '🐟', name: 'Jagalchi Market', desc: "Korea's largest seafood market, where you can pick your catch fresh and eat it right on the spot — a true taste of Busan.", q: '자갈치시장' }
+          { name: 'Former Baekje Hospital', desc: "Built in 1922 as Busan's first modern private general hospital, it later served as a restaurant, officers' quarters and a consulate, and is now a café and gallery." },
+          { name: 'Bukdu Chilseong Library', desc: 'A library on the ground floor of a building right next to Busan Station — its round bookshelves make it a lovely place to take a break.' },
+          { name: 'Bukhang Waterfront Park', desc: 'North Port, used only as a harbor since it opened in 1876, became a public park in 2022 — great for seaside walks and night views.' },
+          { name: 'Choryang Church', desc: "Founded in 1892, Busan's first Protestant church has witnessed the ups and downs of Korea's modern history." },
+          { name: 'O Choryang', desc: 'A 1925 Japanese-style wooden house (a registered national heritage) reborn as a cultural space. Reservations required — check ahead.' },
+          { name: 'Ibagu Camp', desc: "A guesthouse and community space run with local residents in Choryang's hillside village, overlooking the old town and North Port." },
+          { name: 'Munhwa Gonggam Sujeong', desc: 'A 1943 Japanese-style house (formerly Jeongnangak), now a registered national heritage run as a cultural space and teahouse.' },
+          { name: 'Sujeongsan Dream Playground', desc: 'A large forest playground on the slopes of Sujeongsan, with nature, adventure and energy play zones and views over North Port.' },
+          { name: 'Dong-gu Culture Platform', desc: 'A cultural complex in the renovated former Busanjin Station, hosting exhibitions, performances and other programs.' },
+          { name: 'International Coffee Museum', desc: 'A coffee museum in the former Busanjin Station showcasing coffee tools and cultures from around the world. Scheduled to close at the end of December 2026.' },
+          { name: 'Yongdusan Park', desc: "A hilltop park in the heart of the old town — Busan Tower's observation deck offers a panorama of the city and the sea." },
+          { name: 'Lee Jung-seob Culture Street', desc: 'A street honoring painter Lee Jung-seob, who lived in Beomil-dong as a wartime refugee, with his works displayed along alleys and an observatory.' },
+          { name: 'Busanjinseong Fortress', desc: 'A site that recalls the first battle of the 1592 Japanese invasion, with restored walls and the Geumnugwan west gate inside Jaseongdae Park.' },
+          { name: 'SEA LIFE Busan Aquarium', desc: 'A large aquarium facing Haeundae Beach, where an undersea tunnel brings you face to face with sharks and other marine life.' },
+          { name: 'Hoedong Reservoir', desc: "Busan's drinking-water reservoir, whose long-restricted lakeside trails and red-clay forest paths are now open to walkers." },
+          { name: 'Ahopsan Forest', desc: 'A Gijang forest tended by one family for nearly 400 years, famous for its towering bamboo groves and Geumgang pines.' }
         ]
       }
     },
@@ -472,21 +596,41 @@
       mapBtn: '在Naver地图查看',
       footer: '出发前请再次确认最新营业时间。',
       cats: {
-        wartime: { title: '避难首都釜山', sub: '留有朝鲜战争痕迹的历史遗产' },
-        station: { title: '釜山站周边景点', sub: '步行即可游览的老城区景点' }
+        wartime: { title: '避难首都釜山遗产', sub: '留有朝鲜战争1,023天记忆的11处遗产' },
+        station: { title: '釜山站周边景点', sub: '按距釜山站由近到远介绍16处景点' }
       },
+      dist: km => `距釜山站直线约${km}公里`,
       spots: {
         wartime: [
-          { icon: '🏛️', name: '临时首都纪念馆', desc: '朝鲜战争时期曾作为总统官邸使用的红砖建筑，是感受釜山作为战时首都历史的最佳去处。', q: '부산 임시수도기념관' },
-          { icon: '🪦', name: '阿米洞墓碑村', desc: '建在日据时期墓地之上的山村，狭窄的阶梯巷弄间至今仍可见墓碑的痕迹，风景独特。', q: '부산 아미동 비석마을' },
-          { icon: '🕊️', name: '联合国纪念公园', desc: '全球唯一的联合国军人公墓，用以纪念在朝鲜战争中牺牲的联合国军将士，绿草如茵、氛围静谧。', q: '부산 유엔기념공원' },
-          { icon: '📚', name: '宝水洞书街', desc: '源于战争时期难民买卖旧书的小巷，至今仍保留着许多老书店，充满怀旧气息。', q: '부산 보수동책방골목' }
+          { name: '景武台（总统官邸）', now: '现临时首都纪念馆', desc: '建于1926年，原为庆尚南道知事官邸，朝鲜战争期间用作避难首都釜山的总统官邸。' },
+          { name: '临时中央厅', now: '现东亚大学石堂博物馆', desc: '原庆尚南道厅建筑，避难时期作为政府办公楼“临时中央厅”使用，是当时的国政中心。' },
+          { name: '国立中央观象台', now: '现釜山气象观测所', desc: '外观形似船只的近代建筑，战争期间从首尔迁来的国立中央观象台在此继续气象业务。' },
+          { name: '釜山港第1码头', now: '', desc: '联合国军兵力与救援物资在此登陆，无数避难民也由此上岸，是支撑战争的物资补给门户。' },
+          { name: '影岛大桥', now: '', desc: '1934年通车的开合桥，战乱中失散的家人曾约定“在影岛桥见面”，期盼重逢。' },
+          { name: '伏兵山配水池', now: '', desc: '1910年竣工的近代自来水设施，在避难民涌入、人口激增时仍为老城区供水。' },
+          { name: '阿米洞墓碑村', now: '', desc: '避难民在日据时期的公墓上，以墓碑和石板为基石建房安家而形成的村落。' },
+          { name: '牛岩洞牛棚村', now: '', desc: '将日据时期的牛检疫所棚舍分隔成小间，作为避难民的栖身之所，至今保留着当时的居住形态。' },
+          { name: '哈雅利亚营地', now: '现釜山市民公园', desc: '建于旧赛马场上的美军基地，战争期间设有联合国军釜山基地司令部，归还后改建为市民公园。' },
+          { name: '美国大使馆兼美国新闻处', now: '现釜山近现代历史馆别馆', desc: '原东洋拓殖株式会社釜山支店建筑，避难首都时期用作美国大使馆和美国新闻处。' },
+          { name: '联合国军墓地', now: '在韩联合国纪念公园', desc: '1951年建成，是全球唯一的联合国军公墓，长眠着在朝鲜战争中牺牲的联合国军将士。' }
         ],
         station: [
-          { icon: '🏮', name: '唐人街（德克萨斯街）', desc: '紧邻釜山站，融合中国与俄罗斯文化的异国街区，可品尝到丰富的中华料理与各式小吃。', q: '부산 차이나타운' },
-          { icon: '🌄', name: '草梁伊巴古路', desc: '沿山腰道路延伸的散步小径，从168台阶和观景台可俯瞰釜山港与老城区全景。', q: '초량이바구길' },
-          { icon: '🗼', name: '龙头山公园·釜山塔', desc: '位于市中心山丘上的公园，登上釜山塔观景台可将老城区与大海尽收眼底。', q: '부산 용두산공원' },
-          { icon: '🐟', name: '札嘎其市场', desc: '韩国最大的海鲜市场，可以亲自挑选新鲜海产并现场品尝，是釜山代表性的美食去处。', q: '자갈치시장' }
+          { name: '旧百济医院', desc: '建于1922年，是釜山首家近代私立综合医院，后曾作为餐厅、军官宿舍、领事馆等使用，现为咖啡馆和画廊。' },
+          { name: '北斗七星图书馆', desc: '位于釜山站旁建筑一楼的图书馆，环形书架令人印象深刻，适合旅途中小憩。' },
+          { name: '北港亲水公园', desc: '自1876年开港以来一直作为港口使用的北港，于2022年作为市民公园开放，海边散步与夜景都十分迷人。' },
+          { name: '草梁教会', desc: '创立于1892年的釜山首座新教教堂，见证了韩国近现代史的风风雨雨。' },
+          { name: '吾草梁', desc: '由1925年建造的日式木屋（国家登录文化遗产）改建而成的复合文化空间，采用预约制，请提前确认。' },
+          { name: '伊巴古营地', desc: '由草梁山腰村落居民共同经营的旅舍兼社区空间，可俯瞰老城区与北港风景。' },
+          { name: '文化共感水晶', desc: '建于1943年的日式住宅（旧政兰阁），已列为国家登录文化遗产，现作为文化空间和茶馆运营。' },
+          { name: '水晶山梦想乐园', desc: '位于水晶山脚下的大型森林儿童游乐场，设有生态、冒险、能量三大主题区，还可眺望北港海景。' },
+          { name: '东区文化平台', desc: '由旧釜山镇站改建而成的复合文化空间，举办展览、演出等多种文化活动。' },
+          { name: '国际咖啡博物馆', desc: '位于旧釜山镇站的咖啡博物馆，展示世界各地的咖啡器具与文化。预计于2026年12月底停止运营。' },
+          { name: '龙头山公园', desc: '位于老城区中心山丘上的公园，登上釜山塔观景台可将城市与大海尽收眼底。' },
+          { name: '李仲燮文化街', desc: '因画家李仲燮避难时期曾居住在凡一洞而打造的街道，在观景台和巷弄间可欣赏他的作品。' },
+          { name: '釜山镇城', desc: '留有壬辰倭乱首场激战历史的地方，子城台公园内复原了城墙与西门金楼馆。' },
+          { name: 'SEA LIFE釜山水族馆', desc: '位于海云台海水浴场前的大型水族馆，在海底隧道中可近距离观赏鲨鱼等多种海洋生物。' },
+          { name: '回东水源地', desc: '釜山市民的饮用水源湖泊，长期禁止出入后开放的湖畔步道与黄土林道十分宜人。' },
+          { name: '九峰山森林', desc: '由一个家族近400年精心守护的机张森林，高耸茂密的竹林与金刚松林蔚为壮观。' }
         ]
       }
     },
@@ -499,21 +643,41 @@
       mapBtn: '在Naver地圖查看',
       footer: '出發前請再次確認最新營業時間。',
       cats: {
-        wartime: { title: '避難首都釜山', sub: '留有韓戰痕跡的歷史遺產' },
-        station: { title: '釜山站周邊景點', sub: '步行即可遊覽的舊城區景點' }
+        wartime: { title: '避難首都釜山遺產', sub: '留有韓戰1,023天記憶的11處遺產' },
+        station: { title: '釜山站周邊景點', sub: '依距釜山站由近到遠介紹16處景點' }
       },
+      dist: km => `距釜山站直線約${km}公里`,
       spots: {
         wartime: [
-          { icon: '🏛️', name: '臨時首都紀念館', desc: '韓戰時期曾作為總統官邸使用的紅磚建築，是感受釜山身為戰時首都歷史最貼近的地方。', q: '부산 임시수도기념관' },
-          { icon: '🪦', name: '阿米洞墓碑村', desc: '建於日治時期墓地之上的山城聚落，狹窄的階梯巷弄間至今仍可見墓碑的痕跡，景色相當獨特。', q: '부산 아미동 비석마을' },
-          { icon: '🕊️', name: '聯合國紀念公園', desc: '全球唯一的聯合國軍人公墓，用以紀念在韓戰中犧牲的聯合國軍將士，綠草如茵、氣氛靜謐。', q: '부산 유엔기념공원' },
-          { icon: '📚', name: '寶水洞書街', desc: '源自戰爭時期難民買賣舊書的小巷，至今仍保留許多老書店，充滿懷舊氛圍。', q: '부산 보수동책방골목' }
+          { name: '景武臺（總統官邸）', now: '現臨時首都紀念館', desc: '建於1926年，原為慶尚南道知事官邸，韓戰期間作為避難首都釜山的總統官邸使用。' },
+          { name: '臨時中央廳', now: '現東亞大學石堂博物館', desc: '原慶尚南道廳建築，避難時期作為政府辦公廳舍「臨時中央廳」使用，是當時的國政中心。' },
+          { name: '國立中央觀象臺', now: '現釜山氣象觀測所', desc: '外觀形似船隻的近代建築，戰爭期間自首爾遷來的國立中央觀象臺在此延續氣象業務。' },
+          { name: '釜山港第1碼頭', now: '', desc: '聯合國軍兵力與救援物資在此登岸，無數避難民也由此上岸，是支撐戰爭的物資補給門戶。' },
+          { name: '影島大橋', now: '', desc: '1934年通車的開合橋，戰亂中失散的家人曾相約「在影島橋見」，期盼重逢。' },
+          { name: '伏兵山配水池', now: '', desc: '1910年竣工的近代自來水設施，在避難民湧入、人口激增時仍為舊城區供水。' },
+          { name: '阿米洞墓碑村', now: '', desc: '避難民在日治時期的公墓上，以墓碑與石板為基石蓋房安家而形成的聚落。' },
+          { name: '牛岩洞牛棚村', now: '', desc: '將日治時期的牛隻檢疫所棚舍隔成小間，作為避難民的棲身之所，至今保留當時的居住樣貌。' },
+          { name: '哈雅利亞營區', now: '現釜山市民公園', desc: '建於舊賽馬場上的美軍基地，戰爭期間設有聯合國軍釜山基地司令部，歸還後改建為市民公園。' },
+          { name: '美國大使館兼美國新聞處', now: '現釜山近現代歷史館別館', desc: '原東洋拓殖株式會社釜山支店建築，避難首都時期作為美國大使館與美國新聞處使用。' },
+          { name: '聯合國軍墓地', now: '在韓聯合國紀念公園', desc: '1951年建成，是全球唯一的聯合國軍公墓，長眠著在韓戰中犧牲的聯合國軍將士。' }
         ],
         station: [
-          { icon: '🏮', name: '唐人街（德州街）', desc: '緊鄰釜山站，融合中國與俄羅斯文化的異國街區，可品嚐豐富的中華料理與各式小吃。', q: '부산 차이나타운' },
-          { icon: '🌄', name: '草梁伊巴古路', desc: '沿著山腰道路延伸的散步小徑，從168階梯與觀景台可俯瞰釜山港與舊城區全景。', q: '초량이바구길' },
-          { icon: '🗼', name: '龍頭山公園·釜山塔', desc: '位於市中心山丘上的公園，登上釜山塔觀景台可將舊城區與大海盡收眼底。', q: '부산 용두산공원' },
-          { icon: '🐟', name: '札嘎其市場', desc: '韓國最大的海鮮市場，可以親自挑選新鮮海產並現場品嚐，是釜山具代表性的美食景點。', q: '자갈치시장' }
+          { name: '舊百濟醫院', desc: '建於1922年，是釜山第一家近代私立綜合醫院，之後曾作為餐廳、軍官宿舍、領事館等使用，現為咖啡館與藝廊。' },
+          { name: '北斗七星圖書館', desc: '位於釜山站旁建築一樓的圖書館，環形書牆令人印象深刻，適合旅途中稍作休息。' },
+          { name: '北港親水公園', desc: '自1876年開港以來僅作為港口使用的北港，於2022年以市民公園之姿開放，海濱散步與夜景都很迷人。' },
+          { name: '草梁教會', desc: '創立於1892年的釜山第一座基督新教教堂，見證了韓國近現代史的起伏。' },
+          { name: '吾草梁', desc: '由1925年建造的日式木造住宅（國家登錄文化遺產）改造而成的複合文化空間，採預約制，請事先確認。' },
+          { name: '伊巴古營地', desc: '由草梁山腰聚落居民共同經營的民宿兼社區空間，可俯瞰舊城區與北港風光。' },
+          { name: '文化共感水晶', desc: '建於1943年的日式住宅（舊政蘭閣），已列為國家登錄文化遺產，現作為文化空間與茶館營運。' },
+          { name: '水晶山夢想樂園', desc: '位於水晶山山腳的大型森林兒童遊樂場，設有生態、冒險、能量三大主題區，還能眺望北港海景。' },
+          { name: '東區文化平台', desc: '由舊釜山鎮站改建而成的複合文化空間，舉辦展覽、演出等多元文化活動。' },
+          { name: '國際咖啡博物館', desc: '位於舊釜山鎮站的咖啡博物館，展示世界各地的咖啡器具與文化。預計於2026年12月底停止營運。' },
+          { name: '龍頭山公園', desc: '位於舊城區中心山丘上的公園，登上釜山塔觀景台可將城市與大海盡收眼底。' },
+          { name: '李仲燮文化街', desc: '因畫家李仲燮避難時期曾住在凡一洞而打造的街道，在觀景台與巷弄間都能欣賞他的作品。' },
+          { name: '釜山鎮城', desc: '留有壬辰倭亂首場激戰歷史的地方，子城台公園內復原了城牆與西門金樓館。' },
+          { name: 'SEA LIFE釜山水族館', desc: '位於海雲台海水浴場前的大型水族館，在海底隧道中可近距離欣賞鯊魚等各種海洋生物。' },
+          { name: '回東水源地', desc: '釜山市民的飲用水源湖泊，長期禁止進入後開放的湖畔步道與黃土林道相當宜人。' },
+          { name: '九峰山森林', desc: '由一個家族近400年悉心守護的機張森林，高聳茂密的竹林與金剛松林蔚為壯觀。' }
         ]
       }
     },
@@ -526,25 +690,83 @@
       mapBtn: 'Naverマップで見る',
       footer: '訪問前に最新の営業時間をご確認ください。',
       cats: {
-        wartime: { title: '避難首都・釜山', sub: '朝鮮戦争の痕跡が残る歴史遺産' },
-        station: { title: '釜山駅周辺の観光地', sub: '徒歩で楽しむ旧市街の名所' }
+        wartime: { title: '避難首都・釜山の遺産', sub: '朝鮮戦争1,023日の記憶が残る11か所' },
+        station: { title: '釜山駅周辺の観光地', sub: '釜山駅から近い順に紹介する16か所' }
       },
+      dist: km => `釜山駅から直線で約${km}km`,
       spots: {
         wartime: [
-          { icon: '🏛️', name: '臨時首都記念館', desc: '朝鮮戦争当時、大統領官邸として使われた赤レンガの建物。避難首都・釜山の歴史を最も身近に感じられる場所です。', q: '부산 임시수도기념관' },
-          { icon: '🪦', name: 'アミドン墓石村', desc: '日本統治時代の墓地の上に形成された村で、狭い階段道のあちこちに墓石が残る独特な風景が広がります。', q: '부산 아미동 비석마을' },
-          { icon: '🕊️', name: '国連記念公園', desc: '朝鮮戦争で戦死した国連軍兵士を追悼する、世界で唯一の国連軍墓地。緑の芝生と静かな雰囲気が印象的です。', q: '부산 유엔기념공원' },
-          { icon: '📚', name: '宝水洞 本の街', desc: '避難時代に古本を売買していたことから始まった路地で、今も昔ながらの古書店が並び懐かしい雰囲気を残しています。', q: '부산 보수동책방골목' }
+          { name: '景武台（大統領官邸）', now: '現・臨時首都記念館', desc: '1926年に慶尚南道知事の官舎として建てられ、朝鮮戦争中は避難首都・釜山の大統領官邸として使われました。' },
+          { name: '臨時中央庁', now: '現・東亜大学校 石堂博物館', desc: '旧慶尚南道庁の建物で、避難時代には政府庁舎「臨時中央庁」として国政の中心を担いました。' },
+          { name: '国立中央観象台', now: '現・釜山気象観測所', desc: '船を思わせる外観の近代建築。戦時中、ソウルから移転した国立中央観象台がここで気象業務を続けました。' },
+          { name: '釜山港第1埠頭', now: '', desc: '国連軍の兵力と救援物資が到着し、多くの避難民が降り立った場所。戦争を支えた物資補給の玄関口でした。' },
+          { name: '影島大橋', now: '', desc: '1934年開通の跳ね橋。戦乱で離れ離れになった家族が「影島橋で会おう」と再会を誓った場所です。' },
+          { name: '伏兵山配水池', now: '', desc: '1910年完成の近代上水道施設。避難民で人口が急増した時期にも旧市街へ水を送り続けました。' },
+          { name: '峨嵋洞 碑石村', now: '', desc: '避難民が日本統治時代の共同墓地の上に、墓石を礎石にして家を建て暮らしを築いた村です。' },
+          { name: '牛岩洞 牛小屋村', now: '', desc: '日本統治時代の牛の検疫所の畜舎を小さく仕切り、避難民の住まいとした場所。当時の住居形態が残っています。' },
+          { name: 'キャンプ・ハヤリア', now: '現・釜山市民公園', desc: '旧競馬場の跡地に置かれた米軍基地で、戦時中は国連軍釜山基地司令部が置かれ、返還後に市民公園となりました。' },
+          { name: '米国大使館 兼 米国広報院', now: '現・釜山近現代歴史館 別館', desc: '旧東洋拓殖株式会社釜山支店の建物で、避難首都時代には米国大使館と米国広報院として使われました。' },
+          { name: '国連軍墓地', now: '在韓国連記念公園', desc: '1951年に造成された世界で唯一の国連軍墓地で、朝鮮戦争で戦死した国連軍将兵が眠っています。' }
         ],
         station: [
-          { icon: '🏮', name: 'チャイナタウン（テキサス通り）', desc: '釜山駅のすぐ前に広がる、中国とロシアの文化が入り混じるエキゾチックな通り。中華料理をはじめ多彩なグルメが楽しめます。', q: '부산 차이나타운' },
-          { icon: '🌄', name: '草梁イバグギル', desc: '山腹道路沿いに続く散策路。168階段と展望台からは釜山港と旧市街を一望できます。', q: '초량이바구길' },
-          { icon: '🗼', name: '龍頭山公園・釜山タワー', desc: '市街地中心部の丘にある公園。釜山タワーの展望台に上れば、旧市街と海のパノラマが広がります。', q: '부산 용두산공원' },
-          { icon: '🐟', name: 'チャガルチ市場', desc: '韓国最大の水産市場。新鮮な海産物をその場で選んで味わえる、釜山を代表するグルメスポットです。', q: '자갈치시장' }
+          { name: '旧百済病院', desc: '1922年に建てられた釜山初の近代的な個人総合病院の建物。飲食店・将校宿舎・領事館などを経て、現在はカフェとギャラリーになっています。' },
+          { name: '北斗七星図書館', desc: '釜山駅のすぐ隣の建物1階にある図書館。円形の書架が印象的な空間で、旅の合間のひと休みにぴったりです。' },
+          { name: '北港親水公園', desc: '1876年の開港以来、港としてのみ使われてきた北港が2022年に市民公園として開放。海沿いの散歩と夜景が魅力です。' },
+          { name: '草梁教会', desc: '1892年に設立された釜山初のプロテスタント教会で、韓国近現代史の歩みとともにあった歴史的な場所です。' },
+          { name: 'オチョリャン（吾草梁）', desc: '1925年築の日本式木造住宅（国家登録文化遺産）を複合文化空間としてよみがえらせた場所。予約制なので事前にご確認ください。' },
+          { name: 'イバグキャンプ', desc: '草梁の山腹道路の村で住民とともに運営されるゲストハウス兼コミュニティスペース。旧市街と北港の景色を見渡せます。' },
+          { name: '文化共感スジョン', desc: '1943年に建てられた日本式家屋（旧政蘭閣）。国家登録文化遺産で、文化空間と茶房として運営されています。' },
+          { name: '水晶山ドリーム遊び場', desc: '水晶山のふもとに造られた大規模な森の子ども遊び場。生態・冒険・エネルギーの遊び場があり、北港の海も一望できます。' },
+          { name: '東区文化プラットフォーム', desc: '旧釜山鎮駅舎を改装した複合文化空間で、展示や公演などさまざまな文化プログラムが開かれます。' },
+          { name: '国際コーヒー博物館', desc: '旧釜山鎮駅にあるコーヒー博物館。世界各国のコーヒー道具と文化に出会えます。2026年12月末で運営終了予定です。' },
+          { name: '龍頭山公園', desc: '旧市街の中心にある丘の上の公園。釜山タワーの展望台に上れば、街と海のパノラマが広がります。' },
+          { name: '李仲燮文化通り', desc: '画家・李仲燮が避難時代に凡一洞で暮らした縁から造られた通り。展望台や路地のあちこちで彼の作品に出会えます。' },
+          { name: '釜山鎮城', desc: '文禄の役（壬辰倭乱）最初の激戦の歴史を伝える場所で、子城台公園内に城壁と西門・金楼館が復元されています。' },
+          { name: 'SEA LIFE釜山アクアリウム', desc: '海雲台海水浴場前の大型水族館。海底トンネルでサメなど多彩な海の生き物に出会えます。' },
+          { name: '回東水源地', desc: '釜山市民の水源となっている湖。長く立ち入りが制限されてきた湖畔の散策路や黄土の森の道を歩けます。' },
+          { name: 'アホプサンの森', desc: 'ひとつの家門が400年近く守り育ててきた機張の森。空を覆うほどの竹林と金剛松の群落は圧巻です。' }
         ]
       }
     }
   };
+
+  // 피란수도 부산 유산 — 이미지·주소·지도 검색어 (언어 공통, content.*.spots.wartime 과 순서 동일)
+  const wartimeMeta = [
+    { img: 'Presidential Residence.jpg', addr: '부산광역시 서구 임시수도기념로 45', q: '임시수도기념관' },
+    { img: 'Government Complex.jpg', addr: '부산광역시 서구 구덕로 225', q: '동아대학교 석당박물관' },
+    { img: 'Meteorological.jpg', addr: '부산광역시 중구 복병산길 32번길 5-11', q: '부산기상관측소' },
+    { img: 'Pier 1 of Busan Port.jpg', addr: '부산광역시 중구 4가 105 일원 등', q: '부산항 제1부두' },
+    { img: 'Yeongdo Bridge.png', addr: '부산광역시 영도구 대교동 1가 190-1', q: '영도대교' },
+    { img: 'Bokbyeongsan.png', addr: '부산광역시 중구 샘길 10', q: '복병산배수지' },
+    { img: 'Tombstone Village.jpg', addr: '부산광역시 서구 아미로 38번길 1 등', q: '아미동 비석마을' },
+    { img: 'Cattle Shed Village.jpg', addr: '부산광역시 남구 우암번영로 9번길 9 등', q: '우암동 소막마을' },
+    { img: 'Camp Hialeah.jpg', addr: '부산광역시 부산진구 시민공원로 73', q: '부산시민공원' },
+    { img: 'U.S..jpg', addr: '부산광역시 중구 대청로 104', q: '부산근현대역사관 별관' },
+    { img: 'UN.jpg', addr: '부산광역시 남구 유엔평화로 93', q: '재한유엔기념공원' }
+  ];
+
+  // 부산역 인근 관광지 — 부산역 기준 직선거리 가까운 순 (content.*.spots.station 과 순서 동일)
+  const KOGL = '© 부산관광공사 · 공공누리 제1유형';
+  const stationMeta = [
+    { km: 0.4, img: 'Baekje Hospital.jpg', credit: KOGL, addr: '부산광역시 동구 중앙대로209번길 16', q: '구 백제병원' },
+    { km: 0.4, img: 'Bukdu Chilseong Library.jpg', credit: KOGL, addr: '부산광역시 동구 충장대로 160 협성마리나G7 B동 1층', q: '북두칠성도서관' },
+    { km: 0.6, img: 'Bukhang Waterfront Park.jpg', credit: KOGL, addr: '부산광역시 동구 이순신대로 164', q: '북항친수공원' },
+    { km: 0.7, img: 'Choryang Church.jpg', credit: KOGL, addr: '부산광역시 동구 초량상로 53', q: '초량교회 부산 동구' },
+    { km: 0.8, img: 'O Choryang.jpg', credit: KOGL, addr: '부산광역시 동구 고관로13번나길 22', q: '오초량' },
+    { km: 1.1, img: 'ibagu camp.jpg', addr: '부산광역시 동구 망양로525번길 22', q: '이바구캠프' },
+    { km: 1.2, img: 'Munhwa Gonggam Sujeong.jpg', credit: '© Trainholic · CC BY-SA 4.0', addr: '부산광역시 동구 홍곡로 75', q: '문화공감수정' },
+    { km: 1.5, img: 'Sujeongsan.png', addr: '부산광역시 동구 수정동 721', q: '수정산꿈자람터' },
+    { km: 1.6, img: 'Donggu Culture Platform.png', addr: '부산광역시 동구 중앙대로 380', q: '동구문화플랫폼' },
+    { km: 1.6, img: 'Coffee Museum.jpg', credit: KOGL, addr: '부산광역시 동구 중앙대로 380 (옛 부산진역)', q: '국제커피박물관' },
+    { km: 1.8, img: 'Yongdusan Park.jpg', credit: '© Mobius6 · CC BY-SA 4.0', addr: '부산광역시 중구 용두산길 37-55', q: '용두산공원' },
+    { km: 3.0, img: 'Lee Jung-seob Street.jpg', credit: KOGL, addr: '부산광역시 동구 범일동 1461-144 일원', q: '이중섭거리' },
+    { km: 3.1, img: 'Busanjinseong.jpg', credit: '© Kwondaeo · CC BY-SA 4.0', addr: '부산광역시 동구 자성로 99', q: '부산진성' },
+    { km: 12, img: 'Busan Aquarium.jpg', credit: KOGL, addr: '부산광역시 해운대구 해운대해변로 266', q: 'SEA LIFE 부산아쿠아리움' },
+    { km: 15, img: 'Hoedong Reservoir.jpg', credit: KOGL, addr: '부산광역시 금정구 회동동 일원', q: '회동수원지' },
+    { km: 23, img: 'Ahopsan Forest.jpg', credit: '© Xia · CC BY-SA 4.0', addr: '부산광역시 기장군 철마면 미동길 37-1', q: '아홉산숲' }
+  ];
+
+  const spotMeta = { wartime: wartimeMeta, station: stationMeta };
 
   const photoTint = {
     wartime: ['#2E6BC2', '#123A75'],
@@ -590,15 +812,26 @@
       const spotList = document.getElementById('spotList');
       spotList.innerHTML = '';
 
-      c.spots[cat].forEach(spot => {
+      c.spots[cat].forEach((spot, i) => {
+        const meta = spotMeta[cat][i] || {};
+        const q = meta.q || spot.q;
+        const num = `<span class="spot-num">${String(i + 1).padStart(2, '0')}</span>`;
+        const credit = meta.credit ? `<div class="spot-credit">📷 ${meta.credit}</div>` : '';
+        const photo = meta.img
+          ? `<div class="spot-photo has-img"><img src="assets/busan.spots/${encodeURIComponent(meta.img)}" alt="${spot.name}" loading="lazy">${num}</div>`
+          : `<div class="spot-photo" style="--photo-a:${tint[0]};--photo-b:${tint[1]}">${num}<span>${meta.icon || spot.icon}</span></div>`;
         const card = document.createElement('div');
         card.className = 'spot-card';
         card.innerHTML = `
-          <div class="spot-photo" style="--photo-a:${tint[0]};--photo-b:${tint[1]}"><span>${spot.icon}</span></div>
+          ${photo}
           <div class="spot-body">
             <div class="spot-title">${spot.name}</div>
+            ${spot.now ? `<div class="spot-now">${spot.now}</div>` : ''}
+            ${meta.km ? `<div class="spot-now">🚶 ${c.dist(meta.km)}</div>` : ''}
             <div class="spot-desc">${spot.desc}</div>
-            <a class="map-btn" href="${naverUrl(spot.q)}" target="_blank" rel="noopener noreferrer">📍 ${c.mapBtn}</a>
+            ${meta.addr ? `<div class="spot-addr"><span>📌</span><span>${meta.addr}</span></div>` : ''}
+            <a class="map-btn" href="${naverUrl(q)}" target="_blank" rel="noopener noreferrer">📍 ${c.mapBtn}</a>
+            ${credit}
           </div>
         `;
         spotList.appendChild(card);
@@ -632,6 +865,12 @@
     render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+
+  const toTop = document.getElementById('toTop');
+  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('show', window.scrollY > 400);
+  }, { passive: true });
 
   render();
 </script>
