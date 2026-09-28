@@ -2496,8 +2496,11 @@ homeBtn.addEventListener('click',()=>{
   solved = STEPS.map(()=>false);
   dlgSeenOnce = STEPS.map(()=>false);
   dlgPausedAtQuestMark = false;
+  openingQuest = false;
   clearProgress();
-  showOpeningQuest();
+  fName.value=''; fAddr.value=''; fEmail.value=''; fConsent.checked=false; refreshRegBtn();
+  PLAYER.name=''; PLAYER.addr=''; PLAYER.email='';
+  showScreen(titleEl);
 });
 
 questBadge.addEventListener('click',()=>{
