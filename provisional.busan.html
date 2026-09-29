@@ -350,7 +350,17 @@ button{cursor:pointer}
 #hint-body-wrap{flex:1;min-width:0}
 #hint-name{font-size:11px;color:var(--coral-deep);margin-bottom:3px}
 #hint-text{font-size:12px;line-height:1.5;color:#2b2018}
-#hint-close{margin-top:8px;width:100%;border-radius:9px;font-size:11.5px;padding:7px;
+#hint-answer{display:none;font-size:12.5px;font-weight:700;color:var(--blue-deep);margin-top:7px;
+  background:#e8eeff;border:1.5px dashed var(--blue);border-radius:8px;padding:6px 8px}
+#hint-answer.show{display:block}
+#hint-answer-img{display:none;width:100%;border-radius:8px;margin-top:6px;border:1.5px solid var(--blue);cursor:zoom-in}
+#hint-answer-img.show{display:block}
+#img-lightbox{display:none;position:absolute;inset:0;z-index:300;background:rgba(0,0,0,.85);
+  align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+#img-lightbox.show{display:flex}
+#img-lightbox img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+#hint-reveal{margin-top:8px;width:100%;border-radius:9px;font-size:11.5px;padding:7px}
+#hint-close{margin-top:6px;width:100%;border-radius:9px;font-size:11.5px;padding:7px;
   background:var(--coral-deep);border-color:var(--coral-deep);box-shadow:2px 2px 0 #5c1c28}
 #hint-close:active{box-shadow:0 0 0 #5c1c28}
 
@@ -487,7 +497,7 @@ button{cursor:pointer}
           <button type="button" class="lang-opt" data-lang="ko"><span data-content="한국어">한국어</span></button>
           <button type="button" class="lang-opt" data-lang="en"><span data-content="English">English</span></button>
           <button type="button" class="lang-opt" data-lang="cn"><span data-content="中文">中文</span></button>
-          <button type="button" class="lang-opt" data-lang="tw"><span data-content="臺語">臺語</span></button>
+          <button type="button" class="lang-opt" data-lang="tw"><span data-content="繁體中文">繁體中文</span></button>
           <button type="button" class="lang-opt" data-lang="ja"><span data-content="日本語">日本語</span></button>
         </div>
       </div>
@@ -503,7 +513,6 @@ button{cursor:pointer}
       <div id="fields">
         <div class="field"><span id="label-name">탐정명</span><input id="f-name" placeholder="예: 홍길동" maxlength="12"></div>
         <div class="field"><span id="label-addr">사는곳</span><input id="f-addr" placeholder="예: 부산 동구" maxlength="20"></div>
-        <div class="field"><span id="label-email">메일주소</span><input id="f-email" type="email" placeholder="선택 입력"></div>
       </div>
       <div id="consent-box">
         <div class="ttl" id="consent-ttl">※ 개인정보 수집 및 이용 안내</div>
@@ -540,6 +549,9 @@ button{cursor:pointer}
           <div id="hint-body-wrap">
             <div id="hint-name">미요</div>
             <div id="hint-text"></div>
+            <div id="hint-answer"></div>
+            <img id="hint-answer-img" alt="">
+            <button id="hint-reveal" class="rbtn rbtn--secondary">정답 바로보기</button>
             <button id="hint-close" class="rbtn rbtn--wood">닫기</button>
           </div>
         </div>
@@ -654,12 +666,14 @@ button{cursor:pointer}
 
   <div id="new-quest-toast">새로운 퀘스트</div>
 
+  <div id="img-lightbox"><img id="img-lightbox-img" alt=""></div>
+
 </div></div>
 
 <script>
 "use strict";
 
-const PLAYER = { name:'', addr:'', email:'' };
+const PLAYER = { name:'', addr:'' };
 
 /* ---- 다국어(i18n) ---- */
 const TR = {
@@ -669,7 +683,6 @@ en: {
     "정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.":  "To ensure accurate participation statistics, please enter the correct information for each actual participant.",
     "탐정명":  "Detective\u0027s Name",
     "사는곳":  "Place of Residence",
-    "메일주소":  "Email Address",
     "예: 홍길동":  "e.g. John Smith",
     "예: 부산 동구":  "e.g. USA",
     "선택 입력":  "Optional input",
@@ -699,7 +712,7 @@ en: {
     "알아내보자":  "Let\u0027s find out",
     "사건 해결":  "Resolving the Case",
     "모든 단서를 모았어요. 결과를 확인해볼까요?":  "I\u0027ve gathered all the clues. Shall we see the results?",
-    "도착완료":  "Delivery Complete",
+    "도착완료":  "I've Arrived",
     "도착했어요":  "I\u0027ve arrived.",
     "소포의 시작":  "The Beginning of the Package",
     "발밑의 단서":  "Clues at My Feet",
@@ -813,7 +826,7 @@ en: {
     "맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.":  "That\u0027s right. They say that in the past, everyone used to stand on top of this high hill and these stairs, panting for breath, and gaze endlessly out at the sea at Busan Harbor.",
     "바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.":  "Whenever a large ship came in from far out at sea, it meant there was finally work to be had at the port! Then, the locals would rush over in droves to carry heavy cargo, and they’d work up a sweat while saving up every little bit of money they could.",
     "아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?":  "I guess… my grandmother’s father—my great-grandfather—must have worked just as hard down there, too…?",
-    "아참! 탐정님, 슬퍼하고 있을 시간이 없어요! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "Oh, right! ⟦DET⟧, there’s no time to be sad! Come check this out instead! It’s a place called the “Mangyang-ro Mountain Road Exhibition Hall.” The true, deep history of our neighborhood is all hidden right here!",
+    "아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "Oh, right! Come check this out instead! It’s a place called the “Mangyang-ro Mountain Road Exhibition Hall.” The true, deep history of our neighborhood is all hidden right here!",
     "어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!":  "Maybe you’ll even find a clue here about the secret behind that suspicious package ⟦DET⟧ is holding!",
     "거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!":  "If you go there, there’s this guy named Ian who sings just as amazingly well as today’s idols and is incredibly handsome, right? Hurry up and go ask him!",
     "저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!":  "I really, really want to go with you too… but if I go any further, my mom will give me a huge scolding, so I’ll just go this far. Hehe! ⟦DET⟧ Be careful on your way!",
@@ -833,7 +846,8 @@ en: {
     "누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.":  "See if you can find that “item” inside the exhibition hall—it’s the one your sister used to make at the factory. It’s probably right there in plain sight.",
     "(지금까지 모은 단서들을 보여준다.)":  "(He shows the clues he has gathered so far.)",
     "전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?":  "Let\u0027s use the clues hidden in the exhibition to find out where my older sister used to work.",
-    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 무엇이 있을까요?":  "What is below the purple, to the left of the white, and across from the navy blue?",
+    "정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?":  "What did Jeong-su's sister make while walking back and forth along \"My Sister's Path\"?",
+    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "What is below the purple, to the left of the white, and across from the navy blue? (You can also enter the number where the item is placed!)",
     "정수의 누나가 일하던 곳을 알아내셨나요?":  "Did you find out where Jung-soo\u0027s older sister used to work?",
     "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "Don\u0027t rush. If you take another look at the exhibits one by one, you\u0027ll see it.",
     "맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠":  "That\u0027s right, rubber shoes... or rather, it was a factory that made rubber shoes! Back then, the refugees—whether at the rubber shoe factory beyond that mountain road or as porters—each did their part to get through the day as best they could.",
@@ -861,7 +875,10 @@ en: {
     "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "...Hwang Jeong-wol—so this is the older sister my grandfather longed for his whole life.",
     "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "To think that this package... wasn\u0027t a lost package at all, but one you couldn\u0027t bring yourself to send and had buried in the soil of Choryang...",
     "보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요":  "Believing that the train ticket you never sent was not a source of sorrow but a hope that would one day blossom… you buried it in the soil of Choryang.",
-    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "Thank you so much, ⟦DET⟧, for finally bringing our family’s long-forgotten promise to light."
+    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "Thank you so much, ⟦DET⟧, for finally bringing our family’s long-forgotten promise to light.",
+    "정답 바로보기":  "Reveal Answer",
+    "정답: ":  "Answer: ",
+    "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "Check out the new quest in the top right!"
 },
 ja: {
     "잃어버린 소포 — 미션투어":  "紛失した小包 — ミッションツアー",
@@ -869,7 +886,6 @@ ja: {
     "정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.":  "正確な参加者統計を集計するため、実際に参加される方の情報を正確にご記入ください。",
     "탐정명":  "探偵名",
     "사는곳":  "住んでいる場所",
-    "메일주소":  "メールアドレス",
     "예: 홍길동":  "例：山田太郎",
     "예: 부산 동구":  "例：日本",
     "선택 입력":  "選択を入力してください",
@@ -1013,7 +1029,7 @@ ja: {
     "맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.":  "そうですね。昔は、この高い丘や階段の上で、みんな息を切らしながら、釜山港の海をただひたすら眺めていたそうです。",
     "바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.":  "海の彼方から大きな船が入港すると、ついに港で仕事ができるようになったということなんです！すると、近所の人たちがこぞって駆けつけて重い荷物を運び、汗を流しながら、わずかなお金を少しずつ貯めていったそうです。",
     "아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?":  "たぶん…私の祖母の父、つまり私の曽祖父も、あそこであんなに一生懸命働いていたんでしょうね…？",
-    "아참! 탐정님, 슬퍼하고 있을 시간이 없어요! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "あっ、そうだ！⟦DET⟧、悲しんでいる暇なんてありませんよ！今度はこっちへ来てみてください！「マンヤンロ山腹道路展示館」という場所なのですが、私たちの町の本当に深い歴史が、すべてここに隠されているんですよ！",
+    "아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "あっ、そうだ！今度はこっちへ来てみてください！「マンヤンロ山腹道路展示館」という場所なのですが、私たちの町の本当に深い歴史が、すべてここに隠されているんですよ！",
     "어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!":  "もしかすると、⟦DET⟧さんが持っているあの不審な小包の秘密についても、ここから手がかりが見つかるかもしれませんよ！",
     "거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!":  "あそこに行けば、最近のアイドル並みに歌が本当にすごく上手で、めちゃくちゃイケメンなイアンお兄さんがいるんですよ？ 早く行って、そのお兄さんにぜひ聞いてみてください！",
     "저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!":  "私も本当に本当に一緒に行きたいんだけど…ここから先に行くとママにすごく怒られちゃうから、ここまでにするね、へへっ！ ⟦DET⟧ 気をつけて行ってね！",
@@ -1033,7 +1049,8 @@ ja: {
     "누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.":  "お姉さんがどんなものを製造する工場で働いていたのか、展示室の中でその「もの」をぜひ探してみてください。きっと目立つ場所にあるはずです。",
     "(지금까지 모은 단서들을 보여준다.)":  "（これまでに集めた手がかりを見せる。）",
     "전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?":  "展示の中に隠された手がかりを頼りに、お姉さんがどこで働いていたのか探してみましょうか？",
-    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 무엇이 있을까요?":  "紫の下、白の左側、そして紺色の反対側には何があるでしょうか？",
+    "정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?":  "正洙の姉が「姉の道」を行き来しながら作っていたものは何でしょうか？",
+    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫の下、白の左側、そして紺色の反対側にあるものは何でしょうか？（物が置かれている番号を入力してもOKです！）",
     "정수의 누나가 일하던 곳을 알아내셨나요?":  "ジョンソの姉さんが働いていた場所を突き止めましたか？",
     "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "急がないでください。展示物を一つずつ改めてご覧になれば、きっとお分かりになるはずです。",
     "맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠":  "そうですね、ゴム靴……いえ、ゴム靴を作っていた工場でした！あの頃、避難民たちはあの山腹の道路の向こうにあるゴム靴工場で、あるいは荷担ぎとして……それぞれの場所で、なんとか一日をやり過ごしていたのです。",
@@ -1061,7 +1078,10 @@ ja: {
     "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "…ファン・ジョンウォル、この方が、おじいさんが生涯、あれほど慕っていたお姉さんだったのですね。",
     "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "この小包が……紛失した小包ではなく、どうしても送る勇気がなく、草梁の土の中に埋めておいたものだったとは……",
     "보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요":  "送ることができなかった切符を、悲しみではなく、いつか花開く希望だと信じて……草梁の土の中に埋めておいたのですね",
-    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "長い間埋もれていた私たちの家族の約束を…ついに世の中に広めてくださり、本当にありがとうございます、⟦DET⟧。"
+    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "長い間埋もれていた私たちの家族の約束を…ついに世の中に広めてくださり、本当にありがとうございます、⟦DET⟧。",
+    "정답 바로보기":  "答えをすぐ見る",
+    "정답: ":  "答え：",
+    "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "右上で新しいクエストを確認してみましょう！"
 },
 cn: {
     "잃어버린 소포 — 미션투어":  "丢失的包裹 — 任务之旅",
@@ -1069,7 +1089,6 @@ cn: {
     "정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.":  "为了准确统计参与人数，请如实填写实际参与者的信息。",
     "탐정명":  "侦探名",
     "사는곳":  "居住地",
-    "메일주소":  "电子邮箱地址",
     "예: 홍길동":  "例：张伟",
     "예: 부산 동구":  "例：中国",
     "선택 입력":  "请输入选项",
@@ -1099,7 +1118,7 @@ cn: {
     "알아내보자":  "让我们来了解一下吧",
     "사건 해결":  "案件解决",
     "모든 단서를 모았어요. 결과를 확인해볼까요?":  "所有线索都收集齐了。来看看结果吧？",
-    "도착완료":  "已送达",
+    "도착완료":  "已到达",
     "도착했어요":  "到了",
     "소포의 시작":  "包裹的起源",
     "발밑의 단서":  "脚下的线索",
@@ -1213,7 +1232,7 @@ cn: {
     "맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.":  "是啊。据说以前，大家都会在这座高高的山丘和台阶上气喘吁吁地，无尽地眺望釜山港的海景。",
     "바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.":  "当远处海面上驶来一艘大船时，这就意味着港口终于有活干了！于是，村里的人们便蜂拥而至，搬运沉重的货物，一边挥汗如雨，一边一点一滴地攒下微薄的收入。",
     "아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?":  "也许……我奶奶的爸爸，也就是我的曾祖父，当时也在那里那么努力地干活吧……？",
-    "아참! 탐정님, 슬퍼하고 있을 시간이 없어요! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "啊，对了！⟦DET⟧，没时间伤心了！这次来这边看看吧！这里叫「望阳路山麓公路展览馆」。我们社区真正深厚的历史，全都藏在这里呢！",
+    "아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "啊，对了！这次来这边看看吧！这里叫「望阳路山麓公路展览馆」。我们社区真正深厚的历史，全都藏在这里呢！",
     "어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!":  "说不定关于⟦DET⟧手中那个可疑包裹的秘密，也能在这里找到线索呢！",
     "거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!":  "去那里的话，会有一个叫伊安的哥哥，他唱歌真的超棒，和现在的偶像一样，而且长得超级帅，对吧？快点去问问那个哥哥吧！",
     "저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!":  "我真的真的好想和你一起去啊……但如果再往前走的话，妈妈会狠狠骂我的，所以我只能走到这里了，嘿嘿！⟦DET⟧ 路上小心哦！",
@@ -1233,7 +1252,8 @@ cn: {
     "누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.":  "姐姐曾在一家生产某种物品的工厂工作，请在展厅里亲自找找看那件“物品”。它应该就在显眼的地方。",
     "(지금까지 모은 단서들을 보여준다.)":  "（展示迄今为止收集到的线索。）",
     "전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?":  "让我们通过展览中隐藏的线索，来寻找姐姐以前在哪里工作吧？",
-    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 무엇이 있을까요?":  "紫色下面、白色左边以及深蓝色对面有什么呢？",
+    "정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?":  "正秀的姐姐往返于「姐姐的路」时制作的是什么呢？",
+    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫色下面、白色左边，以及深蓝色对面的是什么呢？（也可以输入物品所在的编号！）",
     "정수의 누나가 일하던 곳을 알아내셨나요?":  "您查到正秀姐姐以前工作的地方了吗？",
     "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "请别着急。如果您逐一重新仔细观察展品，就会发现其中的奥妙。",
     "맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠":  "没错，是橡胶鞋……不，是曾经生产橡胶鞋的工厂！那个年代，难民们有的在那条山麓公路对面的橡胶鞋工厂工作，有的当挑夫……每个人都在自己的岗位上，竭尽全力熬过每一天。",
@@ -1261,7 +1281,10 @@ cn: {
     "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "……黄正月，这位就是爷爷一辈子都如此思念的姐姐啊。",
     "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "原来这个包裹……并不是丢失的包裹，而是您不忍心寄出，便将其埋在了草梁的泥土里啊……",
     "보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요":  "您将那张未能寄出的火车票，视作并非悲伤，而是终将绽放的希望……并将其埋藏在草梁的泥土中了呢",
-    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "感谢您⟦DET⟧，终于将我们家族那尘封已久的承诺……公之于众，真的非常感谢。"
+    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "感谢您⟦DET⟧，终于将我们家族那尘封已久的承诺……公之于众，真的非常感谢。",
+    "정답 바로보기":  "直接查看答案",
+    "정답: ":  "答案：",
+    "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "请查看右上角的新任务吧！"
 },
 tw: {
     "잃어버린 소포 — 미션투어":  "遺失的包裹 — 使命之旅",
@@ -1269,7 +1292,6 @@ tw: {
     "정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.":  "為了準確統計參與人數，請正確填寫實際參與者的資料。",
     "탐정명":  "偵探名",
     "사는곳":  "居住地",
-    "메일주소":  "電子郵件地址",
     "예: 홍길동":  "例：陳大文",
     "예: 부산 동구":  "例：台灣",
     "선택 입력":  "請輸入選項",
@@ -1299,7 +1321,7 @@ tw: {
     "알아내보자":  "讓我們來了解看看",
     "사건 해결":  "案件解決",
     "모든 단서를 모았어요. 결과를 확인해볼까요?":  "所有線索都已經收集齊全了。來看看結果吧？",
-    "도착완료":  "已送達",
+    "도착완료":  "已抵達",
     "도착했어요":  "我到了",
     "소포의 시작":  "包裹的起源",
     "발밑의 단서":  "腳下的線索",
@@ -1413,7 +1435,7 @@ tw: {
     "맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.":  "沒錯。據說以前大家都會在這座高高的山丘和階梯上氣喘吁吁地，無盡地凝視著釜山港的大海。",
     "바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.":  "當遠處海面上駛來一艘大船時，這就意味著港口終於有活計了！據說屆時鄰里居民便會蜂擁而至，搬運沉重的貨物，一邊流著汗，一邊一點一滴地攢下微薄的錢財。",
     "아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?":  "或許……我奶奶的爸爸，也就是我的曾祖父，當時也在那兒下面那樣努力地工作吧……？",
-    "아참! 탐정님, 슬퍼하고 있을 시간이 없어요! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "啊，對了！⟦DET⟧，沒時間難過了！這次來這邊看看吧！這裡是「望洋路山麓道路展示館」。我們這片街區最深厚的歷史，全都隱藏在這裡喔！",
+    "아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "啊，對了！這次來這邊看看吧！這裡是「望洋路山麓道路展示館」。我們這片街區最深厚的歷史，全都隱藏在這裡喔！",
     "어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!":  "說不定，關於⟦DET⟧手中那個可疑包裹的秘密，也能從這裡找到線索呢！",
     "거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!":  "去那裡的話，會有個叫伊安的哥哥，他唱歌真的超厲害，唱得跟現在的偶像一樣好，而且長得超級帥氣，對吧？快點去問問那位哥哥吧！",
     "저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!":  "我真的真的好想一起去啊……但如果再往前走，媽媽會狠狠罵我的，所以我只到這裡囉，嘿嘿！⟦DET⟧ 請小心點喔！",
@@ -1433,7 +1455,8 @@ tw: {
     "누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.":  "請在展覽廳內親自尋找姊姊曾在哪間工廠製作的「物品」。它應該就在顯眼的地方。",
     "(지금까지 모은 단서들을 보여준다.)":  "（展示迄今為止收集到的線索。）",
     "전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?":  "讓我們透過展覽中隱藏的線索，來找出姊姊以前在哪裡工作吧？",
-    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 무엇이 있을까요?":  "紫色下方、白色左側，以及深藍色對面，那裡有什麼呢？",
+    "정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?":  "正秀的姊姊往返於「姊姊之路」時製作的是什麼呢？",
+    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫色下方、白色左側，以及深藍色對面的是什麼呢？（也可以輸入物品所在的編號！）",
     "정수의 누나가 일하던 곳을 알아내셨나요?":  "您查出正秀的姊姊以前工作的地方了嗎？",
     "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "請別著急。如果您逐一重新仔細端詳展品，就會發現了。",
     "맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠":  "沒錯，是橡膠鞋……不，是曾經生產橡膠鞋的工廠！那時候的避難民，有的在那條山麓道路彼端的橡膠鞋工廠工作，有的則當挑夫……大家都在各自的位置上，想方設法撐過每一天。",
@@ -1461,7 +1484,10 @@ tw: {
     "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "……黃正月，這位就是爺爺這輩子一直如此思念的姐姐了。",
     "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "這件包裹……原來並非那件遺失的包裹，而是您不忍寄出，便將它埋藏在草梁的泥土裡了……",
     "보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요":  "您將那張未能寄出的火車票，視為希望而非悲傷——相信它終將綻放……並將其埋藏在草梁的泥土之中了呢",
-    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "感謝您⟦DET⟧，終於將我們家族那項被塵封已久的承諾……帶到了世人眼前。"
+    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "感謝您⟦DET⟧，終於將我們家族那項被塵封已久的承諾……帶到了世人眼前。",
+    "정답 바로보기":  "直接查看解答",
+    "정답: ":  "解答：",
+    "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "請查看右上角的新任務吧！"
 }
 };
 let LANG = 'ko';
@@ -1562,6 +1588,7 @@ const STEPS = [
     type:'number', q:'발밑의 단서를 통해 드러나는 네 자리 숫자는?',
     hint:'발밑의 그림을 순서대로 노트북에 적고 선을 그어보세요!',
     answers:['1041'],
+    answerImage:'assets/ui/hint.1041.png',
     confirmQ:'발밑의 숨은 단서를 통해 번지수를 알아냈는가?',
     confirmNo:['천천히 바닥 속 타일과 노트를 비교하다보면 답이 나올 거야.'],
     solvedLines:['그래, 초량동 1041번지. 아주 좁은 골목이었지. 그 시절 피난민들이 정말 많이 모여 살았어.','이젠, 남매가 살던 그 곳으로 가 봐.']
@@ -1664,7 +1691,7 @@ const STEPS = [
       '맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.',
       '바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.',
       '아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?',
-      '아참! 탐정님, 슬퍼하고 있을 시간이 없어요! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!',
+      '아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!',
       '어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!',
       '거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!',
       '저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!',
@@ -1695,9 +1722,9 @@ const STEPS = [
   ],
   lineReply:{0:'잃어버린 소포의 비밀을 찾으러 왔어요.',1:'(지금까지 모은 단서들을 보여준다.)'},
   puzzle:{
-    type:'text', q:'전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?',
-    hint:'보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 무엇이 있을까요?',
-    answers:['고무신','고무신 공장','고무신공장'],
+    type:'text', q:'정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?',
+    hint:'보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)',
+    answers:['고무신','고무신 공장','고무신공장','1','1번'],
     confirmQ:'정수의 누나가 일하던 곳을 알아내셨나요?',
     confirmNo:['서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.'],
     solvedLines:['맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠','이제 누나가 일하던 곳까지 밝혀졌으니, 이 모든 단서를 모아 명란브랜드연구소로 돌아가 보세요.']
@@ -1755,6 +1782,7 @@ let dlgLine = 0, dlgChar = 0, dlgTimer = null, dlgDone = false, dlgPlayingSolved
 let dlgConfirmMode = false, dlgCustomLines = null, dlgGreetMode = false;
 let dlgReplyPending = null;
 let dlgPausedAtQuestMark = false;
+let npcLocked = false;
 let solved = STEPS.map(()=>false);
 let dlgSeenOnce = STEPS.map(()=>false);
 
@@ -1823,18 +1851,17 @@ function applyStaticI18n(){
   $('reg-notice').textContent = tr('정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.');
   $('label-name').textContent = tr('탐정명');
   $('label-addr').textContent = tr('사는곳');
-  $('label-email').textContent = tr('메일주소');
   $('f-name').placeholder = tr('예: 홍길동');
   $('f-addr').placeholder = tr('예: 부산 동구');
-  $('f-email').placeholder = tr('선택 입력');
   $('consent-ttl').textContent = tr('※ 개인정보 수집 및 이용 안내');
   $('consent-text').textContent = tr('본 프로그램은 결과 보고(KPI) 통계 작성을 위해 이름 및 거주지를 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.');
   $('consent-label').textContent = tr('위 내용을 확인했으며 동의합니다');
   $('tip').textContent = tr('⚠️ 이동하실 때는 화면 대신 주변을 살펴주세요.');
   $('register-btn').textContent = tr('등록하고 시작하기');
-  $('dlg-choice-yes').textContent = '▶ '+tr('네');
-  $('dlg-choice-no').textContent = '▶ '+tr('아니오');
+  $('dlg-choice-yes').textContent = tr('▶ 네');
+  $('dlg-choice-no').textContent = tr('▶ 아니오');
   $('hint-name').textContent = tr('미요');
+  $('hint-reveal').textContent = tr('정답 바로보기');
   $('hint-close').textContent = tr('닫기');
   document.querySelector('#quest-modal h3').textContent = tr('퀘스트 목록');
   $('pz-input').placeholder = tr('정답 입력');
@@ -1878,7 +1905,7 @@ langMenu.querySelectorAll('.lang-opt').forEach(btn=>{
 });
 applyStaticI18n();
 
-const fName=$('f-name'), fAddr=$('f-addr'), fEmail=$('f-email'), fConsent=$('f-consent'), regBtn=$('register-btn');
+const fName=$('f-name'), fAddr=$('f-addr'), fConsent=$('f-consent'), regBtn=$('register-btn');
 function refreshRegBtn(){ regBtn.disabled = !(fName.value.trim() && fAddr.value.trim() && fConsent.checked); }
 [fName,fAddr,fConsent].forEach(el=>el.addEventListener('input',refreshRegBtn));
 fConsent.addEventListener('change',refreshRegBtn);
@@ -1887,13 +1914,13 @@ function sendRegistrationToSheet(){
   try{
     fetch(REGISTER_SHEET_URL, {
       method:'POST',
-      body: JSON.stringify({ name:PLAYER.name, addr:PLAYER.addr, email:PLAYER.email, consent:fConsent.checked })
+      body: JSON.stringify({ name:PLAYER.name, addr:PLAYER.addr, consent:fConsent.checked })
     }).catch(()=>{});
   }catch(e){}
 }
 
 regBtn.onclick=()=>{
-  PLAYER.name=fName.value.trim(); PLAYER.addr=fAddr.value.trim(); PLAYER.email=fEmail.value.trim();
+  PLAYER.name=fName.value.trim(); PLAYER.addr=fAddr.value.trim();
   sendRegistrationToSheet();
   showScreen(gameEl); showOpeningQuest();
 };
@@ -1906,6 +1933,7 @@ function loadStep(i){
   dlgEl.classList.remove('on');
   dlgReplyPending=null;
   dlgPausedAtQuestMark=false;
+  npcLocked=false;
   dlgReplyBtn.classList.remove('show');
   pzModal.classList.remove('on');
   hintModal.classList.remove('on');
@@ -1934,7 +1962,6 @@ function loadStep(i){
   sceneWrapEl.style.setProperty('--npc-left', s.npcLeft || '50%');
   sceneWrapEl.style.setProperty('--npc-scale', '1');
 
-  hintIcon.classList.toggle('show', !!s.puzzle && !solved[i]);
   navMiyo.classList.remove('show');
 
   questMark.style.display = (isStepClear(i) || s.questMarkFromLine!=null || (s.greetLine && !dlgSeenOnce[i])) ? 'none' : 'block';
@@ -1969,11 +1996,21 @@ function playGreetLine(s){
 
 function isStepClear(i){ return STEPS[i].puzzle ? solved[i] : dlgSeenOnce[i]; }
 
+function refreshHintVisibility(){
+  const s=STEPS[idx];
+  hintIcon.classList.toggle('show', !!s.puzzle && !solved[idx] && dlgSeenOnce[idx] && !npcLocked);
+}
 function updateIdleHint(){
   if(openingQuest) return;
   const s=STEPS[idx];
+  refreshHintVisibility();
   if(isStepClear(idx)){
     tapHint.classList.add('hide');
+    return;
+  }
+  if(npcLocked){
+    tapHint.textContent = tr('오른쪽 위에서 새로운 퀘스트를 확인해보세요!');
+    tapHint.classList.remove('hide');
     return;
   }
   if(s.puzzle && dlgSeenOnce[idx]){
@@ -2078,9 +2115,6 @@ function applyLineVisuals(lines, ln){
 function typeLine(lines){
   const s=STEPS[idx];
   applyLineVisuals(lines, dlgLine);
-  if(lines===s.lines && s.questMarkFromLine!=null && dlgLine>=s.questMarkFromLine){
-    questMark.style.display='block';
-  }
   const cur=P(tr(lines[dlgLine]||''));
   clearTimeout(dlgTimer);
   $('dlg-next').textContent='▼';
@@ -2174,7 +2208,7 @@ function advanceDialogue(){
     dlgEl.classList.remove('on');
     dlgSeenOnce[idx]=true;
     saveProgress();
-    if(!s.puzzle){ markStepReady(); } else { updateIdleHint(); showNewQuestToast(); if(s.puzzle.readyHint){ questMark.style.display='block'; } }
+    if(!s.puzzle){ markStepReady(); } else { npcLocked=true; updateIdleHint(); showNewQuestToast(); if(s.puzzle.readyHint){ questMark.style.display='block'; } }
     return;
   }
   if(lines===s.lines && s.pauseAtQuestMark && s.questMarkFromLine===dlgLine){
@@ -2319,13 +2353,39 @@ $('pz-submit').onclick=checkTextAnswer;
 pzInput.addEventListener('keydown',e=>{ if(e.key==='Enter') checkTextAnswer(); });
 
 /* 힌트 (미요) */
+const hintAnswer=$('hint-answer');
+const hintAnswerImg=$('hint-answer-img');
+const imgLightbox=$('img-lightbox'), imgLightboxImg=$('img-lightbox-img');
+hintAnswerImg.addEventListener('click',(e)=>{
+  e.stopPropagation();
+  imgLightboxImg.src=hintAnswerImg.src;
+  imgLightbox.classList.add('show');
+});
+imgLightbox.addEventListener('click',()=>{ imgLightbox.classList.remove('show'); imgLightboxImg.src=''; });
 hintIcon.addEventListener('click',()=>{
   const s=STEPS[idx];
   if(!s.puzzle) return;
   hintPortrait.style.backgroundImage="url('assets/characters/miyo/portrait.png')";
   hintText.textContent='💡 '+tr(s.puzzle.hint);
+  hintAnswer.textContent='';
+  hintAnswer.classList.remove('show');
+  hintAnswerImg.classList.remove('show');
+  hintAnswerImg.src='';
   hintModal.classList.add('on');
 });
+$('hint-reveal').onclick=()=>{
+  const s=STEPS[idx];
+  if(!s.puzzle) return;
+  hintAnswer.textContent=tr('정답: ')+s.puzzle.answers[0];
+  hintAnswer.classList.add('show');
+  if(s.puzzle.answerImage){
+    hintAnswerImg.src=s.puzzle.answerImage;
+    hintAnswerImg.classList.add('show');
+  } else {
+    hintAnswerImg.classList.remove('show');
+    hintAnswerImg.src='';
+  }
+};
 $('hint-close').onclick=()=>{ hintModal.classList.remove('on'); updateIdleHint(); };
 
 /* 퀘스트 배지 → 퀘스트 목록 팝업
@@ -2498,14 +2558,16 @@ homeBtn.addEventListener('click',()=>{
   dlgPausedAtQuestMark = false;
   openingQuest = false;
   clearProgress();
-  fName.value=''; fAddr.value=''; fEmail.value=''; fConsent.checked=false; refreshRegBtn();
-  PLAYER.name=''; PLAYER.addr=''; PLAYER.email='';
+  fName.value=''; fAddr.value=''; fConsent.checked=false; refreshRegBtn();
+  PLAYER.name=''; PLAYER.addr='';
   showScreen(titleEl);
 });
 
 questBadge.addEventListener('click',()=>{
   questBadgeImg.src='assets/ui/quest_list.png';
   questBadge.classList.remove('pulse');
+  npcLocked=false;
+  refreshHintVisibility();
   renderQuestModal();
 });
 $('quest-close').addEventListener('click',()=>{ questModal.classList.remove('on'); updateIdleHint(); });
@@ -2515,6 +2577,7 @@ function isSceneBusy(){
     hintModal.classList.contains('on') || questModal.classList.contains('on') || navModal.classList.contains('on');
 }
 function resumeOrOpenDialogue(){
+  if(npcLocked) return;
   questModal.classList.remove('on');
   if(dlgPausedAtQuestMark){
     dlgPausedAtQuestMark=false;
@@ -2646,8 +2709,8 @@ $('complete-replay').addEventListener('click',()=>{
   clearProgress();
   solved = STEPS.map(()=>false); dlgSeenOnce = STEPS.map(()=>false);
   openingQuest=false;
-  fName.value=''; fAddr.value=''; fEmail.value=''; fConsent.checked=false; refreshRegBtn();
-  PLAYER.name=''; PLAYER.addr=''; PLAYER.email='';
+  fName.value=''; fAddr.value=''; fConsent.checked=false; refreshRegBtn();
+  PLAYER.name=''; PLAYER.addr='';
   showScreen(titleEl);
 });
 
@@ -2656,7 +2719,6 @@ $('complete-replay').addEventListener('click',()=>{
   if(!save) return;
   PLAYER.name = save.player && save.player.name || '';
   PLAYER.addr = save.player && save.player.addr || '';
-  PLAYER.email = save.player && save.player.email || '';
   solved = save.solved;
   dlgSeenOnce = (Array.isArray(save.dlgSeenOnce) && save.dlgSeenOnce.length===STEPS.length) ? save.dlgSeenOnce : STEPS.map(()=>false);
   openingQuest = false;
