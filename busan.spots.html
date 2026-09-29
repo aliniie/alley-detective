@@ -254,6 +254,22 @@
   .cat-more .arrow { transition: transform 0.2s; }
   .cat-card:hover .cat-more .arrow { transform: translateX(3px); }
 
+  .cat-card--promo { text-decoration: none; background: linear-gradient(135deg, var(--surface), var(--surface-hover)); }
+  .cat-card--promo:hover .cat-more .arrow { transform: translate(2px, -2px); }
+
+  .cat-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+
+  .cat-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-bright);
+    background: var(--accent-glow);
+    border: 1px solid var(--border-hover);
+    border-radius: 999px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+
   /* ── DETAIL VIEW ── */
   .detail-view { display: none; flex-direction: column; gap: 20px; }
   .detail-view.active { display: flex; }
@@ -475,6 +491,15 @@
       <div class="cat-sub" id="cat2Sub"></div>
       <div class="cat-more"><span id="moreLabel2"></span><span class="arrow">→</span></div>
     </button>
+    <a class="cat-card cat-card--promo" href="https://korean.visitkorea.or.kr/dgtourcard/biz/regn/regnMain.do?mtpcDoCd=26&signguCd=26170" target="_blank" rel="noopener noreferrer">
+      <div class="cat-head">
+        <div class="cat-icon">🪪</div>
+        <span class="cat-badge" id="cat3Badge"></span>
+      </div>
+      <div class="cat-title" id="cat3Title"></div>
+      <div class="cat-sub" id="cat3Sub"></div>
+      <div class="cat-more"><span id="moreLabel3"></span><span class="arrow">↗</span></div>
+    </a>
   </div>
 
   <div class="detail-view" id="detailView">
@@ -505,6 +530,7 @@
         wartime: { title: '피란수도 부산 유산', sub: '한국전쟁 1,023일의 기억이 남은 11곳' },
         station: { title: '부산역 인근 관광지', sub: '부산역에서 가까운 순으로 소개하는 16곳' }
       },
+      promo: { title: '디지털 관광주민증', sub: '부산 동구의 관광주민이 되어 제휴 관광지·가게 할인 혜택을 받아보세요.', badge: '내국인 전용', more: '발급하러 가기' },
       dist: km => `부산역에서 직선거리 약 ${km}km`,
       spots: {
         wartime: [
@@ -552,6 +578,7 @@
         wartime: { title: 'Wartime Capital Heritage', sub: '11 sites from the 1,023 days of the Korean War' },
         station: { title: 'Near Busan Station', sub: '16 spots, listed from nearest to farthest' }
       },
+      promo: { title: 'Digital Tourist Resident Card', sub: 'Become a tourist resident of Dong-gu, Busan and enjoy discounts at partner sights and shops.', badge: 'Korean nationals only', more: 'Go to sign-up page (Korean)' },
       dist: km => `≈ ${km} km from Busan Station (straight line)`,
       spots: {
         wartime: [
@@ -599,6 +626,7 @@
         wartime: { title: '避难首都釜山遗产', sub: '留有朝鲜战争1,023天记忆的11处遗产' },
         station: { title: '釜山站周边景点', sub: '按距釜山站由近到远介绍16处景点' }
       },
+      promo: { title: '数字观光居民证', sub: '成为釜山东区的观光居民，即可享受合作景点与商家的优惠。', badge: '仅限韩国国民', more: '前往申请页面（韩文）' },
       dist: km => `距釜山站直线约${km}公里`,
       spots: {
         wartime: [
@@ -646,6 +674,7 @@
         wartime: { title: '避難首都釜山遺產', sub: '留有韓戰1,023天記憶的11處遺產' },
         station: { title: '釜山站周邊景點', sub: '依距釜山站由近到遠介紹16處景點' }
       },
+      promo: { title: '數位觀光居民證', sub: '成為釜山東區的觀光居民，即可享有合作景點與店家的優惠。', badge: '僅限韓國國民', more: '前往申請頁面（韓文）' },
       dist: km => `距釜山站直線約${km}公里`,
       spots: {
         wartime: [
@@ -693,6 +722,7 @@
         wartime: { title: '避難首都・釜山の遺産', sub: '朝鮮戦争1,023日の記憶が残る11か所' },
         station: { title: '釜山駅周辺の観光地', sub: '釜山駅から近い順に紹介する16か所' }
       },
+      promo: { title: 'デジタル観光住民証', sub: '釜山・東区の観光住民になると、提携観光地やお店で割引特典が受けられます。', badge: '韓国国民限定', more: '申請ページへ（韓国語）' },
       dist: km => `釜山駅から直線で約${km}km`,
       spots: {
         wartime: [
@@ -792,6 +822,10 @@
     document.getElementById('cat2Sub').textContent = c.cats.station.sub;
     document.getElementById('moreLabel1').textContent = c.more;
     document.getElementById('moreLabel2').textContent = c.more;
+    document.getElementById('cat3Title').textContent = c.promo.title;
+    document.getElementById('cat3Sub').textContent = c.promo.sub;
+    document.getElementById('cat3Badge').textContent = c.promo.badge;
+    document.getElementById('moreLabel3').textContent = c.promo.more;
     document.getElementById('backLabel').textContent = c.back;
     document.getElementById('footerNote').textContent = c.footer;
 
@@ -851,7 +885,7 @@
   });
 
   document.getElementById('catList').addEventListener('click', (e) => {
-    const card = e.target.closest('.cat-card');
+    const card = e.target.closest('.cat-card[data-cat]');
     if (!card) return;
     state.view = 'detail';
     state.cat = card.dataset.cat;
