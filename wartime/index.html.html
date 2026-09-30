@@ -1,0 +1,2744 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>잃어버린 소포 — 미션투어</title>
+<link rel="icon" href="assets/ui/busan_station.png">
+<style>
+@font-face {
+    font-family: 'DosMyungjo';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSMyungjo.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+@font-face{
+  font-family:'ZLabsRoundPix_12px_M_CN';
+  src:url('ZLabsRoundPix_12px_M_CN.ttf.woff2') format('woff2');
+  font-weight:normal;
+  font-display:swap;
+}
+
+:root{
+  --blue:#4169E1; --blue-deep:#28398f; --red:#E1332E; --red-deep:#9e211d; --gray:#E0E0E0;
+  --ink:#141414; --ink-soft:#5B6B82;
+  --wood:#6b4f3a; --wood-dark:#4a3323; --wood-deep:#241a14;
+  --parchment:#f2ead9; --parchment-deep:#e8ddc8;
+  --gold:#e8b25c; --gold-deep:#a87526; --sepia:#8c2f1f;
+  --navy:#33445f; --navy-deep:#161e2b;
+  --coral:#e0637a; --coral-deep:#8f2f42;
+  --teal:#2f8f83; --teal-deep:#154842;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'DosMyungjo','Courier New',monospace;
+  background:#0c1219;
+  color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  overscroll-behavior:none;
+}
+.zh{font-family:'ZLabsRoundPix_12px_M_CN','DosMyungjo',monospace;}
+button{cursor:pointer}
+
+/* ---------------- 레트로 버튼 시스템 ---------------- */
+.rbtn{
+  font-family:'DosMyungjo';border:3px solid var(--wood-deep);
+  position:relative;transition:transform .07s ease,box-shadow .07s ease;
+  outline:none;
+}
+.rbtn:active{transform:translate(3px,3px)}
+.rbtn:disabled{opacity:.55;box-shadow:none!important;transform:none!important;cursor:default}
+
+.rbtn--primary{background:var(--red);color:#fff;box-shadow:3px 3px 0 var(--red-deep)}
+.rbtn--primary:active{box-shadow:0 0 0 var(--red-deep)}
+.rbtn--secondary{background:var(--blue);color:#fff;box-shadow:3px 3px 0 var(--blue-deep)}
+.rbtn--secondary:active{box-shadow:0 0 0 var(--blue-deep)}
+.rbtn--wood{background:var(--wood);color:#fff4e6;box-shadow:3px 3px 0 var(--wood-deep)}
+.rbtn--wood:active{box-shadow:0 0 0 var(--wood-deep)}
+.rbtn--ghost{background:transparent;color:#f2ead9;border-color:rgba(255,255,255,.4);box-shadow:3px 3px 0 rgba(255,255,255,.18)}
+.rbtn--ghost:active{box-shadow:0 0 0 rgba(255,255,255,.18)}
+.rbtn--choice{background:#f5f6f8;color:var(--ink);border-color:var(--gray);box-shadow:3px 3px 0 #b9bcc2}
+.rbtn--choice:active{box-shadow:0 0 0 #b9bcc2}
+
+#app{width:100vw;height:100dvh;display:flex;align-items:center;justify-content:center}
+#stage{
+  position:relative;width:100vw;height:100dvh;overflow:hidden;background:var(--parchment);
+}
+@media (min-width:480px) and (min-height:640px){
+  #stage{width:min(100vw,430px);height:min(100dvh,860px);box-shadow:0 0 0 1px var(--gray),0 24px 70px rgba(0,0,0,.5);}
+}
+
+.screen{position:absolute;inset:0;display:none;opacity:0;transition:opacity .3s ease}
+.screen.on{display:flex;opacity:1}
+
+/* ---------------- 타이틀 화면 ---------------- */
+#title{
+  background:url('assets/backgrounds/intro-4.png') center/cover no-repeat;
+  align-items:center;justify-content:center;text-align:center;
+}
+#title::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,7,5,.3),rgba(10,7,5,.55));}
+#title-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:20px}
+#title-logo{width:min(58vw,300px);height:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.6));animation:titlePulse 2.6s ease-in-out infinite;}
+@keyframes titlePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+#play-btn{width:min(15vw,75px);height:auto;border:none;background:none;padding:0;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));transition:transform .15s}
+#play-btn:active{transform:scale(.94)}
+
+/* 타이틀 화면: PLAY 버튼을 누르면 뜨는 언어 선택 목록 */
+#play-wrap{position:relative}
+#lang-menu{
+  display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  z-index:6;flex-direction:column;align-items:center;justify-content:center;gap:2%;
+  width:min(46vw,180px);aspect-ratio:1163/1339;box-sizing:border-box;
+  background:url('assets/ui/languages_list.png') center/100% 100% no-repeat;
+  padding:15% 18%;
+  filter:drop-shadow(0 10px 20px rgba(0,0,0,.45));
+}
+#lang-menu.show{display:flex}
+.lang-opt{
+  position:relative;border:none;background:none;padding:3px 0;width:100%;
+  font-family:'DosMyungjo';font-size:17px;color:var(--wood-dark);
+}
+.lang-opt span{position:relative;display:inline-block}
+.lang-opt span::before{
+  position:absolute;left:0;top:0;white-space:nowrap;
+  content:attr(data-content);
+  color:var(--sepia);
+  text-decoration:underline;text-decoration-style:wavy;text-decoration-color:var(--sepia);text-underline-offset:3px;
+  clip-path:polygon(0 0,0 0,0% 100%,0 100%);
+  transition:clip-path 275ms ease;
+}
+.lang-opt:hover span::before,.lang-opt:active span::before,.lang-opt.active span::before{
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+}
+
+/* ---------------- 등록증 화면 ---------------- */
+#register{
+  background:radial-gradient(circle at 30% 20%,rgba(65,105,225,.15),transparent 55%),linear-gradient(180deg,#1c2740,#0c1219);
+  align-items:center;justify-content:center;padding:18px;overflow:auto;
+}
+#card{
+  width:min(94%,620px);max-height:100%;overflow:auto;
+  background:linear-gradient(180deg,#eef1f7,#d9e0ec);
+  border:3px solid var(--navy);border-radius:14px;box-shadow:0 0 0 3px var(--navy-deep),0 16px 34px rgba(0,0,0,.5);
+  padding:16px 20px;color:#2b2018;
+}
+#card h2{text-align:center;font-size:19px;color:var(--navy);letter-spacing:.08em;margin-bottom:2px}
+#reg-notice{text-align:center;font-size:10.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:10px}
+#card .badge-stamp{width:48px;height:48px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center}
+#card .badge-stamp img{width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 3px 8px rgba(0,0,0,.3))}
+#fields{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 10px}
+.field{flex:1 1 150px;min-width:130px;display:flex;flex-direction:column;gap:4px}
+.field span{font-size:11px;color:var(--navy)}
+.field input{
+  border:1.5px solid var(--gray);border-radius:8px;padding:8px 10px;font-family:'DosMyungjo';
+  font-size:13px;background:#fff;color:var(--ink);
+}
+.field input:focus{outline:none;border-color:var(--blue)}
+#consent-box{background:#fff8ea;border:1.5px dashed var(--gold);border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.7;color:#5c4a30;margin-bottom:8px}
+#consent-box .ttl{font-size:12px;font-weight:700;color:var(--sepia);margin-bottom:3px}
+.chk{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:12px;color:var(--navy);cursor:pointer}
+.chk input{width:15px;height:15px}
+#tip{font-size:11px;color:var(--sepia);margin-bottom:10px}
+#register-btn{width:100%;border-radius:10px;font-size:15px;letter-spacing:.04em;padding:11px}
+#register-btn:disabled{background:#b8a99a;border-color:#8a7d6a}
+
+/* ---------------- 게임 화면 (닌텐도DS풍 상/하 듀얼스크린) ---------------- */
+#game{padding:0;flex-direction:column;background:#f0e7d5}
+#scene-wrap{position:relative;flex:1 1 50%;min-height:0;overflow:hidden;background:#f0e7d5;}
+#scene{position:absolute;inset:0;background-size:cover;background-position:center;transition:background-image .25s}
+.bg-lab{background:linear-gradient(180deg,#eef1f7 0%,#dfe6f3 55%,#cdd8ea 100%)}
+.bg-lab-evening{background:linear-gradient(180deg,#f3e6d2 0%,#e7cfae 55%,#d3b48c 100%)}
+.bg-gallery{background:linear-gradient(180deg,#f1e6d2 0%,#e3d2b3 60%,#cbb384 100%)}
+.bg-wall{background:linear-gradient(180deg,#e7d9c2 0%,#cdb98f 55%,#a98f66 100%)}
+.bg-steps{background:linear-gradient(180deg,#bcdcf0 0%,#eef6ea 45%,#d9d2b8 100%)}
+.bg-hall{background:radial-gradient(ellipse at 50% 20%,rgba(232,178,92,.35),transparent 60%),linear-gradient(180deg,#2c2620 0%,#1b1613 100%)}
+.scene-deco{position:absolute;inset:0;pointer-events:none;opacity:.5}
+.deco-frames{background-image:
+  linear-gradient(0deg,transparent 72%,rgba(0,0,0,.05) 72%),
+  repeating-linear-gradient(90deg,rgba(74,51,35,.18) 0 46px,transparent 46px 130px);
+  background-position:0 18%;background-size:100% 30%,100% 100%;background-repeat:no-repeat,repeat-x}
+.deco-bricks{background-image:repeating-linear-gradient(0deg,rgba(74,51,35,.15) 0 2px,transparent 2px 26px),
+  repeating-linear-gradient(90deg,rgba(74,51,35,.12) 0 2px,transparent 2px 58px)}
+.deco-stairs{background-image:repeating-linear-gradient(115deg,rgba(90,90,70,.16) 0 10px,transparent 10px 34px);background-position:0 55%;background-size:100% 45%;background-repeat:no-repeat}
+.deco-hall{background-image:radial-gradient(circle at 30% 75%,rgba(0,0,0,.35),transparent 45%),radial-gradient(circle at 75% 80%,rgba(0,0,0,.3),transparent 40%)}
+
+#scene-wrap{--npc-bottom:15%;--npc-shadow-bottom:14%;--npc-left:50%;--npc-scale:1;}
+#npc-shadow{position:absolute;left:var(--npc-left);bottom:var(--npc-shadow-bottom);width:70px;height:13px;
+  background:radial-gradient(ellipse,rgba(0,0,0,.35),transparent 70%);transform:translateX(-50%)}
+#npc-img{
+  position:absolute;left:var(--npc-left);bottom:var(--npc-bottom);width:86px;height:86px;
+  transform:translateX(-50%) scale(var(--npc-scale));
+  image-rendering:pixelated;filter:drop-shadow(0 6px 4px rgba(0,0,0,.25));
+  animation:npcBob 2.6s ease-in-out infinite;cursor:pointer;
+}
+@keyframes npcBob{
+  0%,100%{transform:translateX(-50%) scale(var(--npc-scale)) translateY(0)}
+  50%{transform:translateX(-50%) scale(var(--npc-scale)) translateY(-3px)}
+}
+#quest-mark{
+  position:absolute;left:var(--npc-left);bottom:calc(var(--npc-bottom) + 82px);width:24px;height:auto;transform:translateX(-50%);
+  filter:drop-shadow(0 3px 4px rgba(0,0,0,.35));cursor:pointer;animation:questBob 1s ease-in-out infinite;
+}
+@keyframes questBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+
+#tap-hint{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:20px;font-size:13px;line-height:1.6;color:var(--ink-soft);
+  pointer-events:none;transition:opacity .25s}
+#tap-hint.hide{opacity:0}
+
+/* 오른쪽 위 퀘스트 배지 */
+#quest-badge{position:absolute;top:8px;right:8px;z-index:55;width:40px;height:40px;border:none;background:none;padding:0;transition:transform .15s}
+#quest-badge img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))}
+#quest-badge:active{transform:scale(.92)}
+#quest-badge.pulse{animation:questBadgePulse 1s ease-in-out infinite}
+@keyframes questBadgePulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.15)}
+}
+#quest-badge.pulse img{filter:drop-shadow(0 0 8px rgba(232,178,92,.9))}
+
+/* 왼쪽 위 홈(처음으로) 버튼 */
+#home-btn{position:absolute;top:8px;left:8px;z-index:55;width:40px;height:40px;border:none;background:none;padding:0;transition:transform .15s}
+#home-btn img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))}
+#home-btn:active{transform:scale(.92)}
+
+
+/* 퀘스트 버튼 왼쪽에 붙는 힌트 아이콘 */
+#hint-icon{position:absolute;top:8px;right:58px;z-index:55;width:56px;height:auto;border:none;background:none;padding:0;
+  display:none;filter:drop-shadow(0 3px 8px rgba(0,0,0,.35));transition:transform .15s}
+#hint-icon.show{display:block}
+#hint-icon:active{transform:scale(.92)}
+
+/* 이동안내 중 씬 위에 뜨는 미요의 설명 말풍선 */
+#nav-miyo{
+  display:none;position:absolute;left:8px;right:8px;bottom:8px;z-index:15;
+  gap:9px;align-items:center;
+  background:linear-gradient(180deg,#fdedf0,#f6d3d9);
+  border:2.5px solid var(--coral-deep);border-radius:12px;
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
+  padding:9px 11px;
+}
+#nav-miyo.show{display:flex}
+#nav-miyo-portrait{
+  flex:none;width:42px;height:42px;background:url('assets/characters/miyo/portrait.png') center/contain no-repeat;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));
+}
+#nav-miyo-text{flex:1;min-width:0;font-size:12px;line-height:1.5;color:#2b2018}
+
+/* ---------------- 하단 스크린 (닌텐도DS 터치스크린 역할) ---------------- */
+#bottom-screen{position:relative;flex:1 1 50%;min-height:0;overflow:hidden;background:#f0e7d5;}
+
+/* ---------------- 대화창 ---------------- */
+#dlg{
+  position:absolute;inset:0;z-index:20;
+  display:none;flex-direction:column;
+  padding:14px 14px 14px 76px;overflow:auto;
+}
+#dlg.on{display:flex}
+#dlg-title{font-size:10.5px;color:var(--sepia);letter-spacing:.03em;margin-bottom:3px}
+#dlg-body{font-size:13px;line-height:1.5;color:#2b2018;min-height:36px;white-space:pre-wrap;word-break:keep-all}
+#dlg-foot{display:flex;align-items:center;justify-content:flex-end;margin-top:5px}
+#dlg-next{font-size:20px;color:var(--wood-dark);animation:dlgArrowBob 1s infinite;line-height:1}
+@keyframes dlgArrowBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+#dlg-choices{display:none;flex-direction:column;gap:3px;margin-top:6px}
+#dlg-choices.show{display:flex}
+.dlg-choice-btn{
+  font-family:inherit;font-size:13px;color:var(--wood-dark);
+  background:rgba(255,255,255,.35);border:1.5px solid transparent;border-radius:7px;
+  text-align:left;padding:5px 9px;cursor:pointer;transition:background .12s,border-color .12s,color .12s;
+}
+.dlg-choice-btn:hover,.dlg-choice-btn:active{
+  background:var(--wood);color:#fff4e6;border-color:var(--wood-dark);
+}
+#dlg-reply-btn{display:none;width:100%;margin-top:6px}
+#dlg-reply-btn.show{display:block}
+#dlg-portrait-wrap{
+  position:absolute;left:12px;top:14px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;width:58px;
+}
+#dlg-portrait{
+  width:58px;height:58px;background:center/contain no-repeat;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));image-rendering:pixelated;
+}
+#dlg-name{
+  font-size:10px;color:#fff4e6;background:var(--wood-deep);border:1.5px solid var(--wood);
+  border-radius:5px;padding:2px 7px;white-space:nowrap;box-shadow:2px 2px 0 rgba(0,0,0,.25);
+}
+
+/* ---------------- 공통 팝업 (하단 스크린을 그대로 채움) ---------------- */
+.modal{position:absolute;inset:0;z-index:50;display:none;overflow:auto;
+  background:linear-gradient(180deg,var(--parchment),var(--parchment-deep));padding:14px 16px}
+.modal.on{display:block}
+.modal-card{position:relative;color:#2b2018}
+.modal,.modal-card{scrollbar-width:none;-ms-overflow-style:none;}
+.modal::-webkit-scrollbar,.modal-card::-webkit-scrollbar{display:none;}
+.modal-close{position:absolute;top:0;right:0;z-index:2;width:26px;height:26px;
+  background:var(--parchment-deep);color:var(--wood-dark);font-size:13px;line-height:1;font-family:'DosMyungjo';
+  border:2px solid var(--wood-deep);box-shadow:2px 2px 0 var(--wood-deep);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;transition:transform .07s ease,box-shadow .07s ease}
+.modal-close:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--wood-deep)}
+
+/* 문제 팝업 — 남색 톤 */
+#puzzle-modal{background:linear-gradient(180deg,#eef1f7,#d9e0ec)}
+#pz-q{font-size:13px;font-weight:700;color:var(--navy);line-height:1.5;margin-bottom:9px}
+.pz-row{display:flex;gap:7px}
+#pz-input{flex:1;min-width:0;border:1.5px solid var(--gray);border-radius:9px;padding:9px 11px;
+  font-family:'DosMyungjo';font-size:15px;color:var(--ink);background:#faf8f4}
+#pz-input:focus{outline:none;border-color:var(--blue)}
+#pz-submit{flex:none;border-radius:9px;padding:0 15px;font-size:13.5px}
+#pz-choices{display:flex;flex-direction:column;gap:7px}
+.pz-choice{border-radius:9px;padding:9px 11px;font-size:13.5px;text-align:left}
+.pz-choice:active{background:var(--blue);color:#fff}
+#pz-cryptex{display:none}
+#pz-cryptex.show{display:block}
+#pz-cryptex-board{
+  position:relative;background:#2b2018;border-radius:10px;padding:8px 6px;margin-bottom:9px;
+}
+#pz-cryptex-reels{display:flex;gap:3px;justify-content:center}
+#pz-cryptex-board::after{
+  content:'';position:absolute;left:6px;right:6px;top:50%;
+  height:34px;transform:translateY(-50%);
+  background:rgba(232,178,92,.22);
+  border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);
+  pointer-events:none;
+}
+.cryptex-reel{
+  width:30px;height:102px;overflow-y:auto;overflow-x:hidden;
+  scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;
+}
+.cryptex-reel::-webkit-scrollbar{display:none}
+.cryptex-reel-inner{padding:34px 0}
+.cryptex-letter{
+  height:34px;line-height:34px;text-align:center;
+  font-family:'DosMyungjo';font-weight:700;font-size:19px;color:#f2ead9;
+  scroll-snap-align:center;
+}
+#pz-form{display:none}
+#pz-form.show{display:block}
+#pz-form-title{font-size:13px;font-weight:700;color:var(--navy);text-align:center;margin-bottom:8px;
+  padding-bottom:6px;border-bottom:2px dashed var(--gray)}
+.pz-form-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12.5px}
+.pz-form-label{flex:0 0 50px;color:var(--navy);font-weight:700}
+.pz-form-fixed{color:var(--ink-soft)}
+.pz-form-input{flex:1;min-width:0;border:1.5px solid var(--gray);border-radius:7px;padding:6px 8px;
+  font-family:'DosMyungjo';font-size:13px;color:var(--ink);background:#faf8f4}
+.pz-form-input:focus{outline:none;border-color:var(--blue)}
+#pz-form-sub{font-size:11.5px;font-weight:700;color:var(--sepia);margin:8px 0 6px;padding-top:6px;border-top:2px dashed var(--gray)}
+#pz-form-submit{width:100%;border-radius:9px;padding:9px;font-size:13.5px;margin-top:4px}
+#pz-feed{min-height:15px;font-size:11.5px;color:var(--red-deep);margin-top:7px}
+#pz-feed:not(:empty){background:#f8d7da;border:2px solid var(--red-deep);border-radius:7px;padding:5px 8px}
+
+/* 힌트(미요) 팝업 — 위쪽 화면 위에 작게 뜨는 팝업 */
+#hint-modal{
+  position:absolute;inset:0;z-index:60;
+  background:none;padding:14px;
+  display:none;align-items:center;justify-content:center;
+}
+#hint-modal.on{display:flex}
+#hint-modal .modal-card{
+  width:88%;max-width:260px;
+  display:flex;gap:9px;align-items:flex-start;
+  background:linear-gradient(180deg,#fdedf0,#f6d3d9);
+  border:2.5px solid var(--coral-deep);border-radius:12px;
+  box-shadow:0 10px 26px rgba(0,0,0,.45);
+  padding:11px 13px;
+}
+#hint-portrait{flex:none;width:44px;height:44px;background:center/contain no-repeat;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+#hint-body-wrap{flex:1;min-width:0}
+#hint-name{font-size:11px;color:var(--coral-deep);margin-bottom:3px}
+#hint-text{font-size:12px;line-height:1.5;color:#2b2018}
+#hint-answer{display:none;font-size:12.5px;font-weight:700;color:var(--blue-deep);margin-top:7px;
+  background:#e8eeff;border:1.5px dashed var(--blue);border-radius:8px;padding:6px 8px}
+#hint-answer.show{display:block}
+#hint-answer-img{display:none;width:100%;border-radius:8px;margin-top:6px;border:1.5px solid var(--blue);cursor:zoom-in}
+#hint-answer-img.show{display:block}
+#img-lightbox{display:none;position:absolute;inset:0;z-index:300;background:rgba(0,0,0,.85);
+  align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+#img-lightbox.show{display:flex}
+#img-lightbox img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+#hint-reveal{margin-top:8px;width:100%;border-radius:9px;font-size:11.5px;padding:7px}
+#hint-close{margin-top:6px;width:100%;border-radius:9px;font-size:11.5px;padding:7px;
+  background:var(--coral-deep);border-color:var(--coral-deep);box-shadow:2px 2px 0 #5c1c28}
+#hint-close:active{box-shadow:0 0 0 #5c1c28}
+
+/* 퀘스트 목록 팝업 (2단 구성) — 골드 톤, 작은 팝업 느낌 */
+#quest-modal{
+  z-index:60;
+  background:none;padding:14px;
+  display:none;align-items:center;justify-content:center;
+}
+#quest-modal.on{display:flex}
+#quest-modal .modal-card{
+  width:100%;max-width:360px;max-height:100%;overflow:auto;
+  background:linear-gradient(180deg,var(--parchment),var(--parchment-deep));
+  border:3px solid var(--gold-deep);border-radius:14px;
+  box-shadow:0 14px 30px rgba(0,0,0,.45);
+  padding:14px 16px;
+}
+#quest-modal h3{font-size:14px;color:var(--wood-dark);margin-bottom:8px;letter-spacing:.03em;text-align:center;padding-right:28px}
+#quest-modal .modal-close{background:#f2e4c4;border-color:var(--gold-deep);box-shadow:2px 2px 0 var(--gold-deep);color:var(--wood-dark)}
+#quest-modal .modal-close:active{box-shadow:0 0 0 var(--gold-deep)}
+.quest-split{display:flex;gap:10px;align-items:stretch}
+.quest-left{flex:0 0 38%;max-height:none;overflow:visible;border-right:1px solid rgba(107,79,58,.25);padding-right:8px}
+.qitem{padding:8px 6px;border-radius:8px;font-size:11.5px;line-height:1.4;color:#c2b49a}
+.qitem.clickable{cursor:pointer;color:#a89880}
+.qitem.clickable:active{background:rgba(107,79,58,.12)}
+.qitem.done{color:var(--blue);font-weight:700}
+.qitem.selected{background:rgba(140,47,31,.12);color:var(--sepia);font-weight:700}
+.quest-right{flex:1;min-width:0;padding-left:2px}
+.qd-empty{font-size:12px;color:#a89880;padding:10px 4px}
+.qd-npc-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.qd-npc-img{flex:none;width:34px;height:34px;background:center/contain no-repeat;
+  image-rendering:pixelated;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3))}
+.qd-npc-name{font-size:12.5px;color:var(--ink-soft);font-weight:700}
+.qd-title{font-size:14.5px;font-weight:700;color:var(--wood-dark);padding-bottom:7px;margin-bottom:8px;border-bottom:2px solid var(--gold)}
+.qd-desc{font-size:12px;line-height:1.6;color:#2b2018;margin-bottom:10px}
+.qd-desc--solved{color:var(--blue);font-weight:700}
+.qd-tip{font-size:11px;color:var(--sepia);margin-top:-4px;margin-bottom:10px}
+
+/* 새 퀘스트 알림 토스트 */
+#new-quest-toast{
+  display:none;position:absolute;top:50%;left:50%;z-index:200;
+  align-items:center;gap:9px;
+  background:linear-gradient(180deg,#ffe19a,var(--gold) 70%,var(--gold-deep));
+  color:var(--wood-deep);
+  border:3px solid var(--wood-deep);border-radius:30px;
+  padding:9px 22px 9px 14px;
+  font-size:14.5px;font-weight:700;letter-spacing:.04em;font-family:'DosMyungjo';
+  box-shadow:0 3px 0 var(--gold-deep),0 10px 24px rgba(0,0,0,.4);
+  animation:toastPop .35s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+#new-quest-toast.show{display:flex}
+#new-quest-toast::before{
+  content:'';flex:none;width:24px;height:24px;
+  background:url('assets/icons/quest.png') center/contain no-repeat;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.3));
+}
+@keyframes toastPop{
+  0%{transform:translate(-50%,-50%) scale(.7);opacity:0}
+  100%{transform:translate(-50%,-50%) scale(1);opacity:1}
+}
+.qd-btn{width:100%;border-radius:10px;font-size:12.5px;padding:10px}
+
+/* 퀘스트 완료 → 다음 장소 안내 팝업 — 틸 톤, 살짝 작게 뜨는 진짜 팝업 느낌 */
+#nav-modal{
+  background:none;padding:0;
+  display:none;align-items:center;justify-content:center;
+}
+#nav-modal.on{display:flex}
+#nav-modal .modal-card{
+  width:80%;max-height:80%;overflow:auto;
+  background:linear-gradient(180deg,#eaf5f2,#cfe8e2);
+  border:3px solid var(--teal-deep);border-radius:14px;
+  box-shadow:0 14px 30px rgba(0,0,0,.45);
+  padding:14px 16px;
+}
+#nav-title{font-size:14px;color:var(--teal-deep);margin-bottom:8px;letter-spacing:.03em;text-align:center}
+#nav-map{width:100%;border-radius:10px;border:1.5px solid var(--gray);margin-bottom:9px;background:#556}
+#nav-obj{font-size:12px;line-height:1.55;color:#2b2018;margin-bottom:10px;text-align:center}
+#nav-go{width:100%;border-radius:10px;font-size:13.5px;padding:11px}
+
+/* ---------------- 엔딩: 내레이션 (검정 화면 타자연출) ---------------- */
+#narrative{
+  background:#0a0a0a;color:#f2ead9;
+  align-items:center;justify-content:center;text-align:center;padding:34px 26px;cursor:pointer;
+}
+#narrative-text{
+  font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:keep-all;
+  max-width:520px;text-shadow:0 1px 3px rgba(0,0,0,.6);
+  opacity:0;transition:opacity 1.6s ease;
+}
+#narrative-next{
+  position:absolute;left:0;right:0;bottom:22px;text-align:center;
+  font-size:18px;color:var(--gold);opacity:0;transition:opacity .3s;animation:dlgArrowBob 1s infinite;
+}
+
+/* ---------------- 엔딩: 남매 이미지 ---------------- */
+#legacy{background:#000;flex-direction:column;align-items:center;justify-content:center;padding:0;gap:0;}
+#legacy-imgwrap{position:relative;width:100%;flex:1;min-height:0;}
+#legacy-img1,#legacy-img2{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
+#legacy-img2{opacity:0;transition:opacity 2.6s ease;}
+#legacy-caption{
+  flex:none;font-size:10.5px;line-height:1.6;color:#cfc7b8;text-align:center;
+  max-width:540px;padding:14px 24px 20px;opacity:0;transition:opacity .8s ease;
+}
+
+/* ---------------- 엔딩: 미션 컴플리트 ---------------- */
+#complete{background:#faf6ec;color:#2b2018;align-items:center;justify-content:center;text-align:center;padding:26px;overflow:auto;}
+#complete-inner{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:520px}
+#complete-miyo{width:66px;height:66px;image-rendering:pixelated;filter:drop-shadow(0 6px 12px rgba(0,0,0,.25))}
+#complete h2{font-size:19px;letter-spacing:.04em;color:var(--sepia);font-family:'DosMyungjo'}
+#complete-desc{font-size:12px;line-height:1.6;color:#5c4a30;background:#fff8ea;border:1.5px dashed var(--gold);
+  border-radius:10px;padding:10px 13px;margin-bottom:4px}
+.complete-btn{width:100%;border-radius:10px;padding:12px;text-align:center}
+.complete-btn .cb-title{font-size:14px;font-weight:700}
+.complete-btn .cb-sub{display:block;font-size:10px;font-weight:400;line-height:1.5;margin-top:4px;opacity:.9}
+#complete-replay{
+  margin-top:6px;border-radius:10px;font-size:12px;padding:9px 22px;
+  background:#efe4cc;color:var(--wood-dark);border-color:var(--wood);
+  box-shadow:2px 2px 0 var(--wood);
+}
+#complete-replay:active{box-shadow:0 0 0 var(--wood)}
+</style>
+</head>
+<body>
+<div id="app"><div id="stage">
+
+  <!-- ===== 타이틀 ===== -->
+  <div id="title" class="screen on">
+    <div id="title-inner">
+      <img id="title-logo" src="assets/ui/title.svg" alt="잃어버린 소포">
+      <div id="play-wrap">
+        <button id="play-btn"><img src="assets/ui/play.svg" alt="PLAY" style="width:100%"></button>
+        <div id="lang-menu">
+          <button type="button" class="lang-opt" data-lang="ko"><span data-content="한국어">한국어</span></button>
+          <button type="button" class="lang-opt" data-lang="en"><span data-content="English">English</span></button>
+          <button type="button" class="lang-opt" data-lang="cn"><span data-content="中文">中文</span></button>
+          <button type="button" class="lang-opt" data-lang="tw"><span data-content="繁體中文">繁體中文</span></button>
+          <button type="button" class="lang-opt" data-lang="ja"><span data-content="日本語">日本語</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 탐정등록증 ===== -->
+  <div id="register" class="screen">
+    <div id="card">
+      <div class="badge-stamp"><img src="assets/ui/detective.svg" alt="탐정"></div>
+      <h2 id="reg-h2">탐 정 방 문 기 록</h2>
+      <p id="reg-notice">정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.</p>
+      <div id="fields">
+        <div class="field"><span id="label-name">탐정명</span><input id="f-name" placeholder="예: 홍길동" maxlength="12"></div>
+        <div class="field"><span id="label-addr">사는곳</span><input id="f-addr" placeholder="예: 부산 동구" maxlength="20"></div>
+      </div>
+      <div id="consent-box">
+        <div class="ttl" id="consent-ttl">※ 개인정보 수집 및 이용 안내</div>
+        <span id="consent-text">본 프로그램은 결과 보고(KPI) 통계 작성을 위해 이름 및 거주지를 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.</span>
+        <label class="chk"><input type="checkbox" id="f-consent"> <span id="consent-label">위 내용을 확인했으며 동의합니다</span></label>
+      </div>
+      <p id="tip">⚠️ 이동하실 때는 화면 대신 주변을 살펴주세요.</p>
+      <button id="register-btn" class="rbtn rbtn--primary" disabled>등록하고 시작하기</button>
+    </div>
+  </div>
+
+  <!-- ===== 게임 화면 (닌텐도DS풍 상/하 듀얼스크린) ===== -->
+  <div id="game" class="screen">
+    <!-- 상단 스크린: 장면 -->
+    <div id="scene-wrap">
+      <div id="scene"><div class="scene-deco" id="scene-deco"></div></div>
+      <div id="npc-shadow"></div>
+      <img id="npc-img" alt="">
+      <img id="quest-mark" src="assets/icons/quest.png" alt="퀘스트">
+
+      <button id="home-btn"><img src="assets/ui/home.png" alt="처음으로"></button>
+      <button id="quest-badge"><img id="quest-badge-img" src="assets/ui/quest_list.png" alt="퀘스트 목록"></button>
+      <button id="hint-icon"><img src="assets/ui/hint.svg" alt="힌트" style="width:100%"></button>
+
+      <div id="nav-miyo">
+        <div id="nav-miyo-portrait"></div>
+        <div id="nav-miyo-text"></div>
+      </div>
+
+      <!-- 미요 힌트 팝업 (위쪽 화면 위에 작게) -->
+      <div id="hint-modal" class="modal">
+        <div class="modal-card">
+          <div id="hint-portrait"></div>
+          <div id="hint-body-wrap">
+            <div id="hint-name">미요</div>
+            <div id="hint-text"></div>
+            <div id="hint-answer"></div>
+            <img id="hint-answer-img" alt="">
+            <button id="hint-reveal" class="rbtn rbtn--secondary">정답 바로보기</button>
+            <button id="hint-close" class="rbtn rbtn--wood">닫기</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 퀘스트 목록 팝업 (위쪽 화면 위에) -->
+      <div id="quest-modal" class="modal">
+        <div class="modal-card">
+          <button class="modal-close" id="quest-close">✕</button>
+          <h3>퀘스트 목록</h3>
+          <div class="quest-split">
+            <div class="quest-left" id="quest-left"></div>
+            <div class="quest-right" id="quest-right"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 스크린: 대화·퍼즐·퀘스트목록·이동안내 -->
+    <div id="bottom-screen">
+      <div id="tap-hint">NPC 위의 전구를 눌러 대화를 시작하세요.</div>
+      <div id="dlg">
+        <div id="dlg-portrait-wrap">
+          <div id="dlg-portrait"></div>
+          <div id="dlg-name"></div>
+        </div>
+        <div id="dlg-title">이야기</div>
+        <div id="dlg-body"></div>
+        <div id="dlg-choices">
+          <button type="button" class="dlg-choice-btn" id="dlg-choice-yes">▶ 네</button>
+          <button type="button" class="dlg-choice-btn" id="dlg-choice-no">▶ 아니오</button>
+        </div>
+        <button type="button" class="dlg-choice-btn" id="dlg-reply-btn"></button>
+        <div id="dlg-foot"><span id="dlg-next">▼</span></div>
+      </div>
+
+      <!-- 문제 팝업 -->
+      <div id="puzzle-modal" class="modal">
+        <div class="modal-card">
+          <div id="pz-q"></div>
+          <div id="pz-cryptex">
+            <div id="pz-cryptex-board">
+              <div id="pz-cryptex-reels"></div>
+            </div>
+          </div>
+          <div class="pz-row" id="pz-input-row">
+            <input id="pz-input" placeholder="정답 입력">
+            <button id="pz-submit" class="rbtn rbtn--secondary">확인</button>
+          </div>
+          <div id="pz-choices"></div>
+          <div id="pz-form">
+            <div id="pz-form-title">피난민증명서</div>
+            <div class="pz-form-row"><span class="pz-form-label">소재지</span><span class="pz-form-fixed">초량동</span><input class="pz-form-input" data-field="addr" maxlength="4" style="max-width:56px"><span class="pz-form-fixed">번지</span></div>
+            <div class="pz-form-row"><span class="pz-form-label">출생년도</span><span class="pz-form-fixed">1936</span></div>
+            <div class="pz-form-row"><span class="pz-form-label">이름</span><input class="pz-form-input" data-field="name"></div>
+            <div class="pz-form-row"><span class="pz-form-label">피난년도</span><input class="pz-form-input" data-field="year" maxlength="4" style="max-width:70px"></div>
+            <div class="pz-form-row"><span class="pz-form-label">직장</span><input class="pz-form-input" data-field="job"></div>
+            <div id="pz-form-sub">가족명단란</div>
+            <div class="pz-form-row"><span class="pz-form-label">성명</span><input class="pz-form-input" data-field="famName"></div>
+            <div class="pz-form-row"><span class="pz-form-label">성별</span><span class="pz-form-fixed">남 (M)</span></div>
+            <div class="pz-form-row"><span class="pz-form-label">연령</span><span class="pz-form-fixed">10</span></div>
+            <div class="pz-form-row"><span class="pz-form-label">직장</span><input class="pz-form-input" data-field="famJob"></div>
+            <button id="pz-form-submit" class="rbtn rbtn--secondary">확인</button>
+          </div>
+          <div id="pz-feed"></div>
+        </div>
+      </div>
+
+      <!-- 퀘스트 완료 → 다음 장소 안내 팝업 (자동) -->
+      <div id="nav-modal" class="modal">
+        <div class="modal-card">
+          <h3 id="nav-title"></h3>
+          <img id="nav-map" src="" alt="이동 경로">
+          <p id="nav-obj"></p>
+          <button id="nav-go" class="rbtn rbtn--primary"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 엔딩 1: 내레이션 ===== -->
+  <div id="narrative" class="screen">
+    <div id="narrative-text"></div>
+    <div id="narrative-next">▼</div>
+  </div>
+
+  <!-- ===== 엔딩 2: 남매 이미지 ===== -->
+  <div id="legacy" class="screen">
+    <div id="legacy-imgwrap">
+      <img id="legacy-img1" alt="">
+      <img id="legacy-img2" alt="">
+    </div>
+    <p id="legacy-caption">'잃어버린 소포'는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.</p>
+  </div>
+
+  <!-- ===== 엔딩 3: 미션 컴플리트 ===== -->
+  <div id="complete" class="screen">
+    <div id="complete-inner">
+      <img id="complete-miyo" src="assets/characters/miyo/portrait.png" alt="미요">
+      <h2>Mission Complete</h2>
+      <p id="complete-desc">이 화면을 명란스토리지 직원에게 보여주고<br>완료 기념품을 받으세요.</p>
+      <button id="survey-btn" class="rbtn rbtn--primary complete-btn">
+        <span class="cb-title" id="survey-title">만족도조사</span>
+        <span class="cb-sub" id="survey-sub">만족도 조사를 완료한 참여자 중<br>총 50분을 추첨하여 소정의 선물을 드립니다.</span>
+      </button>
+      <button id="spots-btn" class="rbtn rbtn--secondary complete-btn">
+        <span class="cb-title" id="spots-title">추천 부산관광명소</span>
+      </button>
+      <button id="other-escape-btn" class="rbtn rbtn--secondary complete-btn">
+        <span class="cb-title" id="other-escape-title">다른 야외방탈출하기</span>
+      </button>
+      <button id="complete-replay" class="rbtn rbtn--ghost">처음부터 다시하기</button>
+    </div>
+  </div>
+
+  <div id="new-quest-toast">새로운 퀘스트</div>
+
+  <div id="img-lightbox"><img id="img-lightbox-img" alt=""></div>
+
+</div></div>
+
+<script>
+"use strict";
+
+const PLAYER = { name:'', addr:'' };
+
+/* ---- 다국어(i18n) ---- */
+const TR = {
+en: {
+    "잃어버린 소포 — 미션투어":  "The Lost Package — Mission Tour",
+    "탐 정 방 문 기 록":  "Detective\u0027s Visit Log",
+    "정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.":  "To ensure accurate participation statistics, please enter the correct information for each actual participant.",
+    "탐정명":  "Detective\u0027s Name",
+    "사는곳":  "Place of Residence",
+    "예: 홍길동":  "e.g. John Smith",
+    "예: 부산 동구":  "e.g. USA",
+    "선택 입력":  "Optional input",
+    "※ 개인정보 수집 및 이용 안내":  "※ Notice Regarding the Collection and Use of Personal Information",
+    "본 프로그램은 결과 보고(KPI) 통계 작성을 위해 이름 및 거주지를 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.":  "This program collects your name and place of residence for the purpose of compiling statistical reports on results (KPIs), and this information will be destroyed within one month after the program ends. You may refuse to give your consent, but in that case, your participation may be restricted.",
+    "위 내용을 확인했으며 동의합니다":  "I have read and agree to the above",
+    "⚠️ 이동하실 때는 화면 대신 주변을 살펴주세요.":  "⚠️ When walking, please look around you instead of at your screen.",
+    "등록하고 시작하기":  "Sign Up and Get Started",
+    "NPC 위의 전구를 눌러 대화를 시작하세요.":  "Click the light bulb above the NPC to start a conversation.",
+    "▶ 네":  "▶ Yes",
+    "▶ 아니오":  "▶ No",
+    "닫기":  "Close",
+    "퀘스트 목록":  "Quest List",
+    "정답 입력":  "Enter the Correct Answer",
+    "확인":  "Confirm",
+    "이 화면을 명란스토리지 직원에게 보여주고\u003cbr\u003e완료 기념품을 받으세요.":  "Show this screen to a Myeongnan Storage employee and receive your \u003cbr\u003e completion gift.",
+    "만족도조사":  "Satisfaction Survey",
+    "만족도 조사를 완료한 참여자 중\u003cbr\u003e총 50분을 추첨하여 소정의 선물을 드립니다.":  "We will randomly select a total of 50 participants \u003cbr\u003e who have completed the satisfaction survey to receive a small gift.",
+    "다른 야외방탈출하기":  "Try Another Outdoor Escape Room",
+    "추천 부산관광명소":  "Recommended Tourist Attractions in Busan",
+    "처음부터 다시하기":  "Start Over",
+    "새로운 퀘스트":  "New Quest",
+    "처음부터 다시 시작할까요? 지금까지의 진행 상황이 초기화됩니다.":  "Would you like to start over from the beginning? Your progress so far will be reset.",
+    "다시 한번 살펴봐 주세요.":  "Please take another look.",
+    "정답을 알아내면 NPC를 눌러 정답을 입력하세요!":  "Once you figure out the answer, tap the NPC to enter it!",
+    "아직 시작한 퀘스트가 없어요.\u003cbr\u003e먼저 이동을 완료해주세요.":  "You haven\u0027t started any quests yet.\u003cbr\u003ePlease complete the travel quest first.",
+    "결과 보기":  "View Results",
+    "알아내보자":  "Let\u0027s find out",
+    "사건 해결":  "Resolving the Case",
+    "모든 단서를 모았어요. 결과를 확인해볼까요?":  "I\u0027ve gathered all the clues. Shall we see the results?",
+    "도착완료":  "I've Arrived",
+    "도착했어요":  "I\u0027ve arrived.",
+    "사진 속 시간":  "Time in the Photograph",
+    "발밑의 단서":  "Clues at My Feet",
+    "골목에 남겨진 이름":  "A Name Left Behind in the Alley",
+    "계단 위의 시선":  "A Gaze from the Stairs",
+    "누나의 흔적":  "Traces of My Sister",
+    "잊혀진 이름":  "The Forgotten Name",
+    "\u0027잃어버린 소포\u0027는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.":  "\"The Lost Package\" is a fictionalized adaptation based on the true story of a refugee who fled from Pyongyang to Busan and was forced to part ways with his family.",
+    "1950년 겨울,\n피란수도 부산으로 온 두 남매가 있었습니다.\n초량동 1041번지 단칸방.\n남매는 서로를 의지하고\n이웃들과 온기를 나누며 하루하루를 버텨냈습니다.":  "In the winter of 1950,\nthere were two siblings who had fled to Busan, the temporary capital.\nA one-room apartment at 1041 Choryang-dong.\nThe siblings relied on each other\nand shared warmth with their neighbors as they struggled to get through each day.",
+    "누나는 산복도로를 넘어 고무신 공장으로 향했고,\n동생은 168계단을 오르내리며 부두의 짐을 날랐습니다.\n고된 하루 끝에 동생이 사 온 짭조름한 명란젓 한 덩이.\n푹 익은 시래기국에 명란을 얹어\n이웃들과 나누어 먹던 그 한 입은\n추위와 배고픔을 잊게 해 준 유일한 구원이었습니다.":  "My older sister crossed the mountain road to head to the rubber shoe factory,\nwhile my younger brother carried cargo up and down the 168 steps at the docks.\nAt the end of a grueling day, my younger brother would bring home a chunk of salty, fermented pollock roe.\nTopping a bowl of rich, well-simmered dried radish soup with that pollock roe\nand sharing that single bite with our neighbors\nwas the only solace that helped us forget the cold and hunger.",
+    "밤마다 가족사진을 보며 울던 동생을 위해,\n누나는 피땀 흘려 \n부모님을 모셔 올 \u0027기차표\u0027를 마련했습니다.":  "For her younger sister, who would cry every night while looking at family photos,\nher older sister worked tirelessly \nto save up for a “train ticket” to bring their parents to live with them.",
+    "하지만 차갑게 막혀버린 철길 앞에\n그 기차표는 끝내 쓰이지 못하고,\n차마 보내지 못한 소포가 되어 초량의 흙 속에 묻혔습니다.\n 소포 위에 흙을 덮으며,\n누나는 동생의 눈물을 닦아주며 밝게 웃어 보였습니다.":  "But in front of the railroad tracks, which had been frozen shut,\nthat train ticket was never used,\nand it became a package she couldn’t bring herself to send—buried in the soil of Choryang.\nAs she covered the package with soil,\nmy older sister wiped away my younger brother’s tears and smiled brightly.",
+    "\"정수야. 우리는 가족을 묻는 게 아니야.\n우리 마음에 가족을 굳건히 세우는 거지.\n철길이 다시 열릴 때까지,\n우리는 여기서 더 억척스럽게 살아가야 해.\n부모님이 오셨을 때 잘 살고 있었다고 웃으며\n이 기차표를 보여드려야 하니까!\"":  "\"Jung-soo, we’re not just talking about having a family.\nWe’re building a family firmly in our hearts.\nUntil the railroad reopens,\nwe have to keep living here with even more determination.\nThat way, when our parents come to visit, we can smile and show them this train ticket,\nproving that we’re living well!\"",
+    "남매는 흙을 털고 일어나\n언덕 너머 떠오르는 아침 해를 바라보았습니다.\n초량의 흙 속에 묻은 그 소포는\n끝내 부치지 못한 슬픔이 아니라,\n언젠가 피어날 \u0027희망의 씨앗\u0027이었습니다.":  "The brother and sister brushed the dirt off themselves and stood up,\ngazing at the morning sun rising over the hill.\nThat package buried in the soil of Choryang\nwas not a source of sorrow for a letter that was never sent,\nbut a “seed of hope” that would one day blossom.",
+    "이제 피란수도 부산, 그리고 초량은\n더 이상 남매가 쫓겨와 머무는 쓸쓸한 피란지가 아니었습니다.\n가족과의 약속을 가슴에 품고 내일을 향해 달려가는,\n새로운 삶의 출발점이었습니다.":  "Now, Busan—the provisional capital—and Choryang\nwere no longer just desolate places of refuge where siblings had been driven to take shelter.\nThey were the starting points of new lives,\nwhere people, holding their promises to their families close to their hearts,\nrushed toward tomorrow.",
+    "차이나타운":  "Chinatown",
+    "왕지안":  "Wang Jian",
+    "그 낡은 소포를 들고 다니는 걸 보니, 연구소 초량이가 의뢰를 했다는 그 유명한 명탐정인가 보구만!":  "Seeing you carrying that old package around, I guess you must be that famous detective Choryang from the lab hired!",
+    "흠...예전에 한 번 본 적 있긴한데, 다시 볼 수 있겠나? ":  "Hmm... I think I\u0027ve seen it once before—do you think I can watch it again? ",
+    "(사진을 유심히 보며)...남매 중 이 남자 아이 얼굴이 낯이 익은데...?":  "(Looking closely at the photo)... Of the two siblings, this boy\u0027s face looks familiar...?",
+    "어릴 적 골목에서 나보다 나이 조금 많던 형이 하나 있었어. 내 볼이 만두 같다며 많이 귀여워 해줬었던 그 형을 닮았어!":  "When I was little, there was a boy in my neighborhood who was a little older than me. I look just like him—he used to say my cheeks looked like dumplings and always thought I was so cute!",
+    "근데 너무 오래 전이라 가물가물하네, 나도 사느라 바빠서 말이지.":  "But it was so long ago that my memory\u0027s a bit fuzzy—I\u0027ve been too busy with my own life, you see.",
+    "이 소포가 언제 적 물건인지부터 알아봐야할 것 같은데, 초량근대역사갤러리로 가보자고.":  "I think we should start by figuring out how old this package is, so let\u0027s head over to the Choryang Modern History Gallery.",
+    "네, 제가 바로 그 유명한 명탐정이에요.":  "Yes, I am that famous detective.",
+    "(소포를 건넨다.)":  "(Hands over the package.)",
+    "초량근대역사갤러리로 이동하기":  "Go to the Choryang Modern History Gallery",
+    "초량근대역사갤러리":  "Choryang Modern History Gallery",
+    "전시된 부산역 사진과 비교해 남매의 사진이 찍힌 연도를 알아낸다.":  "Compare the photo of the siblings with the photo of Busan Station on display to determine the year the photo of the siblings was taken.",
+    "사진은 1950년이었다.":  "The photo was taken in 1950.",
+    "이 갤러리에는 초량의 역사와 함게 부산의 근대 역사를 볼 수 가 있어.":  "At this gallery, you can learn about the history of Choryang as well as the modern history of Busan.",
+    "어쩌면 단서가 있을지도 모르겠네!":  "Maybe there\u0027s a clue after all!",
+    "남매의 사진은 몇 년도에 찍혔을까요?":  "In what year was this photo of the brother and sister taken?",
+    "6.25 전쟁이 시작된 해예요.":  "That was the year the Korean War began.",
+    "소포 속 남매의 사진은 언제 찍혔는지 알아냈는가?":  "Have you figured out when the photo of the brother and sister in the package was taken?",
+    "그래? 그럼 사진들을 다시 한 번 꼼꼼히 비교해봐. 서두르지 않아도 괜찮아.":  "Really? Then take another close look at the photos and compare them carefully. There\u0027s no need to rush.",
+    "맞아, 1950년. 그 해에 정말 많은 사람들이 피난민 신분으로 부산에 내려왔지. 아마 사진 속 남매도 그중 하나였을 거야.":  "That\u0027s right, 1950. A lot of people came to Busan as refugees that year. The brother and sister in the photo were probably among them.",
+    "삼국지벽화거리로 이동하기":  "Head to the Romance of the Three Kingdoms Mural Street",
+    "삼국지벽화거리":  "Three Kingdoms Mural Street",
+    "삼국지벽화거리를 걸으며 발밑에 숨은 남매가 살던 옛 골목의 주소를 알아내자.":  "As you stroll down the \"Romance of the Three Kingdoms\" Mural Street, try to figure out the address of the old alley where the brother and sister once lived, hidden right beneath your feet.",
+    "남매가 살던 곳은 초량동1041번지였다.":  "The brother and sister lived at 1041 Choryang-dong.",
+    "초량동1041번지로 가세요.":  "Please go to 1041 Choryang-dong.",
+    "초량동1041번지는 현재 초량중로47번길에 있어요.":  "1041 Choryang-dong is currently located on 47 Choryangjung-ro.",
+    "이 그림들은 나중에 생긴 거야. 그땐 그냥 담벼락이었지.":  "These drawings were added later. Back then, it was just a wall.",
+    "이 벽화거리는 도원결의부터 시작해. 이 동네랑 참 잘 어울리는 이야기지. 그때 여기 모여 살던 사람들도 삼국지 속 사람들처럼 새로운 세상을 만들고 싶었나 봐.":  "This mural street starts with the Oath of the Peach Garden. It’s a story that really fits this neighborhood well. I guess the people who lived here back then also wanted to create a new world, just like the characters in *Romance of the Three Kingdoms*.",
+    "그 형은 매일 이 담벼락 길을 걸어 올라갔어. 가끔은 키가 조금 더 큰 누나랑 손을 잡고 가기도 했지.":  "That older brother used to walk up this path along the wall every day. Sometimes he’d walk hand in hand with his slightly taller older sister.",
+    "그땐 이 길이 그 집으로 가는 제일 빠른 길이었거든.":  "Back then, this was the quickest way to get to that house.",
+    "내 기억이 맞다면… 아마도 그 골목 어디쯤에 살았을 텐데. 번지수는 통 생각이 안 나네.":  "If my memory serves me right… I probably lived somewhere down that alley. I just can\u0027t remember the house number at all.",
+    "발밑의 단서를 통해 드러나는 네 자리 숫자는?":  "What is the four-digit number revealed by the clues at your feet?",
+    "발밑의 그림을 순서대로 노트북에 적고 선을 그어보세요!":  "Write down the pictures below in order in your notebook and draw lines between them!",
+    "발밑의 숨은 단서를 통해 번지수를 알아냈는가?":  "Did you figure out the house number by looking for hidden clues right under your feet?",
+    "천천히 바닥 속 타일과 노트를 비교하다보면 답이 나올 거야.":  "If you take your time comparing the tiles on the floor with the notes, you\u0027ll figure it out.",
+    "그래, 초량동 1041번지. 아주 좁은 골목이었지. 그 시절 피난민들이 정말 많이 모여 살았어.":  "Right, 1041 Choryang-dong. It was a very narrow alley. Back then, a lot of refugees lived there.",
+    "이젠, 남매가 살던 그 곳으로 가 봐.":  "Now, go to the place where the brother and sister used to live.",
+    "초량동 1041번지로 이동하기":  "Go to 1041 Choryang-dong",
+    "초량동 1041번지":  "1041 Choryang-dong",
+    "황영숙":  "Hwang Young-sook",
+    "노트북 속 집으로 향하는 길에 남겨진 글자를 찾아내보자.":  "Let\u0027s try to find the letters left behind on the way home from the laptop.",
+    "소년의 이름은 정수였다.":  "The boy\u0027s name was Jeong-su.",
+    "어이구, 어서 오이소! 내가 이 동네서 평생을 살았거든예. 못 보던 얼굴이 오믄 내가 먼저 눈이 가요.":  "Oh my, come on in! I\u0027ve lived in this neighborhood my whole life. Whenever I see a new face, I can\u0027t help but notice it right away.",
+    "낡은 소포까지 들고 댕기는 거 보이, 산책 나온 건 아이네. 뭐 찾는 게 있는 갑제?":  "I see you\u0027re walking around with that old package—you\u0027re not out for a walk, are you? Are you looking for something?",
+    "아이고야, 그 초량이가 부른다던 명탐정인갑네!":  "Oh my, so that\u0027s the famous detective Choryang was talking about!",
+    "1041번지 남매라꼬? 그 시절 그 골목에 남매가 한둘이었나. 천지삐까리였다 아이가!":  "\"Siblings at 1041? Were there just one or two sets of siblings in that alley back then? There were tons of them, kid!\"",
+    "피난민이 하도 많아가 한 방에 서너 집이 같이 살았지. 저 집 아가 이 집 아인가 분간이 안 될 정도였지.":  "There were so many refugees that three or four families lived together in a single room. It was hard to tell whether a child belonged to that house or this one.",
+    "나야 그때 태어나지도 안 했지마는, 우리 아버지가 이 근처서 컸다 카데예.":  "I wasn\u0027t even born back then, but my father says he grew up around here.",
+    "맨날 좁은 골목을 뛰댕기고, 뭘 짊어지고 오르락내리락하고~":  "Always running around in narrow alleys, carrying things up and down the stairs~",
+    "아무튼 사진은 바래도 글은 희한하게 오래 가는 기라.":  "Anyway, photos may fade, but strangely enough, words seem to last a long time.",
+    "이 담장에 적힌 시들에는 이 동네 살던 사람들 사는 이야기가 있다 아이가.":  "The poems written on this wall tell the stories of the people who once lived in this neighborhood, you know.",
+    "동물은 죽어서 가죽을 남기고 사람은 죽어서 이름을 남긴다고 안카드나. 동생의 길에도 이름이 남겨져있을지도 모른다.":  "As the saying goes, animals leave their hides behind when they die, and people leave their names. Perhaps my younger brother’s name will also be remembered.",
+    "담장갤러리":  "Fence Gallery",
+    "잃어버린 소포의 비밀을 찾으러 왔어요.":  "I\u0027m here to uncover the secret behind the lost package.",
+    "골목에 남겨진 이름은?":  "What name was left behind in the alley?",
+    "노트북에 적힌 규칙을 따라 특정 단어의 글자를 짚어보세요.":  "Follow the rules written in the notebook and trace the letters of a specific word.",
+    "골목에 남겨진 이름을 벌써 알아낸기가?":  "Have you already figured out the name left in the alley?",
+    "천천히 다시 봐봐라, 지나온 길에 이름이 남겨지는 법이지.":  "Take another look, slowly—that’s how your name gets left behind on the path you’ve traveled.",
+    "(사진을 내민다.)":  "(He holds out the photo.)",
+    "정수라꼬? 아이고야… 우리 아버지 이름도 정수였는데.":  "Jeong Su-ra? Oh my... My dad\u0027s name was Jeong Su, too.",
+    "(사진을 한참 들여다보며)...우리 막내 동생 어릴 때 얼굴이랑 똑 닮았네. 이 누나는 우리 언니를 닮았고...":  "(Staring at the photo for a while)...She looks exactly like our youngest sibling did when she was little. This older sister looks just like our older sister...",
+    "(눈가를 훔치며) 아이고, 나이 드니까 눈에 자꾸 뭐가 들어가네. 아버지가 그카데. 학교가 그래 가고 싶었는데 일하러 댕기느라 맨날 학교 앞만 지나갔다꼬.":  "(Wiping her eyes) Oh dear, ever since I\u0027ve gotten older, things keep getting in my eyes. That\u0027s just like my father. He used to say he wanted to go to school, but since he was always running around working, he\u0027d just pass by the school every day.",
+    "언제나 마을의 높은 곳에서 매일 누나를 그리워하셨는데...그 쪽을 한 번 가봐래이!":  "He always used to sit up high in the village, missing my older sister every day... Why don\u0027t you go check it out sometime!",
+    "초량초등학교로 이동하기":  "Directions to Choryang Elementary School",
+    "초량초등학교":  "Choryang Elementary School",
+    "한리나":  "Han Ri-na",
+    "168계단 위에서 소년이 일하던 곳을 찾는다.":  "I look for the place where the boy used to work at the top of the 168 steps.",
+    "정수가 바라보던 곳은 부산항이었다.":  "Jeong-su was looking out at Busan Harbor.",
+    "어, 할머니!":  "Oh, Grandma!",
+    "(수첩을 슬쩍 훔쳐보고 눈을 반짝이며) 어? 탐정 수첩이다! 대박, 탐정님이세요? 저도 탐정 조수 할래요! 시켜주세요!":  "(Glancing furtively at the notebook and her eyes sparkling) Huh? It\u0027s a detective\u0027s notebook! Wow, are you ⟦DET⟧? I want to be a detective\u0027s assistant too! Please let me!",
+    "잘됐구나, 탐정님이 초량초등학교 지나서 이바구길로 가신다 카네. 우리 리나가 길 잃어버리시지 않게 잘 모시고 가 봐래이.":  "That\u0027s great—I hear ⟦DET⟧ is heading down Ibagu-gil after passing Choryang Elementary School. Make sure to take good care of our Rina so she doesn\u0027t get lost.",
+    "에이, 할머니 걱정 마세요! 초량동은 이 리나 조수 손바닥 안이거든요!":  "Oh, Grandma, don\u0027t worry! I\u0027ve got Choryang-dong right in the palm of my hand!",
+    "짠! 여기가 저희 학교예요! 엄청 멋지죠? 무려 1937년에 지어졌어요! 근데 옛날에는 학교에 가고 싶어도 못 온 친구들이 많았대요. 책가방 대신 지게를 지고, 학교 앞을 지나서 곧장 저~쪽 길로 바쁘게 일하러 가야 했다구 하더라고요.":  "Ta-da! This is our school! Isn’t it amazing? It was built way back in 1937! But I heard that back in the day, there were a lot of kids who wanted to go to school but couldn’t. Instead of carrying a backpack, they’d carry a bamboo pole on their backs, and after passing by the school, they’d head straight down that road over there to go to work.",
+    "바로 이 길이에요! 「이바구길」이라고 부르는데요, 「이바구」가 사투리로 「이야기」인 거 탐정님은 모르셨죠?":  "This is the very street! It’s called “Ibagu-gil,” and “ibagu” means “story” in the local dialect—⟦DET⟧, you didn’t know that, did you?",
+    "헤헷, 물론 저도 우리 할머니한테 전해 들은 지식이에요! 옛날에 전쟁을 피해서 온 피난민 분들이 이 산복도로를 따라 집을 짓고 다니던 눈물 없인 못 듣는 역사적인 길이라니까요?":  "Hehe, of course, I learned this from my grandmother, too! It’s a historic road—one you can’t hear about without shedding a tear—where refugees who fled the war long ago built their homes along this mountain road, you know?",
+    "에이, 탐정님! 벌써 계단 보고 놀라신 거예요? 다리가 막 후들거리시는 것 같은데… 겨우 이 정도로 놀라시면 안 돼요. 나중에 눈이 번쩍 뜨일 만큼 엄~청 높은 계단이 나타날 테니까 힘내세요, 탐정님!":  "Oh, ⟦DET⟧! Are you already freaked out by the stairs? Your legs look like they\u0027re shaking... You can\u0027t get so scared by something this small. Stay strong, ⟦DET⟧! Because later on, there\u0027ll be some really, really high stairs that\u0027ll make your eyes pop out of your head.",
+    "(음식 냄새를 킁킁 맡으며) 츄릅… 여기는 옛날 도시락을 맛볼 수 있는 곳이에요! 탐정 일 하느라 배고프시면 이따가 저랑 같이 맛봐요. 제가 특별히 맛있는 조합 알려드릴게요!":  "(Sniffing the food) Mmm... This is a place where you can try old-school lunchbox meals! If you get hungry while working on your detective case, come try some with me later. I\u0027ll let you in on a particularly delicious combination!",
+    "자, 요 맛있는 냄새를 뒤로하고 이대로 쭉 올라가야 이바구길이 이어져요. 고고!":  "Okay, let\u0027s leave this delicious smell behind and keep going straight up—that\u0027s where the Ibagu Trail continues. Let\u0027s go!",
+    "짜잔! 여기가 바로 그 유명한 「168계단」이에요! 그리고 바로 옆을 보세요! 손님들이 맨날 바다만 보러 갈 때, 힙한 언니 오빠들은 다 여기 모인다니까요?":  "Ta-da! This is the famous “168 Steps”! And look right next to it! While tourists are always heading to the beach, all the cool guys and girls gather right here, you know?",
+    "바로 「이바구플랫폼」이에요! 옛날 건물을 개조해서 만든 곳인데, 멋진 공방도 있고 맛있는 디저트도 파는 우리 동네 제일 핫플이에요!":  "It\u0027s none other than the \"Ibagu Platform\"! It\u0027s a place created by renovating an old building, and with its cool craft studios and delicious desserts, it\u0027s the hottest spot in our neighborhood!",
+    "탐정님 보니까 계단 다 걸어가다간 사건 해결 못 하실 것 같아서… 저흰 다리 아프니까 문명의 혜택인 엘리베이터를 타요! 저기 계신 친절하신 동네 어르신들이 타는 법 알려 주실 거예요. 인사 바르게 하셔야 해요!":  "⟦DET⟧ It looks like if you walk all the way up those stairs, you won’t be able to solve the case… Our legs hurt, so we’re taking the elevator—one of civilization’s conveniences! Those kind elderly neighbors over there will show you how to use it. Be sure to greet them properly!",
+    "어때요, 예쁘죠? 바다가 이렇게 한눈에 다 보여요! 다른 곳 생각은 싹 사라지죠? 근데… 옛날 사람들은 엘리베이터도 없이 이 많은 계단을 매일 어떻게 오르락내리락했을까요?":  "What do you think? Isn\u0027t it beautiful? You can see the whole ocean at a glance! It makes you forget about everything else, doesn\u0027t it? But… I wonder how people in the old days managed to go up and down all these stairs every day without an elevator?",
+    "저 많은 계단으로 무거운 우물물도 나르고, 짐도 나르고, 일하러 가기도 했다고 해요. 진짜 대단하죠?":  "They say people used to carry heavy well water, haul loads, and even go to work up all those stairs. Isn’t that amazing?",
+    "우리 할머니도 가끔 여기서 가만히 바다를 바라보세요. 어릴 때 할머니의 아빠… 그러니까 제 증조할아버지를 보고 싶어서 그러신 거래요. 증조할아버지는 저 넓은 바다 어디에서 일하셨던 걸까요?":  "My grandmother also sometimes sits here quietly, gazing out at the ocean. She says she does this because, when she was young, she missed her father—my great-grandfather. I wonder where out there on that vast ocean my great-grandfather used to work?",
+    "아! 그러고 보니 할머니가 제게 주신 증조할아버지의 망원경이 있어요, 어쩌면 망원경으로 바다를 바라보면...무언가 알게 될 지도 몰라요!":  "Oh! Come to think of it, I have my great-grandfather’s telescope that my grandmother gave me. Maybe if I look out at the ocean through it... I might find out something!",
+    "담장 갤러리":  "Wall Gallery",
+    "이바구길":  "Ibagu-gil",
+    "168계단 앞":  "In front of the 168 Steps",
+    "168계단 하늘길":  "The 168-Step Sky Path",
+    "리나의 증조할아버지, 정수는 어디에서 일했을까요?":  "Where did Lina\u0027s great-grandfather, Jeong-su, work?",
+    "BUSAN을 먼저 찾다보면 무언가 나타날거예요.":  "If you visit BUSAN first, something will surely appear.",
+    "NPC 위의 전구를 눌러서 망원경을 확인하세요.":  "Click the light bulb above the NPC to check the telescope.",
+    "벌써 어디에서 일하신건지 알아낸거에요?":  "Have you already figured out where you used to work?",
+    "괜찮아요, 다시 한번 이 자리에 서서 천천히 둘러보자구요!":  "It\u0027s okay—let\u0027s stand here one more time and take a slow look around!",
+    "맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.":  "That\u0027s right. They say that in the past, everyone used to stand on top of this high hill and these stairs, panting for breath, and gaze endlessly out at the sea at Busan Harbor.",
+    "바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.":  "Whenever a large ship came in from far out at sea, it meant there was finally work to be had at the port! Then, the locals would rush over in droves to carry heavy cargo, and they’d work up a sweat while saving up every little bit of money they could.",
+    "아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?":  "I guess… my grandmother’s father—my great-grandfather—must have worked just as hard down there, too…?",
+    "아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "Oh, right! Come check this out instead! It’s a place called the “Mangyang-ro Mountain Road Exhibition Hall.” The true, deep history of our neighborhood is all hidden right here!",
+    "어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!":  "Maybe you’ll even find a clue here about the secret behind that suspicious package ⟦DET⟧ is holding!",
+    "거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!":  "If you go there, there’s this guy named Ian who sings just as amazingly well as today’s idols and is incredibly handsome, right? Hurry up and go ask him!",
+    "저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!":  "I really, really want to go with you too… but if I go any further, my mom will give me a huge scolding, so I’ll just go this far. Hehe! ⟦DET⟧ Be careful on your way!",
+    "영초윗길":  "Yeongcho Upper Road",
+    "산복도로전시관으로 이동하기":  "Go to the Sanbok-ro Exhibition Hall",
+    "망양로 산복도로전시관":  "Mangyang-ro Mountain Road Exhibition Hall",
+    "박이안":  "Park Ian",
+    "산복도로전시관의 전시물을 통해 누나가 일하던 곳을 알아낸다.":  "Through the exhibits at the Sanbok-ro Exhibition Hall, I figure out where my older sister used to work.",
+    "누나가 일하던 곳은 고무신 공장이었다.":  "My older sister used to work at a rubber shoe factory.",
+    "여행객이신가요? 여기까지 올라오는 분은 흔치않은데...":  "Are you a tourist? It\u0027s rare for people to come all the way up here...",
+    "안녕하세요, 인사가 늦었네요. 저는 산복도로전시관 도슨트, 박이안입니다. 여기는 어쩐 일이신가요? 이 안쪽으로 들어오시면 됩니다.":  "Hello, sorry for the late introduction. I’m Park Ian, a docent at the Sanbok-ro Exhibition Hall. What brings you here? Please come on in.",
+    "소포의 비밀이라... 리나가 얼핏 이야기한 것같네요. 명란브랜드연구소 공사중에 나왔다면서요? 여기까지 오신거면 많이 알아내셨겠네요.":  "\"The secret of the package\"... I think Rina mentioned something about that in passing. She said it turned up during construction at the Myeongnan Brand Research Institute, right? Since you\u0027ve made it this far, you must have found out quite a bit.",
+    "역시 명탐정이시네요, 아직 이 기차표에 대해서는 모르시는 건가요...?":  "You really are a master detective—don’t you know anything about this train ticket yet...?",
+    "(기차표를 바라보며)이건… 사용하지 않은 기차표네요. 옛날에는 표를 쓰면 개표가위로 구멍을 냈거든요. 그런데 이 표는 너무 깨끗해요.":  "(Looking at the train ticket) This is… an unused train ticket. Back in the day, they used to punch a hole in the ticket with a ticket-punching scissors. But this ticket is too clean.",
+    "남매가 돈을 모아 기차표는 마련해 놓고도 끝내 쓰지 못했나 봐요.":  "It seems the brother and sister saved up money to buy train tickets but never ended up using them.",
+    "흠, 정수라는 분이 아래쪽 항구를 바라보며 일했다면...아마 누나는 반대로 이 산복도로를 넘어 일터로 향했을지도 몰라요. 옛날에 그 곳을 「누나의 길」이라고 불렀거든요.":  "Hmm, if a man named Jeong-su was working while looking out at the harbor down below... maybe my older sister was heading to work by going the other way, over this mountain road. Back in the day, we used to call that place “My Sister’s Path.”",
+    "누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.":  "See if you can find that “item” inside the exhibition hall—it’s the one your sister used to make at the factory. It’s probably right there in plain sight.",
+    "(지금까지 모은 단서들을 보여준다.)":  "(He shows the clues he has gathered so far.)",
+    "전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?":  "Let\u0027s use the clues hidden in the exhibition to find out where my older sister used to work.",
+    "정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?":  "What did Jeong-su's sister make while walking back and forth along \"My Sister's Path\"?",
+    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "What is below the purple, to the left of the white, and across from the navy blue? (You can also enter the number where the item is placed!)",
+    "정수의 누나가 일하던 곳을 알아내셨나요?":  "Did you find out where Jung-soo\u0027s older sister used to work?",
+    "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "Don\u0027t rush. If you take another look at the exhibits one by one, you\u0027ll see it.",
+    "맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠":  "That\u0027s right, rubber shoes... or rather, it was a factory that made rubber shoes! Back then, the refugees—whether at the rubber shoe factory beyond that mountain road or as porters—each did their part to get through the day as best they could.",
+    "이제 누나가 일하던 곳까지 밝혀졌으니, 이 모든 단서를 모아 명란브랜드연구소로 돌아가 보세요.":  "Now that you\u0027ve found out where your sister used to work, gather all these clues and head back to the Myeongnan Brand Research Institute.",
+    "명란브랜드연구소로 복귀하기":  "Return to the Myeongnan Brand Research Institute",
+    "명란브랜드연구소":  "Myeongnan Brand Research Institute",
+    "김초량":  "Kim Cho-ryang",
+    "모은 단서를 모두 맞춰 소포 속 남매의 정체를 밝혀낸다.":  "By piecing together all the clues, he uncovers the identities of the brother and sister inside the package.",
+    "정수와 함께 있던 누나는 황정월이었다.":  "The older sister who was with Jeong-su was Hwang Jeong-wol.",
+    "명란브랜드연구소까지 오셨네요! 이 계단 밑으로 내려가면 돼요!":  "You\u0027ve made it to the Myeongnan Brand Research Institute! Just go down these stairs!",
+    "미요":  "Miyo",
+    "탐정님, 수고 많으셨어요. 모은 단서들을 한번 펼쳐볼까요?":  "⟦DET⟧, great work. Shall we lay out all the clues we\u0027ve gathered?",
+    "1950년, 초량동 1041번지, 정수라는 이름, 부산항을 바라보던 지게꾼 동생, 고무신 공장에서 일하던 누나, 그리고 한 번도 쓰이지 못한 기차표...":  "In 1950, at 1041 Choryang-dong: a name—Jeong-su—a younger brother who worked as a porter overlooking Busan Harbor, an older sister who worked at a rubber shoe factory, and a train ticket that was never used...",
+    "(깜짝 놀라며)…어?! 그렇다면, 이 소포 속 「정수」라는 분… 제 할아버지가 분명해요!":  "(Startled)… Huh?! If that’s the case, then the person named “Jeong-su” in this package… it’s definitely my grandfather!",
+    "할아버지는 어릴 적 피난 시절 이야기를 잘 안 하셨지만, 일찍 세상을 떠난 누나 얘기만큼은 가끔 하셨거든요. 늘 다정하셨고, 아무리 배고프고 힘든 날에도 동생인 할아버지를 먼저 챙겨주셨다고…":  "Grandpa didn’t talk much about his childhood days as a refugee, but he would occasionally mention his older sister, who passed away at a young age. He said she was always kind and, no matter how hungry or difficult the day was, she always made sure to take care of him—her younger brother—first…",
+    "특히 시장에서 구해온 명란젓을 따뜻한 밥 위에 올려주시던 걸 평생 못 잊으셨대요. 명란은 초량 산복도로 피난민들이 서로를 먹여 살리던 눈물겨운 정성이 담긴 「진짜 우리 전통 음식」이거든요.":  "In particular, she said she would never forget how they used to place salted pollock roe—bought at the market—on top of warm rice. Salted pollock roe is a “true traditional Korean dish” filled with the heartwarming devotion of refugees who supported one another along the Sanbok-ro road in Choryang.",
+    "그 짭조름한 우리 명란의 맛이… 할아버지에겐 평생 누나를 떠올리게 하는 그리움의 맛이었나 봐요.":  "The salty-sweet taste of our mackerel roe… I guess for Grandpa, it was the taste of longing that reminded him of his older sister his whole life.",
+    "제가 이 초량에서 명란브랜드연구소장이 되어 우리 명란을 세상에 널리 알리게 된 것도, 다 이런 이끌림 때문이었나 보네요.":  "I suppose it was all because of this calling that I became the director of the Myeongnan Brand Research Institute here in Choryang and came to introduce our Myeongnan to the world.",
+    "이 소포의 주인… 아마 평생 우리 할아버지가 그토록 그리워하던, 할아버지의 누나인 제 고모할머니가 확실해요.":  "The owner of this package… I’m pretty sure it’s my great-aunt—my grandfather’s older sister, whom he longed for his entire life.",
+    "황영숙 할머니의 아버지인 것같아요.":  "I think he\u0027s Grandma Hwang Young-sook\u0027s father.",
+    "잊혀진 이름, 누나의 이름은 뭘까요?":  "A Forgotten Name: What Was My Sister\u0027s Name?",
+    "피난민증명서의 빈 칸을 마저 채워보세요.":  "Please fill in the remaining blanks on the refugee certificate.",
+    "이제 남매의 정체를 전부 알아내셨나요?":  "Have you figured out the siblings\u0027 true identities yet?",
+    "천천히 살펴보도록해요.":  "Let\u0027s take a look at it slowly.",
+    "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "...Hwang Jeong-wol—so this is the older sister my grandfather longed for his whole life.",
+    "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "To think that this package... wasn\u0027t a lost package at all, but one you couldn\u0027t bring yourself to send and had buried in the soil of Choryang...",
+    "보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요":  "Believing that the train ticket you never sent was not a source of sorrow but a hope that would one day blossom… you buried it in the soil of Choryang.",
+    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "Thank you so much, ⟦DET⟧, for finally bringing our family’s long-forgotten promise to light.",
+    "정답 바로보기":  "Reveal Answer",
+    "정답: ":  "Answer: ",
+    "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "Check out the new quest in the top right!"
+},
+ja: {
+    "잃어버린 소포 — 미션투어":  "紛失した小包 — ミッションツアー",
+    "탐 정 방 문 기 록":  "探偵の訪問記録",
+    "정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.":  "正確な参加者統計を集計するため、実際に参加される方の情報を正確にご記入ください。",
+    "탐정명":  "探偵名",
+    "사는곳":  "住んでいる場所",
+    "예: 홍길동":  "例：山田太郎",
+    "예: 부산 동구":  "例：日本",
+    "선택 입력":  "選択を入力してください",
+    "※ 개인정보 수집 및 이용 안내":  "※ 個人情報の収集および利用に関するご案内",
+    "본 프로그램은 결과 보고(KPI) 통계 작성을 위해 이름 및 거주지를 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.":  "本プログラムでは、結果報告（KPI）の統計作成のために氏名および居住地を収集し、終了後1ヶ月以内に破棄いたします。同意を拒否することも可能ですが、その場合は参加が制限される場合があります。",
+    "위 내용을 확인했으며 동의합니다":  "上記の内容を確認し、同意します",
+    "⚠️ 이동하실 때는 화면 대신 주변을 살펴주세요.":  "⚠️ 移動の際は、画面ではなく周囲に注意してください。",
+    "등록하고 시작하기":  "登録して始めよう",
+    "NPC 위의 전구를 눌러 대화를 시작하세요.":  "NPCの上にある電球をタップして、会話を始めてください。",
+    "▶ 네":  "▶ はい",
+    "▶ 아니오":  "▶ いいえ",
+    "닫기":  "閉じる",
+    "퀘스트 목록":  "クエスト一覧",
+    "정답 입력":  "正解を入力",
+    "확인":  "確認",
+    "이 화면을 명란스토리지 직원에게 보여주고\u003cbr\u003e완료 기념품을 받으세요.":  "この画面をMyeongnan Storageのスタッフに見せて、\u003cbr\u003e完了記念品を受け取ってください。",
+    "만족도조사":  "満足度調査",
+    "만족도 조사를 완료한 참여자 중\u003cbr\u003e총 50분을 추첨하여 소정의 선물을 드립니다.":  "満足度調査にご回答いただいた参加者の中から\u003cbr\u003e計50名を抽選で選び、ささやかなプレゼントを差し上げます。",
+    "다른 야외방탈출하기":  "他の屋外脱出ゲームに挑戦する",
+    "추천 부산관광명소":  "おすすめの釜山観光スポット",
+    "처음부터 다시하기":  "最初からやり直す",
+    "새로운 퀘스트":  "新しいクエスト",
+    "처음부터 다시 시작할까요? 지금까지의 진행 상황이 초기화됩니다.":  "最初からやり直しますか？これまでの進行状況がリセットされます。",
+    "다시 한번 살펴봐 주세요.":  "もう一度ご確認ください。",
+    "정답을 알아내면 NPC를 눌러 정답을 입력하세요!":  "正解がわかったら、NPCをタップして正解を入力してください！",
+    "아직 시작한 퀘스트가 없어요.\u003cbr\u003e먼저 이동을 완료해주세요.":  "まだ開始したクエストがありません。\u003cbr\u003eまず、移動を完了してください。",
+    "결과 보기":  "結果を見る",
+    "알아내보자":  "調べてみよう",
+    "사건 해결":  "事件の解決",
+    "모든 단서를 모았어요. 결과를 확인해볼까요?":  "すべての手がかりを集めました。結果を確認してみましょうか？",
+    "도착완료":  "到着完了",
+    "도착했어요":  "着きました",
+    "사진 속 시간":  "写真の中の時間",
+    "발밑의 단서":  "足元の手がかり",
+    "골목에 남겨진 이름":  "路地に残された名前",
+    "계단 위의 시선":  "階段の上からの視線",
+    "누나의 흔적":  "姉の痕跡",
+    "잊혀진 이름":  "忘れられた名前",
+    "\u0027잃어버린 소포\u0027는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.":  "『失われた小包』は、平壌から釜山へ避難し、家族と引き裂かれることになった避難民の実話を脚色して再構成したものです。",
+    "1950년 겨울,\n피란수도 부산으로 온 두 남매가 있었습니다.\n초량동 1041번지 단칸방.\n남매는 서로를 의지하고\n이웃들과 온기를 나누며 하루하루를 버텨냈습니다.":  "1950年の冬、\n避難先の首都・釜山にやってきた兄妹がいました。\n草梁洞1041番地のワンルーム。\n兄妹は互いに支え合い、\n近所の人たちと温もりを分かち合いながら、一日一日を耐え抜きました。",
+    "누나는 산복도로를 넘어 고무신 공장으로 향했고,\n동생은 168계단을 오르내리며 부두의 짐을 날랐습니다.\n고된 하루 끝에 동생이 사 온 짭조름한 명란젓 한 덩이.\n푹 익은 시래기국에 명란을 얹어\n이웃들과 나누어 먹던 그 한 입은\n추위와 배고픔을 잊게 해 준 유일한 구원이었습니다.":  "姉は山腹の道を越えてゴム靴工場へと向かい、\n弟は168段の階段を上り下りしながら、埠頭の荷物を運びました。\n過酷な一日の終わりに、弟が買ってきてくれた塩気のある明太子の一塊。\nよく煮込んだ干し大根のスープに明太子をのせて、\n近所の人たちと分け合って食べたその一口は、\n寒さと空腹を忘れさせてくれた唯一の救いでした。",
+    "밤마다 가족사진을 보며 울던 동생을 위해,\n누나는 피땀 흘려 \n부모님을 모셔 올 \u0027기차표\u0027를 마련했습니다.":  "毎晩、家族の写真を見ながら泣いていた妹のために、\n姉は血の滲むような努力をして、\n両親を連れてくるための「列車の切符」を手配しました。",
+    "하지만 차갑게 막혀버린 철길 앞에\n그 기차표는 끝내 쓰이지 못하고,\n차마 보내지 못한 소포가 되어 초량의 흙 속에 묻혔습니다.\n 소포 위에 흙을 덮으며,\n누나는 동생의 눈물을 닦아주며 밝게 웃어 보였습니다.":  "しかし、凍てついた線路の前で、\nその切符は結局使われることなく、\nどうしても送り出せなかった小包となって、草梁の土の中に埋められたのです。\n小包の上に土をかぶせながら、\n姉は弟の涙を拭いてやり、明るく微笑みました。",
+    "\"정수야. 우리는 가족을 묻는 게 아니야.\n우리 마음에 가족을 굳건히 세우는 거지.\n철길이 다시 열릴 때까지,\n우리는 여기서 더 억척스럽게 살아가야 해.\n부모님이 오셨을 때 잘 살고 있었다고 웃으며\n이 기차표를 보여드려야 하니까!\"":  "「スン。私たちは家族を埋葬するわけじゃない。\n私たちの心の中に、家族をしっかりと築き上げるんだ。\n線路が再開されるまで、\n私たちはここで、もっとたくましく生きていかなきゃいけない。\n両親が来た時に、うまくやってると笑顔で\nこの切符を見せなきゃいけないんだから！」",
+    "남매는 흙을 털고 일어나\n언덕 너머 떠오르는 아침 해를 바라보았습니다.\n초량의 흙 속에 묻은 그 소포는\n끝내 부치지 못한 슬픔이 아니라,\n언젠가 피어날 \u0027희망의 씨앗\u0027이었습니다.":  "兄妹は土を払い落とし、立ち上がって\n丘の向こうに昇る朝日を眺めました。\n草梁の土の中に埋もれたその小包は、\n結局届けることができなかったという悲しみではなく、\nいつか花開く「希望の種」だったのです。",
+    "이제 피란수도 부산, 그리고 초량은\n더 이상 남매가 쫓겨와 머무는 쓸쓸한 피란지가 아니었습니다.\n가족과의 약속을 가슴에 품고 내일을 향해 달려가는,\n새로운 삶의 출발점이었습니다.":  "今や避難の都・釜山、そして草梁は、\nもはや兄妹が追われて身を寄せる寂しい避難地ではありませんでした。\n家族との約束を胸に抱き、明日へと駆け抜ける、\n新たな人生の出発点だったのです。",
+    "차이나타운":  "チャイナタウン",
+    "왕지안":  "ワン・ジアン",
+    "그 낡은 소포를 들고 다니는 걸 보니, 연구소 초량이가 의뢰를 했다는 그 유명한 명탐정인가 보구만!":  "あの古びた小包を持ち歩いているのを見ると、研究所のチョリャンが依頼したという、あの有名な名探偵のようだ！",
+    "흠...예전에 한 번 본 적 있긴한데, 다시 볼 수 있겠나? ":  "うーん…以前一度見たことはあるんだけど、もう一度見られるかな？",
+    "(사진을 유심히 보며)...남매 중 이 남자 아이 얼굴이 낯이 익은데...?":  "（写真をじっと見つめながら）…この兄妹のうち、この男の子の顔、どこかで見たような気がするんだけど…？",
+    "어릴 적 골목에서 나보다 나이 조금 많던 형이 하나 있었어. 내 볼이 만두 같다며 많이 귀여워 해줬었던 그 형을 닮았어!":  "子供の頃、路地裏に僕より少し年上の兄貴分が一人いたんだ。僕の頬が餃子のようだと、すごく可愛がってくれたあの兄貴分にそっくりなんだ！",
+    "근데 너무 오래 전이라 가물가물하네, 나도 사느라 바빠서 말이지.":  "でも、ずいぶん前のことだから、記憶が曖昧だな。僕も生活に追われていてね。",
+    "이 소포가 언제 적 물건인지부터 알아봐야할 것 같은데, 초량근대역사갤러리로 가보자고.":  "この小包がいつの時代のものなのか、まずは調べてみるべきだろう。チョリャン近代歴史ギャラリーに行ってみよう。",
+    "네, 제가 바로 그 유명한 명탐정이에요.":  "はい、私がまさにその有名な名探偵です。",
+    "(소포를 건넨다.)":  "（小包を手渡す。）",
+    "초량근대역사갤러리로 이동하기":  "草梁近代歴史ギャラリーへ移動する",
+    "초량근대역사갤러리":  "草梁近代歴史ギャラリー",
+    "전시된 부산역 사진과 비교해 남매의 사진이 찍힌 연도를 알아낸다.":  "展示されている釜山駅の写真と照らし合わせて、兄妹の写真が撮影された年を特定する。",
+    "사진은 1950년이었다.":  "写真は1950年のものだった。",
+    "이 갤러리에는 초량의 역사와 함게 부산의 근대 역사를 볼 수 가 있어.":  "このギャラリーでは、草梁の歴史とともに、釜山の近代史を垣間見ることができる。",
+    "어쩌면 단서가 있을지도 모르겠네!":  "もしかすると手がかりがあるかもしれないな！",
+    "남매의 사진은 몇 년도에 찍혔을까요?":  "兄妹の写真は、何年に撮られたのでしょうか？",
+    "6.25 전쟁이 시작된 해예요.":  "朝鮮戦争が始まった年です。",
+    "소포 속 남매의 사진은 언제 찍혔는지 알아냈는가?":  "小包に入っていた兄妹の写真がいつ撮影されたのか、突き止めたのか？",
+    "그래? 그럼 사진들을 다시 한 번 꼼꼼히 비교해봐. 서두르지 않아도 괜찮아.":  "そう？　それなら、もう一度写真をじっくり比べてみて。急がなくても大丈夫だよ。",
+    "맞아, 1950년. 그 해에 정말 많은 사람들이 피난민 신분으로 부산에 내려왔지. 아마 사진 속 남매도 그중 하나였을 거야.":  "そう、1950年。その年、本当に多くの人々が避難民として釜山にやって来た。たぶん、写真に写っている兄妹もその中の一人だったのだろう。",
+    "삼국지벽화거리로 이동하기":  "『三国志壁画通り』へ移動する",
+    "삼국지벽화거리":  "三国志壁画通り",
+    "삼국지벽화거리를 걸으며 발밑에 숨은 남매가 살던 옛 골목의 주소를 알아내자.":  "『三国志』の壁画通りを歩きながら、足元に隠れた兄妹が住んでいた昔の路地の住所を突き止めよう。",
+    "남매가 살던 곳은 초량동1041번지였다.":  "兄妹が住んでいたのは、草量洞1041番地だった。",
+    "초량동1041번지로 가세요.":  "草梁洞1041番地へ行ってください。",
+    "초량동1041번지는 현재 초량중로47번길에 있어요.":  "草梁洞1041番地は、現在、草梁中路47番通りにあります。",
+    "이 그림들은 나중에 생긴 거야. 그땐 그냥 담벼락이었지.":  "これらの絵は後から描かれたものだよ。当時はただの塀だったんだ。",
+    "이 벽화거리는 도원결의부터 시작해. 이 동네랑 참 잘 어울리는 이야기지. 그때 여기 모여 살던 사람들도 삼국지 속 사람들처럼 새로운 세상을 만들고 싶었나 봐.":  "この壁画通りは「桃園の誓い」から始まっている。この街にとてもよく似合う物語だね。当時、ここに集まって暮らしていた人々も、『三国志』に登場する人々のように、新しい世の中を作りたかったのだろう。",
+    "그 형은 매일 이 담벼락 길을 걸어 올라갔어. 가끔은 키가 조금 더 큰 누나랑 손을 잡고 가기도 했지.":  "その兄さんは毎日、この塀沿いの道を歩いて登っていった。たまには、もう少し背の高い姉と手をつないで歩くこともあった。",
+    "그땐 이 길이 그 집으로 가는 제일 빠른 길이었거든.":  "あの頃は、この道がその家へ行く一番近道だったんだ。",
+    "내 기억이 맞다면… 아마도 그 골목 어디쯤에 살았을 텐데. 번지수는 통 생각이 안 나네.":  "私の記憶が正しければ……たぶん、あの路地のどこかに住んでいたはずだ。番地は全く思い出せないな。",
+    "발밑의 단서를 통해 드러나는 네 자리 숫자는?":  "足元の手がかりから浮かび上がる4桁の数字は？",
+    "발밑의 그림을 순서대로 노트북에 적고 선을 그어보세요!":  "足元の絵を順番にノートに書き写し、線を引いてみてください！",
+    "발밑의 숨은 단서를 통해 번지수를 알아냈는가?":  "足元の隠された手がかりから、住所を突き止めたのか？",
+    "천천히 바닥 속 타일과 노트를 비교하다보면 답이 나올 거야.":  "じっくりと床のタイルとノートを照らし合わせていけば、答えが見つかるはずだ。",
+    "그래, 초량동 1041번지. 아주 좁은 골목이었지. 그 시절 피난민들이 정말 많이 모여 살았어.":  "そう、草梁洞1041番地。とても狭い路地だったな。あの頃、避難民たちが本当にたくさん集まって暮らしていたんだ。",
+    "이젠, 남매가 살던 그 곳으로 가 봐.":  "さあ、兄妹が住んでいたあの場所へ行ってみよう。",
+    "초량동 1041번지로 이동하기":  "草梁洞1041番地へ移動する",
+    "초량동 1041번지":  "草梁洞1041番地",
+    "황영숙":  "ファン・ヨンスク",
+    "노트북 속 집으로 향하는 길에 남겨진 글자를 찾아내보자.":  "ノートパソコンの中にある、家へ向かう道に残された文字を探してみよう。",
+    "소년의 이름은 정수였다.":  "少年の名前はチョン・スだった。",
+    "어이구, 어서 오이소! 내가 이 동네서 평생을 살았거든예. 못 보던 얼굴이 오믄 내가 먼저 눈이 가요.":  "あらまあ、いらっしゃい！私はこの町で一生を過ごしてきたんです。見慣れない顔を見かけると、つい目が向いてしまうんですよ。",
+    "낡은 소포까지 들고 댕기는 거 보이, 산책 나온 건 아이네. 뭐 찾는 게 있는 갑제?":  "古びた小包まで持ってうろついているのを見かけたよ。散歩に出たわけじゃないんだね。何か探しているのかな？",
+    "아이고야, 그 초량이가 부른다던 명탐정인갑네!":  "あらまあ、あのチョリャンが呼んでいたという名探偵のようですね！",
+    "1041번지 남매라꼬? 그 시절 그 골목에 남매가 한둘이었나. 천지삐까리였다 아이가!":  "1041番地の兄妹だって？　あの頃、あの路地には兄妹が一人や二人しかいなかったわけじゃない。あちこちにいたんだよ、あの頃は！",
+    "피난민이 하도 많아가 한 방에 서너 집이 같이 살았지. 저 집 아가 이 집 아인가 분간이 안 될 정도였지.":  "避難民があまりにも多かったので、一部屋に3、4世帯が一緒に暮らしていた。あそこの家の子供か、この家の子供か、見分けがつかないほどだった。",
+    "나야 그때 태어나지도 안 했지마는, 우리 아버지가 이 근처서 컸다 카데예.":  "私はその頃まだ生まれてもいなかったけれど、父はこの辺りで育ったそうだよ。",
+    "맨날 좁은 골목을 뛰댕기고, 뭘 짊어지고 오르락내리락하고~":  "毎日、狭い路地を走り回ったり、何かを背負って上り下りしたりして～",
+    "아무튼 사진은 바래도 글은 희한하게 오래 가는 기라.":  "とにかく、写真は色あせても、文章は不思議と長く残るものだ。",
+    "이 담장에 적힌 시들에는 이 동네 살던 사람들 사는 이야기가 있다 아이가.":  "この塀に書かれた詩には、この町に住んでいた人々の暮らしの物語が綴られているんだ。",
+    "동물은 죽어서 가죽을 남기고 사람은 죽어서 이름을 남긴다고 안카드나. 동생의 길에도 이름이 남겨져있을지도 모른다.":  "「動物は死んで皮を残し、人は死んで名を残す」とアンカドは言っていた。弟の通った道にも、その名が残されているかもしれない。",
+    "담장갤러리":  "塀ギャラリー",
+    "잃어버린 소포의 비밀을 찾으러 왔어요.":  "紛失した小包の謎を解き明かすために来ました。",
+    "골목에 남겨진 이름은?":  "路地に残された名前とは？",
+    "노트북에 적힌 규칙을 따라 특정 단어의 글자를 짚어보세요.":  "ノートに書かれたルールに従って、特定の単語の文字を指でなぞってみてください。",
+    "골목에 남겨진 이름을 벌써 알아낸기가?":  "路地に残された名前を、もう突き止めたのか？",
+    "천천히 다시 봐봐라, 지나온 길에 이름이 남겨지는 법이지.":  "もう一度、じっくりと振り返ってみてごらん。歩んできた道には、その名が残されるものなのだから。",
+    "(사진을 내민다.)":  "（写真を見せる。）",
+    "정수라꼬? 아이고야… 우리 아버지 이름도 정수였는데.":  "チョン・スラって？ あらまあ…うちの父もチョン・スって名前だったのよ。",
+    "(사진을 한참 들여다보며)...우리 막내 동생 어릴 때 얼굴이랑 똑 닮았네. 이 누나는 우리 언니를 닮았고...":  "（写真をじっと見つめながら）……うちの末っ子の子供の頃の顔にそっくりだね。このお姉さんはうちの姉に似てるし……",
+    "(눈가를 훔치며) 아이고, 나이 드니까 눈에 자꾸 뭐가 들어가네. 아버지가 그카데. 학교가 그래 가고 싶었는데 일하러 댕기느라 맨날 학교 앞만 지나갔다꼬.":  "（目尻を拭きながら）あら、年を取ると目に何かが入りやすいのね。父もそう言っていたわ。学校に行きたかったのに、仕事に行くのに忙しくて、毎日学校の前を通り過ぎるだけだったって。",
+    "언제나 마을의 높은 곳에서 매일 누나를 그리워하셨는데...그 쪽을 한 번 가봐래이!":  "いつも村の高い場所で、毎日お姉さんを恋しく思っていたそうですが……あっちへ一度行ってみたらどうですか！",
+    "초량초등학교로 이동하기":  "草梁小学校へ移動する",
+    "초량초등학교":  "草量小学校",
+    "한리나":  "ハン・リナ",
+    "168계단 위에서 소년이 일하던 곳을 찾는다.":  "168段の階段の上で、少年が働いていた場所を探す。",
+    "정수가 바라보던 곳은 부산항이었다.":  "ジョン・スが見ていたのは釜山港だった。",
+    "어, 할머니!":  "えっ、おばあちゃん！",
+    "(수첩을 슬쩍 훔쳐보고 눈을 반짝이며) 어? 탐정 수첩이다! 대박, 탐정님이세요? 저도 탐정 조수 할래요! 시켜주세요!":  "（手帳をこっそり覗き込み、目を輝かせて）えっ？探偵の手帳だ！すごい、⟦DET⟧さんですか？私も探偵の助手になりたいです！ぜひやらせてください！",
+    "잘됐구나, 탐정님이 초량초등학교 지나서 이바구길로 가신다 카네. 우리 리나가 길 잃어버리시지 않게 잘 모시고 가 봐래이.":  "よかったね、⟦DET⟧さんが初量小学校を過ぎてイバグギルへ行くらしいよ。うちのリーナが道に迷わないように、ちゃんと案内してあげてね。",
+    "에이, 할머니 걱정 마세요! 초량동은 이 리나 조수 손바닥 안이거든요!":  "あ、おばあちゃん、心配しないでください！チョリャン洞は、このリナ・ジョスの手のひらの中なんですから！",
+    "짠! 여기가 저희 학교예요! 엄청 멋지죠? 무려 1937년에 지어졌어요! 근데 옛날에는 학교에 가고 싶어도 못 온 친구들이 많았대요. 책가방 대신 지게를 지고, 학교 앞을 지나서 곧장 저~쪽 길로 바쁘게 일하러 가야 했다구 하더라고요.":  "ジャーン！ここが私たちの学校です！すごく素敵でしょう？なんと1937年に建てられたんです！ でも昔は、学校に行きたくても行けなかった友達がたくさんいたそうです。ランドセルの代わりに背負い棒を背負い、学校の前を通り過ぎて、すぐにあっちの道へ、急いで仕事に行かなければならなかったそうです。",
+    "바로 이 길이에요! 「이바구길」이라고 부르는데요, 「이바구」가 사투리로 「이야기」인 거 탐정님은 모르셨죠?":  "まさにこの道です！「イバグギル」と呼ばれているんですが、「イバグ」が方言で「物語」という意味だなんて⟦DET⟧、ご存じなかったですよね？",
+    "헤헷, 물론 저도 우리 할머니한테 전해 들은 지식이에요! 옛날에 전쟁을 피해서 온 피난민 분들이 이 산복도로를 따라 집을 짓고 다니던 눈물 없인 못 듣는 역사적인 길이라니까요?":  "へへっ、もちろん私もおばあちゃんから聞いた話ですよ！昔、戦争を逃れてきた避難民の方々が、この山腹の道路沿いに家を建てていったという、涙なしには聞けない歴史的な道なんですから？",
+    "에이, 탐정님! 벌써 계단 보고 놀라신 거예요? 다리가 막 후들거리시는 것 같은데… 겨우 이 정도로 놀라시면 안 돼요. 나중에 눈이 번쩍 뜨일 만큼 엄~청 높은 계단이 나타날 테니까 힘내세요, 탐정님!":  "えー、⟦DET⟧！もう階段を見て驚いてしまったんですか？足がガクガクしているようですが……これくらいで驚いてはいけませんよ。後で目が飛び出るほどと～てつもなく高い階段が現れるんだから、頑張ってください、⟦DET⟧！",
+    "(음식 냄새를 킁킁 맡으며) 츄릅… 여기는 옛날 도시락을 맛볼 수 있는 곳이에요! 탐정 일 하느라 배고프시면 이따가 저랑 같이 맛봐요. 제가 특별히 맛있는 조합 알려드릴게요!":  "（料理の匂いをクンクン嗅ぎながら）ムシャムシャ……ここは昔ながらのお弁当が味わえるお店なんです！探偵の仕事でお腹が空いたら、後で私と一緒に食べてみてください。私が特におすすめの組み合わせをお教えしますね！",
+    "자, 요 맛있는 냄새를 뒤로하고 이대로 쭉 올라가야 이바구길이 이어져요. 고고!":  "さあ、このおいしい匂いを背にして、このままずっと登っていけば、「イバグの道」が続いています。さあ、行こう！",
+    "짜잔! 여기가 바로 그 유명한 「168계단」이에요! 그리고 바로 옆을 보세요! 손님들이 맨날 바다만 보러 갈 때, 힙한 언니 오빠들은 다 여기 모인다니까요?":  "ジャジャーン！ここがまさにあの有名な「168段の階段」ですよ！そして、すぐ隣を見てください！観光客が毎日海を見に行く一方で、おしゃれなお姉さんやお兄さんたちはみんなここに集まっているんですよ？",
+    "바로 「이바구플랫폼」이에요! 옛날 건물을 개조해서 만든 곳인데, 멋진 공방도 있고 맛있는 디저트도 파는 우리 동네 제일 핫플이에요!":  "まさに「イバグ・プラットフォーム」です！古い建物を改装して作られた場所で、素敵な工房もあるし、おいしいデザートも売っている、うちの街で一番人気のスポットです！",
+    "탐정님 보니까 계단 다 걸어가다간 사건 해결 못 하실 것 같아서… 저흰 다리 아프니까 문명의 혜택인 엘리베이터를 타요! 저기 계신 친절하신 동네 어르신들이 타는 법 알려 주실 거예요. 인사 바르게 하셔야 해요!":  "⟦DET⟧ 見てみると、階段をずっと歩いていたら事件を解決できなさそうなので… 私たちは足が痛いので、文明の恩恵であるエレベーターに乗ります！あそこにいる親切なご近所のお年寄りの方たちが乗り方を教えてくれるはずです。きちんと挨拶を忘れずに！",
+    "어때요, 예쁘죠? 바다가 이렇게 한눈에 다 보여요! 다른 곳 생각은 싹 사라지죠? 근데… 옛날 사람들은 엘리베이터도 없이 이 많은 계단을 매일 어떻게 오르락내리락했을까요?":  "どうですか、きれいでしょう？海が一望できますよ！他のことはすっかり忘れてしまいますよね？でも…昔の人たちは、エレベーターもないのに、これだけの階段を毎日どうやって上り下りしていたのでしょうか？",
+    "저 많은 계단으로 무거운 우물물도 나르고, 짐도 나르고, 일하러 가기도 했다고 해요. 진짜 대단하죠?":  "あのたくさんの階段を登って、重い井戸水も運び、荷物も運び、仕事にも通っていたそうです。本当にすごいですよね？",
+    "우리 할머니도 가끔 여기서 가만히 바다를 바라보세요. 어릴 때 할머니의 아빠… 그러니까 제 증조할아버지를 보고 싶어서 그러신 거래요. 증조할아버지는 저 넓은 바다 어디에서 일하셨던 걸까요?":  "うちの祖母も、時々ここでじっと海を眺めています。子供の頃、祖母のお父さん……つまり私の曽祖父に会いたくてそうしているのだそうです。曽祖父は、あの広大な海のどこで働いていたのでしょうか。",
+    "아! 그러고 보니 할머니가 제게 주신 증조할아버지의 망원경이 있어요, 어쩌면 망원경으로 바다를 바라보면...무언가 알게 될 지도 몰라요!":  "あ！そういえば、おばあちゃんがくれた曾祖父の望遠鏡があるんです。もしかすると、その望遠鏡で海を眺めれば……何かがわかるかもしれません！",
+    "담장 갤러리":  "塀ギャラリー",
+    "이바구길":  "イバグの道",
+    "168계단 앞":  "168段の階段の前",
+    "168계단 하늘길":  "168段の「天空の道」",
+    "리나의 증조할아버지, 정수는 어디에서 일했을까요?":  "リナの曽祖父、ジョンスはどこで働いていたのでしょうか？",
+    "BUSAN을 먼저 찾다보면 무언가 나타날거예요.":  "まず釜山を訪れてみれば、きっと何かが見つかるはずです。",
+    "NPC 위의 전구를 눌러서 망원경을 확인하세요.":  "NPCの上にある電球をタップして、望遠鏡を確認してください。",
+    "벌써 어디에서 일하신건지 알아낸거에요?":  "もう、どこでお仕事をされていたのか突き止めたんですか？",
+    "괜찮아요, 다시 한번 이 자리에 서서 천천히 둘러보자구요!":  "大丈夫ですよ、もう一度この場所に立って、ゆっくり周りを見てみましょう！",
+    "맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.":  "そうですね。昔は、この高い丘や階段の上で、みんな息を切らしながら、釜山港の海をただひたすら眺めていたそうです。",
+    "바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.":  "海の彼方から大きな船が入港すると、ついに港で仕事ができるようになったということなんです！すると、近所の人たちがこぞって駆けつけて重い荷物を運び、汗を流しながら、わずかなお金を少しずつ貯めていったそうです。",
+    "아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?":  "たぶん…私の祖母の父、つまり私の曽祖父も、あそこであんなに一生懸命働いていたんでしょうね…？",
+    "아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "あっ、そうだ！今度はこっちへ来てみてください！「マンヤンロ山腹道路展示館」という場所なのですが、私たちの町の本当に深い歴史が、すべてここに隠されているんですよ！",
+    "어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!":  "もしかすると、⟦DET⟧さんが持っているあの不審な小包の秘密についても、ここから手がかりが見つかるかもしれませんよ！",
+    "거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!":  "あそこに行けば、最近のアイドル並みに歌が本当にすごく上手で、めちゃくちゃイケメンなイアンお兄さんがいるんですよ？ 早く行って、そのお兄さんにぜひ聞いてみてください！",
+    "저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!":  "私も本当に本当に一緒に行きたいんだけど…ここから先に行くとママにすごく怒られちゃうから、ここまでにするね、へへっ！ ⟦DET⟧ 気をつけて行ってね！",
+    "영초윗길":  "ヨンチョ・ウィットギル",
+    "산복도로전시관으로 이동하기":  "山腹道路展示館へ移動する",
+    "망양로 산복도로전시관":  "マンヤンロ山麓道路展示館",
+    "박이안":  "パク・イアン",
+    "산복도로전시관의 전시물을 통해 누나가 일하던 곳을 알아낸다.":  "山腹道路展示館の展示物を通じて、姉が働いていた場所を突き止める。",
+    "누나가 일하던 곳은 고무신 공장이었다.":  "姉が働いていたのは、ゴム靴の工場だった。",
+    "여행객이신가요? 여기까지 올라오는 분은 흔치않은데...":  "旅行者ですか？ここまで登ってくる人はめったにいないのですが……",
+    "안녕하세요, 인사가 늦었네요. 저는 산복도로전시관 도슨트, 박이안입니다. 여기는 어쩐 일이신가요? 이 안쪽으로 들어오시면 됩니다.":  "こんにちは、ご挨拶が遅くなりました。私は山腹道路展示館のガイド、パク・イアンと申します。こちらへはどのようなご用件でいらっしゃいましたか？こちらの中へお進みください。",
+    "소포의 비밀이라... 리나가 얼핏 이야기한 것같네요. 명란브랜드연구소 공사중에 나왔다면서요? 여기까지 오신거면 많이 알아내셨겠네요.":  "小包の秘密か……リナがちらっと話していたような気がします。明蘭ブランド研究所の工事中に見つかったとか？ここまで来られたのですから、かなり突き止めていらっしゃるでしょうね。",
+    "역시 명탐정이시네요, 아직 이 기차표에 대해서는 모르시는 건가요...?":  "さすが名探偵ですね。まだこの切符のことについてはご存じないのですか……？",
+    "(기차표를 바라보며)이건… 사용하지 않은 기차표네요. 옛날에는 표를 쓰면 개표가위로 구멍을 냈거든요. 그런데 이 표는 너무 깨끗해요.":  "（切符を見ながら）これは…未使用の切符ですね。昔は切符を使うと、改札ハサミで穴を開けていたんです。でも、この切符はすごくきれいなままです。",
+    "남매가 돈을 모아 기차표는 마련해 놓고도 끝내 쓰지 못했나 봐요.":  "兄妹はお金を貯めて列車の切符は用意しておいたものの、結局使えなかったようです。",
+    "흠, 정수라는 분이 아래쪽 항구를 바라보며 일했다면...아마 누나는 반대로 이 산복도로를 넘어 일터로 향했을지도 몰라요. 옛날에 그 곳을 「누나의 길」이라고 불렀거든요.":  "うーん、ジョンスという方が下の港を眺めながら働いていたとしたら……おそらく姉は、逆にこの山腹の道を越えて職場へ向かっていたのかもしれません。昔、あそこを「姉の道」と呼んでいたんですから。",
+    "누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.":  "お姉さんがどんなものを製造する工場で働いていたのか、展示室の中でその「もの」をぜひ探してみてください。きっと目立つ場所にあるはずです。",
+    "(지금까지 모은 단서들을 보여준다.)":  "（これまでに集めた手がかりを見せる。）",
+    "전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?":  "展示の中に隠された手がかりを頼りに、お姉さんがどこで働いていたのか探してみましょうか？",
+    "정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?":  "正洙の姉が「姉の道」を行き来しながら作っていたものは何でしょうか？",
+    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫の下、白の左側、そして紺色の反対側にあるものは何でしょうか？（物が置かれている番号を入力してもOKです！）",
+    "정수의 누나가 일하던 곳을 알아내셨나요?":  "ジョンソの姉さんが働いていた場所を突き止めましたか？",
+    "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "急がないでください。展示物を一つずつ改めてご覧になれば、きっとお分かりになるはずです。",
+    "맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠":  "そうですね、ゴム靴……いえ、ゴム靴を作っていた工場でした！あの頃、避難民たちはあの山腹の道路の向こうにあるゴム靴工場で、あるいは荷担ぎとして……それぞれの場所で、なんとか一日をやり過ごしていたのです。",
+    "이제 누나가 일하던 곳까지 밝혀졌으니, 이 모든 단서를 모아 명란브랜드연구소로 돌아가 보세요.":  "これで姉が働いていた場所も判明したので、これらすべての手がかりを集めて、明太子ブランド研究所に戻ってみてください。",
+    "명란브랜드연구소로 복귀하기":  "明太子ブランド研究所に戻る",
+    "명란브랜드연구소":  "明太子ブランド研究所",
+    "김초량":  "キム・チョリャン",
+    "모은 단서를 모두 맞춰 소포 속 남매의 정체를 밝혀낸다.":  "集めた手がかりをすべて組み合わせ、小包の中にいた兄妹の正体を突き止める。",
+    "정수와 함께 있던 누나는 황정월이었다.":  "ジョン・スと一緒にいた姉はファン・ジョンウォルだった。",
+    "명란브랜드연구소까지 오셨네요! 이 계단 밑으로 내려가면 돼요!":  "明太子ブランド研究所までお越しいただきありがとうございます！この階段を下りていけば大丈夫です！",
+    "미요":  "ミヨ",
+    "탐정님, 수고 많으셨어요. 모은 단서들을 한번 펼쳐볼까요?":  "⟦DET⟧、お疲れ様でした。集めた手がかりを一度並べてみましょうか？",
+    "1950년, 초량동 1041번지, 정수라는 이름, 부산항을 바라보던 지게꾼 동생, 고무신 공장에서 일하던 누나, 그리고 한 번도 쓰이지 못한 기차표...":  "1950年、草梁洞1041番地、チョンスという名前、釜山港を眺めていた荷運びの弟、ゴム靴工場で働いていた姉、そして一度も使われなかった切符……",
+    "(깜짝 놀라며)…어?! 그렇다면, 이 소포 속 「정수」라는 분… 제 할아버지가 분명해요!":  "（びっくりして）…えっ？！それなら、この小包に入っている「ジョン・ス」という方…間違いなく私の祖父です！",
+    "할아버지는 어릴 적 피난 시절 이야기를 잘 안 하셨지만, 일찍 세상을 떠난 누나 얘기만큼은 가끔 하셨거든요. 늘 다정하셨고, 아무리 배고프고 힘든 날에도 동생인 할아버지를 먼저 챙겨주셨다고…":  "おじいちゃんは、幼い頃の避難生活の話はあまりしてくださらなかったのですが、早くに亡くなった姉の話だけは、たまにすることがありました。姉はいつも優しくて、どんなに空腹で辛い日でも、弟であるおじいちゃんをまず気遣ってくれたそうです……",
+    "특히 시장에서 구해온 명란젓을 따뜻한 밥 위에 올려주시던 걸 평생 못 잊으셨대요. 명란은 초량 산복도로 피난민들이 서로를 먹여 살리던 눈물겨운 정성이 담긴 「진짜 우리 전통 음식」이거든요.":  "特に、市場で買ってきた明太子を温かいご飯の上にのせてくださったことを、一生忘れられなかったそうです。明太子は、草梁（チョリャン）の山腹道路で、避難民たちが互いに支え合いながら生きていた、涙ぐましい真心が込められた「本物の私たちの伝統料理」なのです。",
+    "그 짭조름한 우리 명란의 맛이… 할아버지에겐 평생 누나를 떠올리게 하는 그리움의 맛이었나 봐요.":  "あのほのかな塩気のある私たちの明太子…おじいちゃんにとっては、生涯を通じて姉を思い出させる、懐かしさの味だったようです。",
+    "제가 이 초량에서 명란브랜드연구소장이 되어 우리 명란을 세상에 널리 알리게 된 것도, 다 이런 이끌림 때문이었나 보네요.":  "私がこの草梁で明蘭ブランド研究所の所長となり、私たちの明蘭を世に広く知らしめることになったのも、すべてこうした導きのおかげだったようです。",
+    "이 소포의 주인… 아마 평생 우리 할아버지가 그토록 그리워하던, 할아버지의 누나인 제 고모할머니가 확실해요.":  "この小包の持ち主……おそらく、祖父が生涯にわたってあれほど慕っていた、祖父の姉である私の大叔母に違いありません。",
+    "황영숙 할머니의 아버지인 것같아요.":  "ファン・ヨンスクおばあさんの父親のようです。",
+    "잊혀진 이름, 누나의 이름은 뭘까요?":  "忘れられた名前、お姉さんの名前は何でしょうか？",
+    "피난민증명서의 빈 칸을 마저 채워보세요.":  "避難民証明書の空欄をすべて記入してください。",
+    "이제 남매의 정체를 전부 알아내셨나요?":  "これで、兄妹の正体をすべて突き止められましたか？",
+    "천천히 살펴보도록해요.":  "じっくり見ていきましょう。",
+    "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "…ファン・ジョンウォル、この方が、おじいさんが生涯、あれほど慕っていたお姉さんだったのですね。",
+    "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "この小包が……紛失した小包ではなく、どうしても送る勇気がなく、草梁の土の中に埋めておいたものだったとは……",
+    "보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요":  "送ることができなかった切符を、悲しみではなく、いつか花開く希望だと信じて……草梁の土の中に埋めておいたのですね",
+    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "長い間埋もれていた私たちの家族の約束を…ついに世の中に広めてくださり、本当にありがとうございます、⟦DET⟧。",
+    "정답 바로보기":  "答えをすぐ見る",
+    "정답: ":  "答え：",
+    "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "右上で新しいクエストを確認してみましょう！"
+},
+cn: {
+    "잃어버린 소포 — 미션투어":  "丢失的包裹 — 任务之旅",
+    "탐 정 방 문 기 록":  "侦探访问记录",
+    "정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.":  "为了准确统计参与人数，请如实填写实际参与者的信息。",
+    "탐정명":  "侦探名",
+    "사는곳":  "居住地",
+    "예: 홍길동":  "例：张伟",
+    "예: 부산 동구":  "例：中国",
+    "선택 입력":  "请输入选项",
+    "※ 개인정보 수집 및 이용 안내":  "※ 个人信息收集及使用说明",
+    "본 프로그램은 결과 보고(KPI) 통계 작성을 위해 이름 및 거주지를 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.":  "本项目为编制结果报告（KPI）统计数据，将收集您的姓名及居住地信息，并在项目结束后1个月内予以销毁。您可以拒绝同意，但在此情况下，您的参与可能会受到限制。",
+    "위 내용을 확인했으며 동의합니다":  "我已阅读并同意上述内容",
+    "⚠️ 이동하실 때는 화면 대신 주변을 살펴주세요.":  "⚠️ 行走时，请注意观察周围环境，而不是盯着屏幕。",
+    "등록하고 시작하기":  "注册并开始使用",
+    "NPC 위의 전구를 눌러 대화를 시작하세요.":  "点击NPC头上的灯泡，开始对话。",
+    "▶ 네":  "▶ 是的",
+    "▶ 아니오":  "▶ 否",
+    "닫기":  "关闭",
+    "퀘스트 목록":  "任务列表",
+    "정답 입력":  "输入正确答案",
+    "확인":  "确认",
+    "이 화면을 명란스토리지 직원에게 보여주고\u003cbr\u003e완료 기념품을 받으세요.":  "请向Myeongnan Storage的工作人员出示此页面，并\u003cbr\u003e领取完成纪念品。",
+    "만족도조사":  "满意度调查",
+    "만족도 조사를 완료한 참여자 중\u003cbr\u003e총 50분을 추첨하여 소정의 선물을 드립니다.":  "我们将从完成满意度调查的参与者中\u003cbr\u003e随机抽取共50位，并赠送小礼物。",
+    "다른 야외방탈출하기":  "体验其他户外密室逃脱",
+    "추천 부산관광명소":  "推荐的釜山旅游景点",
+    "처음부터 다시하기":  "从头开始",
+    "새로운 퀘스트":  "新任务",
+    "처음부터 다시 시작할까요? 지금까지의 진행 상황이 초기화됩니다.":  "要从头开始吗？迄今为止的进度将被重置。",
+    "다시 한번 살펴봐 주세요.":  "请再看一遍。",
+    "정답을 알아내면 NPC를 눌러 정답을 입력하세요!":  "猜出正确答案后，请点击NPC输入答案！",
+    "아직 시작한 퀘스트가 없어요.\u003cbr\u003e먼저 이동을 완료해주세요.":  "目前还没有开始的任务。\u003cbr\u003e请先完成移动操作。",
+    "결과 보기":  "查看结果",
+    "알아내보자":  "让我们来了解一下吧",
+    "사건 해결":  "案件解决",
+    "모든 단서를 모았어요. 결과를 확인해볼까요?":  "所有线索都收集齐了。来看看结果吧？",
+    "도착완료":  "已到达",
+    "도착했어요":  "到了",
+    "사진 속 시간":  "照片里的时光",
+    "발밑의 단서":  "脚下的线索",
+    "골목에 남겨진 이름":  "留在小巷里的名字",
+    "계단 위의 시선":  "阶梯之上的凝望",
+    "누나의 흔적":  "姐姐的痕迹",
+    "잊혀진 이름":  "被遗忘的名字",
+    "\u0027잃어버린 소포\u0027는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.":  "《丢失的包裹》改编自一位从平壤逃难至釜山、却不得不与家人生离死别的一位难民的真实故事。",
+    "1950년 겨울,\n피란수도 부산으로 온 두 남매가 있었습니다.\n초량동 1041번지 단칸방.\n남매는 서로를 의지하고\n이웃들과 온기를 나누며 하루하루를 버텨냈습니다.":  "1950年冬天，\n有一对兄妹逃难来到了首都釜山。\n初量洞1041号的一间单间。\n兄妹俩互相依靠，\n与邻居们分享温暖，一天一天地熬了过来。",
+    "누나는 산복도로를 넘어 고무신 공장으로 향했고,\n동생은 168계단을 오르내리며 부두의 짐을 날랐습니다.\n고된 하루 끝에 동생이 사 온 짭조름한 명란젓 한 덩이.\n푹 익은 시래기국에 명란을 얹어\n이웃들과 나누어 먹던 그 한 입은\n추위와 배고픔을 잊게 해 준 유일한 구원이었습니다.":  "姐姐翻过山麓公路，前往橡胶鞋厂，\n弟弟则在168级台阶间上上下下，搬运码头的货物。\n辛苦一天过后，弟弟买回了一块咸香的明太子。\n将明太子铺在炖得软烂的干萝卜叶汤上，\n与邻居们分享的那一口，\n是让我们忘却寒冷与饥饿的唯一慰藉。",
+    "밤마다 가족사진을 보며 울던 동생을 위해,\n누나는 피땀 흘려 \n부모님을 모셔 올 \u0027기차표\u0027를 마련했습니다.":  "为了那个每晚看着全家福哭泣的弟弟，\n姐姐付出了血汗，\n终于筹到了接父母回家的“火车票”。",
+    "하지만 차갑게 막혀버린 철길 앞에\n그 기차표는 끝내 쓰이지 못하고,\n차마 보내지 못한 소포가 되어 초량의 흙 속에 묻혔습니다.\n 소포 위에 흙을 덮으며,\n누나는 동생의 눈물을 닦아주며 밝게 웃어 보였습니다.":  "然而，在被冰封的铁轨前，\n那张火车票终究没能派上用场，\n化作一个未能寄出的包裹，被埋在了草梁的泥土里。\n一边往包裹上覆土，\n姐姐一边为弟弟擦去眼泪，露出了灿烂的笑容。",
+    "\"정수야. 우리는 가족을 묻는 게 아니야.\n우리 마음에 가족을 굳건히 세우는 거지.\n철길이 다시 열릴 때까지,\n우리는 여기서 더 억척스럽게 살아가야 해.\n부모님이 오셨을 때 잘 살고 있었다고 웃으며\n이 기차표를 보여드려야 하니까!\"":  "“正秀啊。我们不是在追问家人，\n而是在心中将家人牢牢地扎根。\n直到铁路重新开通之前，\n我们必须在这里更加坚韧地活下去。\n因为等父母来的时候，我们要笑着告诉他们\n我们过得很好，还要把这张火车票展示给他们看！”",
+    "남매는 흙을 털고 일어나\n언덕 너머 떠오르는 아침 해를 바라보았습니다.\n초량의 흙 속에 묻은 그 소포는\n끝내 부치지 못한 슬픔이 아니라,\n언젠가 피어날 \u0027희망의 씨앗\u0027이었습니다.":  "兄妹俩拍去身上的泥土站起身来，\n眺望着山丘彼端升起的朝阳。\n埋在草梁泥土中的那个包裹，\n并非终究未能寄出的悲伤，\n而是终将绽放的“希望的种子”。",
+    "이제 피란수도 부산, 그리고 초량은\n더 이상 남매가 쫓겨와 머무는 쓸쓸한 피란지가 아니었습니다.\n가족과의 약속을 가슴에 품고 내일을 향해 달려가는,\n새로운 삶의 출발점이었습니다.":  "如今，作为避难之都的釜山，以及草梁，\n已不再是兄妹二人被迫流落、栖身其中的凄凉避难所。\n这里是他们将与家人的约定深藏于心、朝着明天奋力奔跑的，\n新生活的起点。",
+    "차이나타운":  "唐人街",
+    "왕지안":  "王健",
+    "그 낡은 소포를 들고 다니는 걸 보니, 연구소 초량이가 의뢰를 했다는 그 유명한 명탐정인가 보구만!":  "看他提着那个破旧的包裹四处走动的样子，看来就是研究所的初良委托过的那个著名名侦探啊！",
+    "흠...예전에 한 번 본 적 있긴한데, 다시 볼 수 있겠나? ":  "嗯……虽然以前看过一次，但还能再看一次吗？",
+    "(사진을 유심히 보며)...남매 중 이 남자 아이 얼굴이 낯이 익은데...?":  "（仔细端详着照片）……这对兄妹中，这个男孩子的脸怎么看起来有点眼熟呢……？",
+    "어릴 적 골목에서 나보다 나이 조금 많던 형이 하나 있었어. 내 볼이 만두 같다며 많이 귀여워 해줬었던 그 형을 닮았어!":  "小时候，小巷里有个比我大几岁的哥哥。我长得就像那个哥哥——他总是说我的脸颊像饺子一样，特别喜欢我！",
+    "근데 너무 오래 전이라 가물가물하네, 나도 사느라 바빠서 말이지.":  "不过那已经是很久以前的事了，记忆有些模糊了，毕竟我也一直忙着生活嘛。",
+    "이 소포가 언제 적 물건인지부터 알아봐야할 것 같은데, 초량근대역사갤러리로 가보자고.":  "看来得先弄清楚这个包裹是什么时候的了，我们去超量近代历史画廊看看吧。",
+    "네, 제가 바로 그 유명한 명탐정이에요.":  "是的，我就是那位著名的名侦探。",
+    "(소포를 건넨다.)":  "(递出包裹。)",
+    "초량근대역사갤러리로 이동하기":  "前往草梁近代历史画廊",
+    "초량근대역사갤러리":  "草梁近代历史画廊",
+    "전시된 부산역 사진과 비교해 남매의 사진이 찍힌 연도를 알아낸다.":  "通过与展出的釜山站照片进行对比，推断出这对兄妹照片的拍摄年份。",
+    "사진은 1950년이었다.":  "照片拍摄于1950年。",
+    "이 갤러리에는 초량의 역사와 함게 부산의 근대 역사를 볼 수 가 있어.":  "在这座美术馆里，既能了解草梁的历史，也能一窥釜山的近代历史。",
+    "어쩌면 단서가 있을지도 모르겠네!":  "说不定会有线索呢！",
+    "남매의 사진은 몇 년도에 찍혔을까요?":  "这张兄妹的照片是哪一年拍的呢？",
+    "6.25 전쟁이 시작된 해예요.":  "这是朝鲜战争爆发的年份。",
+    "소포 속 남매의 사진은 언제 찍혔는지 알아냈는가?":  "你查出包裹里那对兄妹的照片是什么时候拍的了吗？",
+    "그래? 그럼 사진들을 다시 한 번 꼼꼼히 비교해봐. 서두르지 않아도 괜찮아.":  "是吗？那你再仔细对比一下这些照片吧。不用着急。",
+    "맞아, 1950년. 그 해에 정말 많은 사람들이 피난민 신분으로 부산에 내려왔지. 아마 사진 속 남매도 그중 하나였을 거야.":  "没错，是1950年。那一年，确实有很多人以难民身份来到釜山。照片里的这对兄妹大概也是其中之一吧。",
+    "삼국지벽화거리로 이동하기":  "前往《三国演义》壁画街",
+    "삼국지벽화거리":  "《三国演义》壁画街",
+    "삼국지벽화거리를 걸으며 발밑에 숨은 남매가 살던 옛 골목의 주소를 알아내자.":  "一边漫步在《三国演义》壁画街，一边找出藏在脚下那对兄妹曾经居住的旧巷子的地址吧。",
+    "남매가 살던 곳은 초량동1041번지였다.":  "兄妹俩住的地方是草量洞1041号。",
+    "초량동1041번지로 가세요.":  "请前往草梁洞1041号。",
+    "초량동1041번지는 현재 초량중로47번길에 있어요.":  "草量洞1041号目前位于草量中路47巷。",
+    "이 그림들은 나중에 생긴 거야. 그땐 그냥 담벼락이었지.":  "这些画是后来才画上的。那时那里只是一面墙而已。",
+    "이 벽화거리는 도원결의부터 시작해. 이 동네랑 참 잘 어울리는 이야기지. 그때 여기 모여 살던 사람들도 삼국지 속 사람들처럼 새로운 세상을 만들고 싶었나 봐.":  "这条壁画街的故事从“桃园结义”开始。这个故事和这个街区真是相得益彰。看来当时聚居在这里的人们，也像《三国演义》里的人物一样，渴望开创一个新世界。",
+    "그 형은 매일 이 담벼락 길을 걸어 올라갔어. 가끔은 키가 조금 더 큰 누나랑 손을 잡고 가기도 했지.":  "那个哥哥每天都沿着这堵墙边的小路往上走。有时还会和个子稍微高一点的姐姐手拉手一起走。",
+    "그땐 이 길이 그 집으로 가는 제일 빠른 길이었거든.":  "因为那时这条路是去那家的最快路线。",
+    "내 기억이 맞다면… 아마도 그 골목 어디쯤에 살았을 텐데. 번지수는 통 생각이 안 나네.":  "如果我没记错的话……大概就住在那条小巷的某个地方吧。就是怎么也想不起门牌号了。",
+    "발밑의 단서를 통해 드러나는 네 자리 숫자는?":  "通过脚下的线索，会显露出哪个四位数？",
+    "발밑의 그림을 순서대로 노트북에 적고 선을 그어보세요!":  "请按顺序将脚下的图画抄写到笔记本上，并画出线条！",
+    "발밑의 숨은 단서를 통해 번지수를 알아냈는가?":  "你是通过脚下的隐藏线索找出门牌号的吗？",
+    "천천히 바닥 속 타일과 노트를 비교하다보면 답이 나올 거야.":  "慢慢地把地板上的瓷砖和笔记对照起来，答案自然就会显现出来。",
+    "그래, 초량동 1041번지. 아주 좁은 골목이었지. 그 시절 피난민들이 정말 많이 모여 살았어.":  "是啊，草梁洞1041号。那是一条非常狭窄的小巷。那时候，那里真的聚集了好多难民。",
+    "이젠, 남매가 살던 그 곳으로 가 봐.":  "现在，去看看那对兄妹曾经住过的地方吧。",
+    "초량동 1041번지로 이동하기":  "前往草梁洞1041号",
+    "초량동 1041번지":  "草梁洞1041号",
+    "황영숙":  "黄英淑",
+    "노트북 속 집으로 향하는 길에 남겨진 글자를 찾아내보자.":  "让我们试着找出笔记本中通往家园之路上的那些文字吧。",
+    "소년의 이름은 정수였다.":  "那个男孩名叫郑洙。",
+    "어이구, 어서 오이소! 내가 이 동네서 평생을 살았거든예. 못 보던 얼굴이 오믄 내가 먼저 눈이 가요.":  "哎哟，快进来吧！我这一辈子都住在这儿呢。只要看到陌生的面孔，我的目光就会先被吸引过去。",
+    "낡은 소포까지 들고 댕기는 거 보이, 산책 나온 건 아이네. 뭐 찾는 게 있는 갑제?":  "看你连个破包裹都拎着到处晃，这可不是出来散步的小孩啊。该不会是在找什么东西吧？",
+    "아이고야, 그 초량이가 부른다던 명탐정인갑네!":  "哎呀，原来就是那个 초량提到过的名侦探啊！",
+    "1041번지 남매라꼬? 그 시절 그 골목에 남매가 한둘이었나. 천지삐까리였다 아이가!":  "说是1041号的兄妹？那时候那条小巷里，哪只有一两个兄妹啊。简直多得数不胜数啊，孩子！",
+    "피난민이 하도 많아가 한 방에 서너 집이 같이 살았지. 저 집 아가 이 집 아인가 분간이 안 될 정도였지.":  "因为难民实在太多，一间屋子里要挤着三四户人家住。甚至都分不清那个孩子是那家的还是这家家的。",
+    "나야 그때 태어나지도 안 했지마는, 우리 아버지가 이 근처서 컸다 카데예.":  "虽然我那时还没出生，但听说我父亲就是在这附近长大的。",
+    "맨날 좁은 골목을 뛰댕기고, 뭘 짊어지고 오르락내리락하고~":  "每天都在狭窄的小巷里跑来跑去，还背着东西上上下下地走～",
+    "아무튼 사진은 바래도 글은 희한하게 오래 가는 기라.":  "总之，照片虽会褪色，但文字却奇妙地能长久保存呢。",
+    "이 담장에 적힌 시들에는 이 동네 살던 사람들 사는 이야기가 있다 아이가.":  "这堵墙上写着的诗里，记载着曾经住在这个街区的人们的的生活故事啊。",
+    "동물은 죽어서 가죽을 남기고 사람은 죽어서 이름을 남긴다고 안카드나. 동생의 길에도 이름이 남겨져있을지도 모른다.":  "安卡德曾说：“动物死后留下皮毛，人死后留下名声。”或许弟弟走过的路上，也留下了他的名字。",
+    "담장갤러리":  "围墙画廊",
+    "잃어버린 소포의 비밀을 찾으러 왔어요.":  "我是来查明那件丢失包裹的秘密的。",
+    "골목에 남겨진 이름은?":  "小巷里留下的名字是什么？",
+    "노트북에 적힌 규칙을 따라 특정 단어의 글자를 짚어보세요.":  "请按照笔记本上写明的规则，依次点出特定单词中的字母。",
+    "골목에 남겨진 이름을 벌써 알아낸기가?":  "你已经查出小巷里留下的那个名字了吗？",
+    "천천히 다시 봐봐라, 지나온 길에 이름이 남겨지는 법이지.":  "慢慢地再看一遍吧，名字总会留在走过的路上。",
+    "(사진을 내민다.)":  "（递出照片。）",
+    "정수라꼬? 아이고야… 우리 아버지 이름도 정수였는데.":  "叫郑秀拉？哎呀……我爸爸的名字也叫郑秀呢。",
+    "(사진을 한참 들여다보며)...우리 막내 동생 어릴 때 얼굴이랑 똑 닮았네. 이 누나는 우리 언니를 닮았고...":  "（盯着照片看了好一会儿）……这跟我们家最小的弟弟小时候长得一模一样。这位姐姐则长得像我们家的大姐……",
+    "(눈가를 훔치며) 아이고, 나이 드니까 눈에 자꾸 뭐가 들어가네. 아버지가 그카데. 학교가 그래 가고 싶었는데 일하러 댕기느라 맨날 학교 앞만 지나갔다꼬.":  "（擦了擦眼角）哎呀，年纪大了，眼睛里老是进东西。我父亲也是这么说的。他说本来很想去上学，但因为要到处打工，每天只能路过学校门口。",
+    "언제나 마을의 높은 곳에서 매일 누나를 그리워하셨는데...그 쪽을 한 번 가봐래이!":  "您总是站在村子的高处，每天思念着姐姐……去那边看看吧！",
+    "초량초등학교로 이동하기":  "前往草梁小学",
+    "초량초등학교":  "草梁小学",
+    "한리나":  "韩莉娜",
+    "168계단 위에서 소년이 일하던 곳을 찾는다.":  "在168级台阶上方，寻找那个少年曾经工作过的地方。",
+    "정수가 바라보던 곳은 부산항이었다.":  "正秀凝视的地方是釜山港。",
+    "어, 할머니!":  "哎呀，奶奶！",
+    "(수첩을 슬쩍 훔쳐보고 눈을 반짝이며) 어? 탐정 수첩이다! 대박, 탐정님이세요? 저도 탐정 조수 할래요! 시켜주세요!":  "（偷偷瞄了一眼笔记本，眼睛一亮）咦？是侦探笔记本！太棒了，您是⟦DET⟧吗？我也想当侦探助手！请让我当吧！",
+    "잘됐구나, 탐정님이 초량초등학교 지나서 이바구길로 가신다 카네. 우리 리나가 길 잃어버리시지 않게 잘 모시고 가 봐래이.":  "太好了，听说⟦DET⟧要经过初量小学，然后走伊巴古路。让我好好陪着莉娜，别让她迷路了。",
+    "에이, 할머니 걱정 마세요! 초량동은 이 리나 조수 손바닥 안이거든요!":  "哎，奶奶别担心！草梁洞可是李娜这位助手的掌心呢！",
+    "짠! 여기가 저희 학교예요! 엄청 멋지죠? 무려 1937년에 지어졌어요! 근데 옛날에는 학교에 가고 싶어도 못 온 친구들이 많았대요. 책가방 대신 지게를 지고, 학교 앞을 지나서 곧장 저~쪽 길로 바쁘게 일하러 가야 했다구 하더라고요.":  "瞧！这就是我们学校！特别棒吧？竟然建于1937年呢！ 不过听说以前有很多同学，即使想上学也去不了。他们不是背着书包，而是扛着竹筐，经过学校门口后，就得直奔那~边的小路，匆匆赶去干活。",
+    "바로 이 길이에요! 「이바구길」이라고 부르는데요, 「이바구」가 사투리로 「이야기」인 거 탐정님은 모르셨죠?":  "就是这条路！它被称为“伊巴古路”，“伊巴古”在方言里是“故事”的意思⟦DET⟧，您不知道吧？",
+    "헤헷, 물론 저도 우리 할머니한테 전해 들은 지식이에요! 옛날에 전쟁을 피해서 온 피난민 분들이 이 산복도로를 따라 집을 짓고 다니던 눈물 없인 못 듣는 역사적인 길이라니까요?":  "嘿嘿，当然，这也是我从奶奶那里听来的！据说，以前为了躲避战争而来的难民们曾沿着这条山麓公路一路建房而行，这是一条听着都会让人落泪的历史之路哦？",
+    "에이, 탐정님! 벌써 계단 보고 놀라신 거예요? 다리가 막 후들거리시는 것 같은데… 겨우 이 정도로 놀라시면 안 돼요. 나중에 눈이 번쩍 뜨일 만큼 엄~청 높은 계단이 나타날 테니까 힘내세요, 탐정님!":  "哎呀，⟦DET⟧！看到楼梯就吓到了吗？感觉你的腿都在发抖了……才这种程度就吓成这样可不行哦。等会儿还会出现让人惊得瞪大眼睛的超～高楼梯，所以加油啊，⟦DET⟧！",
+    "(음식 냄새를 킁킁 맡으며) 츄릅… 여기는 옛날 도시락을 맛볼 수 있는 곳이에요! 탐정 일 하느라 배고프시면 이따가 저랑 같이 맛봐요. 제가 특별히 맛있는 조합 알려드릴게요!":  "（一边嗅着食物的香味）啧啧……这里可以品尝到怀旧风味的便当哦！要是您因为忙着办案饿了，等会儿就跟我一起尝尝吧。我会特别告诉您一种超好吃的搭配哦！",
+    "자, 요 맛있는 냄새를 뒤로하고 이대로 쭉 올라가야 이바구길이 이어져요. 고고!":  "好了，把这诱人的香味抛在身后，继续往上走，才能沿着伊巴古小径前行。走起！",
+    "짜잔! 여기가 바로 그 유명한 「168계단」이에요! 그리고 바로 옆을 보세요! 손님들이 맨날 바다만 보러 갈 때, 힙한 언니 오빠들은 다 여기 모인다니까요?":  "瞧！这里就是那著名的“168级台阶”！再看看旁边！当游客们整天只顾着去看海的时候，那些潮潮的姐们儿和哥们儿可都聚集在这里哦？",
+    "바로 「이바구플랫폼」이에요! 옛날 건물을 개조해서 만든 곳인데, 멋진 공방도 있고 맛있는 디저트도 파는 우리 동네 제일 핫플이에요!":  "就是“伊巴古平台”！这里是由老建筑改造而成的，既有超棒的手工工坊，还卖美味的甜点，是我们社区最热门的去处！",
+    "탐정님 보니까 계단 다 걸어가다간 사건 해결 못 하실 것 같아서… 저흰 다리 아프니까 문명의 혜택인 엘리베이터를 타요! 저기 계신 친절하신 동네 어르신들이 타는 법 알려 주실 거예요. 인사 바르게 하셔야 해요!":  "⟦DET⟧ 看样子要是走完这些楼梯，恐怕没法破案了……我们腿疼，所以要乘坐文明的产物——电梯！那边那些和蔼可亲的社区老人们会教你们怎么坐的。记得要好好打招呼哦！",
+    "어때요, 예쁘죠? 바다가 이렇게 한눈에 다 보여요! 다른 곳 생각은 싹 사라지죠? 근데… 옛날 사람들은 엘리베이터도 없이 이 많은 계단을 매일 어떻게 오르락내리락했을까요?":  "怎么样，很美吧？大海尽收眼底！其他念头都烟消云散了吧？不过……古人没有电梯，每天是怎么上下这么多台阶的呢？",
+    "저 많은 계단으로 무거운 우물물도 나르고, 짐도 나르고, 일하러 가기도 했다고 해요. 진짜 대단하죠?":  "据说他们曾沿着那么多台阶，既要搬运沉重的井水，又要搬运货物，还要去干活。真是了不起啊，对吧？",
+    "우리 할머니도 가끔 여기서 가만히 바다를 바라보세요. 어릴 때 할머니의 아빠… 그러니까 제 증조할아버지를 보고 싶어서 그러신 거래요. 증조할아버지는 저 넓은 바다 어디에서 일하셨던 걸까요?":  "我奶奶有时也会静静地站在这里眺望大海。据说这是因为她想念小时候的奶奶的爸爸……也就是我的曾祖父。曾祖父当时是在那片辽阔的大海的哪儿工作呢？",
+    "아! 그러고 보니 할머니가 제게 주신 증조할아버지의 망원경이 있어요, 어쩌면 망원경으로 바다를 바라보면...무언가 알게 될 지도 몰라요!":  "啊！说起来，我还有奶奶送给我的曾祖父的望远镜，说不定用望远镜眺望大海的话……说不定能发现什么呢！",
+    "담장 갤러리":  "围墙画廊",
+    "이바구길":  "伊巴古路",
+    "168계단 앞":  "168级台阶前",
+    "168계단 하늘길":  "168级台阶的天空之路",
+    "리나의 증조할아버지, 정수는 어디에서 일했을까요?":  "莉娜的曾祖父郑洙是在哪里工作的呢？",
+    "BUSAN을 먼저 찾다보면 무언가 나타날거예요.":  "如果先去釜山，总会发现些什么的。",
+    "NPC 위의 전구를 눌러서 망원경을 확인하세요.":  "点击NPC头上的灯泡，查看望远镜。",
+    "벌써 어디에서 일하신건지 알아낸거에요?":  "你已经查出他在哪里工作了吗？",
+    "괜찮아요, 다시 한번 이 자리에 서서 천천히 둘러보자구요!":  "没关系，我们再回到这里，慢慢环顾四周吧！",
+    "맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.":  "是啊。据说以前，大家都会在这座高高的山丘和台阶上气喘吁吁地，无尽地眺望釜山港的海景。",
+    "바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.":  "当远处海面上驶来一艘大船时，这就意味着港口终于有活干了！于是，村里的人们便蜂拥而至，搬运沉重的货物，一边挥汗如雨，一边一点一滴地攒下微薄的收入。",
+    "아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?":  "也许……我奶奶的爸爸，也就是我的曾祖父，当时也在那里那么努力地干活吧……？",
+    "아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "啊，对了！这次来这边看看吧！这里叫「望阳路山麓公路展览馆」。我们社区真正深厚的历史，全都藏在这里呢！",
+    "어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!":  "说不定关于⟦DET⟧手中那个可疑包裹的秘密，也能在这里找到线索呢！",
+    "거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!":  "去那里的话，会有一个叫伊安的哥哥，他唱歌真的超棒，和现在的偶像一样，而且长得超级帅，对吧？快点去问问那个哥哥吧！",
+    "저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!":  "我真的真的好想和你一起去啊……但如果再往前走的话，妈妈会狠狠骂我的，所以我只能走到这里了，嘿嘿！⟦DET⟧ 路上小心哦！",
+    "영초윗길":  "永草上路",
+    "산복도로전시관으로 이동하기":  "前往山麓公路展览馆",
+    "망양로 산복도로전시관":  "望阳路山麓公路展览馆",
+    "박이안":  "朴伊安",
+    "산복도로전시관의 전시물을 통해 누나가 일하던 곳을 알아낸다.":  "通过山麓公路展览馆的展品，他查出了姐姐曾经工作过的地方。",
+    "누나가 일하던 곳은 고무신 공장이었다.":  "姐姐以前工作的地方是一家橡胶鞋厂。",
+    "여행객이신가요? 여기까지 올라오는 분은 흔치않은데...":  "您是游客吗？能爬到这里来的可真不多见啊……",
+    "안녕하세요, 인사가 늦었네요. 저는 산복도로전시관 도슨트, 박이안입니다. 여기는 어쩐 일이신가요? 이 안쪽으로 들어오시면 됩니다.":  "您好，打招呼有点晚了。我是山腹道路展览馆的讲解员朴伊安。您来这里有什么事吗？请往里面走。",
+    "소포의 비밀이라... 리나가 얼핏 이야기한 것같네요. 명란브랜드연구소 공사중에 나왔다면서요? 여기까지 오신거면 많이 알아내셨겠네요.":  "包裹里的秘密啊……丽娜好像曾顺口提过。说是“明兰品牌研究所”施工期间发现的？既然您已经来到这里，想必已经查明了不少内情吧。",
+    "역시 명탐정이시네요, 아직 이 기차표에 대해서는 모르시는 건가요...?":  "不愧是名侦探，您难道还不知道这张火车票的事吗……？",
+    "(기차표를 바라보며)이건… 사용하지 않은 기차표네요. 옛날에는 표를 쓰면 개표가위로 구멍을 냈거든요. 그런데 이 표는 너무 깨끗해요.":  "（看着火车票）这张……是没用过的火车票呢。以前用完票后，都会用验票剪在票上打个孔。但这张票却太干净了。",
+    "남매가 돈을 모아 기차표는 마련해 놓고도 끝내 쓰지 못했나 봐요.":  "看来这对兄妹虽然攒钱买了火车票，但最终还是没能用上。",
+    "흠, 정수라는 분이 아래쪽 항구를 바라보며 일했다면...아마 누나는 반대로 이 산복도로를 넘어 일터로 향했을지도 몰라요. 옛날에 그 곳을 「누나의 길」이라고 불렀거든요.":  "嗯，如果叫正秀的那位一边望着下方的港口一边工作的话……姐姐说不定正是沿着这条山麓公路，越过山去上班的呢。以前那里就被称为“姐姐的路”呢。",
+    "누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.":  "姐姐曾在一家生产某种物品的工厂工作，请在展厅里亲自找找看那件“物品”。它应该就在显眼的地方。",
+    "(지금까지 모은 단서들을 보여준다.)":  "（展示迄今为止收集到的线索。）",
+    "전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?":  "让我们通过展览中隐藏的线索，来寻找姐姐以前在哪里工作吧？",
+    "정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?":  "正秀的姐姐往返于「姐姐的路」时制作的是什么呢？",
+    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫色下面、白色左边，以及深蓝色对面的是什么呢？（也可以输入物品所在的编号！）",
+    "정수의 누나가 일하던 곳을 알아내셨나요?":  "您查到正秀姐姐以前工作的地方了吗？",
+    "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "请别着急。如果您逐一重新仔细观察展品，就会发现其中的奥妙。",
+    "맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠":  "没错，是橡胶鞋……不，是曾经生产橡胶鞋的工厂！那个年代，难民们有的在那条山麓公路对面的橡胶鞋工厂工作，有的当挑夫……每个人都在自己的岗位上，竭尽全力熬过每一天。",
+    "이제 누나가 일하던 곳까지 밝혀졌으니, 이 모든 단서를 모아 명란브랜드연구소로 돌아가 보세요.":  "既然姐姐以前工作的地方也查出来了，就把这些线索都收集起来，回到明兰品牌研究所看看吧。",
+    "명란브랜드연구소로 복귀하기":  "返回明兰品牌研究所",
+    "명란브랜드연구소":  "明兰品牌研究所",
+    "김초량":  "金初良",
+    "모은 단서를 모두 맞춰 소포 속 남매의 정체를 밝혀낸다.":  "将收集到的所有线索拼凑起来，揭开包裹里那对兄妹的真实身份。",
+    "정수와 함께 있던 누나는 황정월이었다.":  "和正秀在一起的姐姐是黄正月。",
+    "명란브랜드연구소까지 오셨네요! 이 계단 밑으로 내려가면 돼요!":  "您已经来到明兰品牌研究所了！沿着这楼梯往下走就行！",
+    "미요":  "米娅",
+    "탐정님, 수고 많으셨어요. 모은 단서들을 한번 펼쳐볼까요?":  "⟦DET⟧，辛苦了。要不要把收集到的线索摊开看看呢？",
+    "1950년, 초량동 1041번지, 정수라는 이름, 부산항을 바라보던 지게꾼 동생, 고무신 공장에서 일하던 누나, 그리고 한 번도 쓰이지 못한 기차표...":  "1950年，草梁洞1041号，名叫正秀，那个眺望釜山港的挑夫弟弟，在橡胶鞋厂工作的姐姐，还有那张从未用过的火车票……",
+    "(깜짝 놀라며)…어?! 그렇다면, 이 소포 속 「정수」라는 분… 제 할아버지가 분명해요!":  "（大吃一惊）……咦？！那这样一来，这个包裹里提到的“正秀”先生……肯定就是我的爷爷！",
+    "할아버지는 어릴 적 피난 시절 이야기를 잘 안 하셨지만, 일찍 세상을 떠난 누나 얘기만큼은 가끔 하셨거든요. 늘 다정하셨고, 아무리 배고프고 힘든 날에도 동생인 할아버지를 먼저 챙겨주셨다고…":  "爷爷虽然很少提起小时候逃难时的事，但偶尔会聊起那位早逝的姐姐。她说爷爷一直很体贴，无论多么饥饿、多么艰难的日子，都会先照顾作为弟弟的爷爷……",
+    "특히 시장에서 구해온 명란젓을 따뜻한 밥 위에 올려주시던 걸 평생 못 잊으셨대요. 명란은 초량 산복도로 피난민들이 서로를 먹여 살리던 눈물겨운 정성이 담긴 「진짜 우리 전통 음식」이거든요.":  "据说，他一辈子都忘不了母亲把从市场上买来的明兰腌鱼放在热腾腾的米饭上的那份心意。因为明兰是蕴含着草量山麓公路上难民们相互扶持、共度时艰的感人情怀的“真正的传统美食”。",
+    "그 짭조름한 우리 명란의 맛이… 할아버지에겐 평생 누나를 떠올리게 하는 그리움의 맛이었나 봐요.":  "那种略带咸鲜味的韩国明兰……对爷爷来说，大概是一生中总让他想起姐姐的思念之味吧。",
+    "제가 이 초량에서 명란브랜드연구소장이 되어 우리 명란을 세상에 널리 알리게 된 것도, 다 이런 이끌림 때문이었나 보네요.":  "我能在 초량担任明兰品牌研究所所长，并将我们的明兰推广到世界各地，看来也是因为这种召唤吧。",
+    "이 소포의 주인… 아마 평생 우리 할아버지가 그토록 그리워하던, 할아버지의 누나인 제 고모할머니가 확실해요.":  "这件包裹的主人……恐怕就是我祖父一生都如此思念的、他姐姐——也就是我的姑婆，这绝对没错。",
+    "황영숙 할머니의 아버지인 것같아요.":  "看来是黄英淑老奶奶的父亲。",
+    "잊혀진 이름, 누나의 이름은 뭘까요?":  "被遗忘的名字，姐姐的名字是什么呢？",
+    "피난민증명서의 빈 칸을 마저 채워보세요.":  "请将避难证明书上剩余的空白处填好。",
+    "이제 남매의 정체를 전부 알아내셨나요?":  "现在您已经完全查明这对兄妹的真实身份了吗？",
+    "천천히 살펴보도록해요.":  "我们慢慢来看看吧。",
+    "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "……黄正月，这位就是爷爷一辈子都如此思念的姐姐啊。",
+    "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "原来这个包裹……并不是丢失的包裹，而是您不忍心寄出，便将其埋在了草梁的泥土里啊……",
+    "보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요":  "您将那张未能寄出的火车票，视作并非悲伤，而是终将绽放的希望……并将其埋藏在草梁的泥土中了呢",
+    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "感谢您⟦DET⟧，终于将我们家族那尘封已久的承诺……公之于众，真的非常感谢。",
+    "정답 바로보기":  "直接查看答案",
+    "정답: ":  "答案：",
+    "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "请查看右上角的新任务吧！"
+},
+tw: {
+    "잃어버린 소포 — 미션투어":  "遺失的包裹 — 使命之旅",
+    "탐 정 방 문 기 록":  "偵探訪視紀錄",
+    "정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.":  "為了準確統計參與人數，請正確填寫實際參與者的資料。",
+    "탐정명":  "偵探名",
+    "사는곳":  "居住地",
+    "예: 홍길동":  "例：陳大文",
+    "예: 부산 동구":  "例：台灣",
+    "선택 입력":  "請輸入選項",
+    "※ 개인정보 수집 및 이용 안내":  "※ 個人資料蒐集及使用說明",
+    "본 프로그램은 결과 보고(KPI) 통계 작성을 위해 이름 및 거주지를 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.":  "本計畫為編製成果報告（KPI）統計資料，將蒐集您的姓名及居住地資訊，並於計畫結束後1個月內銷毀。您可拒絕同意，但若拒絕，參與權益可能會受到限制。",
+    "위 내용을 확인했으며 동의합니다":  "我已閱讀並同意上述內容",
+    "⚠️ 이동하실 때는 화면 대신 주변을 살펴주세요.":  "⚠️ 行經時，請留意周遭環境，而非盯著螢幕。",
+    "등록하고 시작하기":  "註冊並開始使用",
+    "NPC 위의 전구를 눌러 대화를 시작하세요.":  "請點擊NPC頭上的燈泡以開始對話。",
+    "▶ 네":  "▶ 是的",
+    "▶ 아니오":  "▶ 否",
+    "닫기":  "關閉",
+    "퀘스트 목록":  "任務清單",
+    "정답 입력":  "輸入正確答案",
+    "확인":  "確認",
+    "이 화면을 명란스토리지 직원에게 보여주고\u003cbr\u003e완료 기념품을 받으세요.":  "請將此畫面出示給Myeongnan Storage的員工，並至\u003cbr\u003e領取完成紀念品。",
+    "만족도조사":  "滿意度調查",
+    "만족도 조사를 완료한 참여자 중\u003cbr\u003e총 50분을 추첨하여 소정의 선물을 드립니다.":  "我們將從完成滿意度調查的參與者中\u003cbr\u003e隨機抽取共50位，並贈送小禮物。",
+    "다른 야외방탈출하기":  "體驗其他戶外密室逃脫",
+    "추천 부산관광명소":  "推薦的釜山觀光景點",
+    "처음부터 다시하기":  "從頭開始",
+    "새로운 퀘스트":  "新任務",
+    "처음부터 다시 시작할까요? 지금까지의 진행 상황이 초기화됩니다.":  "要從頭開始嗎？迄今為止的進度將會被重置。",
+    "다시 한번 살펴봐 주세요.":  "請再仔細查看一次。",
+    "정답을 알아내면 NPC를 눌러 정답을 입력하세요!":  "若已得知正確答案，請點擊NPC並輸入答案！",
+    "아직 시작한 퀘스트가 없어요.\u003cbr\u003e먼저 이동을 완료해주세요.":  "目前尚未開始任何任務。\u003cbr\u003e請先完成移動。",
+    "결과 보기":  "查看結果",
+    "알아내보자":  "讓我們來了解看看",
+    "사건 해결":  "案件解決",
+    "모든 단서를 모았어요. 결과를 확인해볼까요?":  "所有線索都已經收集齊全了。來看看結果吧？",
+    "도착완료":  "已抵達",
+    "도착했어요":  "我到了",
+    "사진 속 시간":  "照片裡的時光",
+    "발밑의 단서":  "腳下的線索",
+    "골목에 남겨진 이름":  "留在小巷裡的名字",
+    "계단 위의 시선":  "階梯之上的凝望",
+    "누나의 흔적":  "姊姊的蹤跡",
+    "잊혀진 이름":  "被遺忘的名字",
+    "\u0027잃어버린 소포\u0027는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.":  "《遺失的包裹》是根據一名從平壤逃難至釜山、卻不得不與家人永別的難民的真實經歷改編而成的作品。",
+    "1950년 겨울,\n피란수도 부산으로 온 두 남매가 있었습니다.\n초량동 1041번지 단칸방.\n남매는 서로를 의지하고\n이웃들과 온기를 나누며 하루하루를 버텨냈습니다.":  "1950年冬天，\n有對兄妹來到作為避難之都的釜山。\n初量洞1041號的一間單間。\n兄妹倆互相扶持，\n與鄰居們分享溫暖，一天一天地撐了下來。",
+    "누나는 산복도로를 넘어 고무신 공장으로 향했고,\n동생은 168계단을 오르내리며 부두의 짐을 날랐습니다.\n고된 하루 끝에 동생이 사 온 짭조름한 명란젓 한 덩이.\n푹 익은 시래기국에 명란을 얹어\n이웃들과 나누어 먹던 그 한 입은\n추위와 배고픔을 잊게 해 준 유일한 구원이었습니다.":  "姊姊翻越山麓公路前往橡皮鞋工廠，\n弟弟則在168級階梯間上上下下，搬運碼頭的貨物。\n辛苦一天過後，弟弟買回來的一塊鹹鮮的明蘭醬。\n將明蘭鋪在燉得軟爛的蘿蔔乾湯上，\n與鄰居們分享的那一口，\n是唯一能讓人忘卻寒冷與飢餓的救贖。",
+    "밤마다 가족사진을 보며 울던 동생을 위해,\n누나는 피땀 흘려 \n부모님을 모셔 올 \u0027기차표\u0027를 마련했습니다.":  "為了那個每晚看著全家福哭泣的弟弟，\n姐姐流血流汗，\n終於籌到了接父母回來的「火車票」。",
+    "하지만 차갑게 막혀버린 철길 앞에\n그 기차표는 끝내 쓰이지 못하고,\n차마 보내지 못한 소포가 되어 초량의 흙 속에 묻혔습니다.\n 소포 위에 흙을 덮으며,\n누나는 동생의 눈물을 닦아주며 밝게 웃어 보였습니다.":  "然而，在被冰冷封鎖的鐵軌前，\n那張火車票終究未能派上用場，\n化作那份終究未能寄出的包裹，被埋入了草量的泥土之中。\n一邊為包裹覆上泥土，\n姊姊一邊為弟弟擦去眼淚，強顏歡笑。",
+    "\"정수야. 우리는 가족을 묻는 게 아니야.\n우리 마음에 가족을 굳건히 세우는 거지.\n철길이 다시 열릴 때까지,\n우리는 여기서 더 억척스럽게 살아가야 해.\n부모님이 오셨을 때 잘 살고 있었다고 웃으며\n이 기차표를 보여드려야 하니까!\"":  "「正秀啊。我們不是在追尋家人，\n而是要把家人牢牢地烙印在心中。\n直到鐵路重新通車之前，\n我們必須在這兒更加堅韌地活下去。\n因為當父母來時，我們得笑著告訴他們\n我們過得很好，並把這張火車票展示給他們看！」",
+    "남매는 흙을 털고 일어나\n언덕 너머 떠오르는 아침 해를 바라보았습니다.\n초량의 흙 속에 묻은 그 소포는\n끝내 부치지 못한 슬픔이 아니라,\n언젠가 피어날 \u0027희망의 씨앗\u0027이었습니다.":  "兄妹倆拍去身上的泥土站起身來，\n凝視著山丘彼端升起的朝陽。\n那封埋在草壟泥土中的包裹，\n並非終究未能寄出的悲傷，\n而是終將綻放的「希望的種子」。",
+    "이제 피란수도 부산, 그리고 초량은\n더 이상 남매가 쫓겨와 머무는 쓸쓸한 피란지가 아니었습니다.\n가족과의 약속을 가슴에 품고 내일을 향해 달려가는,\n새로운 삶의 출발점이었습니다.":  "如今，作為避難之都的釜山，以及草量，\n已不再是這對兄妹被迫流落、棲身其中的凄涼避難所。\n這裡是他們將與家人的約定深藏於心、\n朝著明天奮力奔跑的，\n嶄新生活的起點。",
+    "차이나타운":  "唐人街",
+    "왕지안":  "王建",
+    "그 낡은 소포를 들고 다니는 걸 보니, 연구소 초량이가 의뢰를 했다는 그 유명한 명탐정인가 보구만!":  "看他提著那個破舊的包裹四處走動，看來就是研究所的初良委託的那位著名名偵探吧！",
+    "흠...예전에 한 번 본 적 있긴한데, 다시 볼 수 있겠나? ":  "嗯……雖然以前看過一次，但還能再看一次嗎？",
+    "(사진을 유심히 보며)...남매 중 이 남자 아이 얼굴이 낯이 익은데...?":  "（仔細端詳照片）……這對兄妹中，這個男孩子的臉龐怎麼感覺很眼熟呢……？",
+    "어릴 적 골목에서 나보다 나이 조금 많던 형이 하나 있었어. 내 볼이 만두 같다며 많이 귀여워 해줬었던 그 형을 닮았어!":  "小時候，在小巷裡有個比我大一點的哥哥。我長得跟那位哥哥很像，他當時總說我的臉頰像包子一樣，還特別疼愛我！",
+    "근데 너무 오래 전이라 가물가물하네, 나도 사느라 바빠서 말이지.":  "不過那已經是好久以前的事了，記憶有些模糊了，畢竟我也忙著過日子嘛。",
+    "이 소포가 언제 적 물건인지부터 알아봐야할 것 같은데, 초량근대역사갤러리로 가보자고.":  "看來得先查查這包裹是哪個年代的東西，我們去超量近代歷史藝廊看看吧。",
+    "네, 제가 바로 그 유명한 명탐정이에요.":  "是的，我就是那位著名的名偵探。",
+    "(소포를 건넨다.)":  "(遞出包裹。)",
+    "초량근대역사갤러리로 이동하기":  "前往草梁近代歷史藝廊",
+    "초량근대역사갤러리":  "草梁近代歷史藝廊",
+    "전시된 부산역 사진과 비교해 남매의 사진이 찍힌 연도를 알아낸다.":  "透過與展出的釜山車站照片進行比對，推斷出這對兄妹照片的拍攝年份。",
+    "사진은 1950년이었다.":  "這張照片攝於1950年。",
+    "이 갤러리에는 초량의 역사와 함게 부산의 근대 역사를 볼 수 가 있어.":  "在這座藝廊中，可以一窺草梁的歷史，同時也能了解釜山的近代歷史。",
+    "어쩌면 단서가 있을지도 모르겠네!":  "說不定會有線索呢！",
+    "남매의 사진은 몇 년도에 찍혔을까요?":  "這對兄妹的照片是哪一年拍的呢？",
+    "6.25 전쟁이 시작된 해예요.":  "這是韓戰爆發的那一年。",
+    "소포 속 남매의 사진은 언제 찍혔는지 알아냈는가?":  "你查出包裹裡那對兄妹的照片是何時拍的了嗎？",
+    "그래? 그럼 사진들을 다시 한 번 꼼꼼히 비교해봐. 서두르지 않아도 괜찮아.":  "是嗎？那你再仔細比較一下這些照片吧。不用著急。",
+    "맞아, 1950년. 그 해에 정말 많은 사람들이 피난민 신분으로 부산에 내려왔지. 아마 사진 속 남매도 그중 하나였을 거야.":  "沒錯，是1950年。那一年，確實有許多人以難民身分來到釜山。照片中的這對兄妹，大概也是其中之一吧。",
+    "삼국지벽화거리로 이동하기":  "前往《三國志》壁畫街",
+    "삼국지벽화거리":  "《三國志》壁畫街",
+    "삼국지벽화거리를 걸으며 발밑에 숨은 남매가 살던 옛 골목의 주소를 알아내자.":  "漫步於《三國志》壁畫街，試著找出藏在腳下、那對兄妹曾經居住的舊巷弄的地址吧。",
+    "남매가 살던 곳은 초량동1041번지였다.":  "這對兄妹住的地方是草梁洞1041號。",
+    "초량동1041번지로 가세요.":  "請前往草量洞1041號。",
+    "초량동1041번지는 현재 초량중로47번길에 있어요.":  "草量洞1041號目前位於草量中路47巷。",
+    "이 그림들은 나중에 생긴 거야. 그땐 그냥 담벼락이었지.":  "這些圖畫是後來才畫上去的。那時候那裡只是一面圍牆而已。",
+    "이 벽화거리는 도원결의부터 시작해. 이 동네랑 참 잘 어울리는 이야기지. 그때 여기 모여 살던 사람들도 삼국지 속 사람들처럼 새로운 세상을 만들고 싶었나 봐.":  "這條壁畫街的故事就從「桃園結義」開始。這故事跟這個街區真是相得益彰呢。看來當時聚集在這兒生活的人們，也像《三國演義》裡的人物一樣，渴望開創一個嶄新的世界吧。",
+    "그 형은 매일 이 담벼락 길을 걸어 올라갔어. 가끔은 키가 조금 더 큰 누나랑 손을 잡고 가기도 했지.":  "那個哥哥每天都會沿著這條矮牆小路走上去。有時候還會和個子稍微高一點的姊姊手牽手一起走呢。",
+    "그땐 이 길이 그 집으로 가는 제일 빠른 길이었거든.":  "因為那時候這條路是通往那間屋子的最快路線。",
+    "내 기억이 맞다면… 아마도 그 골목 어디쯤에 살았을 텐데. 번지수는 통 생각이 안 나네.":  "如果我沒記錯的話……大概就住在那條巷子的某個地方吧。門牌號碼卻怎麼也想不起來了。",
+    "발밑의 단서를 통해 드러나는 네 자리 숫자는?":  "透過腳下的線索，會顯現出哪個四位數？",
+    "발밑의 그림을 순서대로 노트북에 적고 선을 그어보세요!":  "請將腳下的圖畫依序抄寫到筆記本上，並試著畫出線條吧！",
+    "발밑의 숨은 단서를 통해 번지수를 알아냈는가?":  "你是否透過腳下隱藏的線索，查出了門牌號碼？",
+    "천천히 바닥 속 타일과 노트를 비교하다보면 답이 나올 거야.":  "只要慢慢地將地板上的磁磚與筆記進行比對，答案自然就會浮現。",
+    "그래, 초량동 1041번지. 아주 좁은 골목이었지. 그 시절 피난민들이 정말 많이 모여 살았어.":  "是啊，草梁洞1041號。那是一條非常狹窄的小巷。那時候，那裡真的聚集了許多避難民。",
+    "이젠, 남매가 살던 그 곳으로 가 봐.":  "現在，去看看那對兄妹曾經住過的地方吧。",
+    "초량동 1041번지로 이동하기":  "前往草量洞1041號",
+    "초량동 1041번지":  "草量洞 1041號",
+    "황영숙":  "黃英淑",
+    "노트북 속 집으로 향하는 길에 남겨진 글자를 찾아내보자.":  "讓我們試著找出筆記本中，那段在歸家途中留下的文字吧。",
+    "소년의 이름은 정수였다.":  "那個少年的名字叫鄭秀。",
+    "어이구, 어서 오이소! 내가 이 동네서 평생을 살았거든예. 못 보던 얼굴이 오믄 내가 먼저 눈이 가요.":  "哎喲，快進來吧！我在這兒住了一輩子呢。只要看到不認識的臉孔，我的目光就會先被吸引過去。",
+    "낡은 소포까지 들고 댕기는 거 보이, 산책 나온 건 아이네. 뭐 찾는 게 있는 갑제?":  "看你連那舊包裹都拎著四處走，看來不是出來散步的吧。該不會是在找什麼東西吧？",
+    "아이고야, 그 초량이가 부른다던 명탐정인갑네!":  "哎喲，原來就是那個據說被 초량叫去的名偵探啊！",
+    "1041번지 남매라꼬? 그 시절 그 골목에 남매가 한둘이었나. 천지삐까리였다 아이가!":  "1041號的兄妹？那時候那條巷子裡，哪有只有一兩個兄妹啊。那裡簡直是兄妹成群啊！",
+    "피난민이 하도 많아가 한 방에 서너 집이 같이 살았지. 저 집 아가 이 집 아인가 분간이 안 될 정도였지.":  "因為難民實在太多，一間房裡要住上三、四戶人家。甚至連那家的小孩是誰家的都分不清了。",
+    "나야 그때 태어나지도 안 했지마는, 우리 아버지가 이 근처서 컸다 카데예.":  "雖然我那時還沒有出生，但聽說我父親就是在這附近長大的。",
+    "맨날 좁은 골목을 뛰댕기고, 뭘 짊어지고 오르락내리락하고~":  "每天都在狹窄的巷弄裡跑來跑去，還得扛著東西上上下下～",
+    "아무튼 사진은 바래도 글은 희한하게 오래 가는 기라.":  "總之，照片雖會褪色，但文字卻奇妙地能長久留存呢。",
+    "이 담장에 적힌 시들에는 이 동네 살던 사람들 사는 이야기가 있다 아이가.":  "這面圍牆上寫著的詩句裡，蘊藏著曾住在這個街區的人們的生活故事呢。",
+    "동물은 죽어서 가죽을 남기고 사람은 죽어서 이름을 남긴다고 안카드나. 동생의 길에도 이름이 남겨져있을지도 모른다.":  "安卡德曾說：「動物死後留下皮毛，人死後留下名聲。」或許在弟弟走過的路上，也留下了他的名字。",
+    "담장갤러리":  "圍牆藝廊",
+    "잃어버린 소포의 비밀을 찾으러 왔어요.":  "我是來查明那件遺失包裹的秘密的。",
+    "골목에 남겨진 이름은?":  "小巷裡留下的名字是什麼？",
+    "노트북에 적힌 규칙을 따라 특정 단어의 글자를 짚어보세요.":  "請依照筆記本上寫的規則，依序點出特定單字的字母。",
+    "골목에 남겨진 이름을 벌써 알아낸기가?":  "你已經查出那條巷子裡留下的名字了嗎？",
+    "천천히 다시 봐봐라, 지나온 길에 이름이 남겨지는 법이지.":  "慢慢地再回頭看看吧，這才是讓名字留在走過的路上的方式。",
+    "(사진을 내민다.)":  "（遞出照片。）",
+    "정수라꼬? 아이고야… 우리 아버지 이름도 정수였는데.":  "叫鄭秀啦？哎唷……我爸爸的名字也叫鄭秀呢。",
+    "(사진을 한참 들여다보며)...우리 막내 동생 어릴 때 얼굴이랑 똑 닮았네. 이 누나는 우리 언니를 닮았고...":  "（盯著照片看了好一會兒）……這跟我們老幺小時候長得一模一樣呢。這位姊姊則長得像我們的姐姐……",
+    "(눈가를 훔치며) 아이고, 나이 드니까 눈에 자꾸 뭐가 들어가네. 아버지가 그카데. 학교가 그래 가고 싶었는데 일하러 댕기느라 맨날 학교 앞만 지나갔다꼬.":  "（擦了擦眼角）哎呀，年紀大了，眼睛裡總是有東西跑進去。我父親就是這樣。他一直很想去上學，但因為要四處打工，每天只能經過學校門口而已。",
+    "언제나 마을의 높은 곳에서 매일 누나를 그리워하셨는데...그 쪽을 한 번 가봐래이!":  "您總是站在村子的高處，每天思念著姊姊……去那邊看看吧！",
+    "초량초등학교로 이동하기":  "前往草量小學",
+    "초량초등학교":  "草量小學",
+    "한리나":  "韓莉娜",
+    "168계단 위에서 소년이 일하던 곳을 찾는다.":  "在168級階梯上方，尋找那名少年曾工作過的地方。",
+    "정수가 바라보던 곳은 부산항이었다.":  "正秀凝視的地方是釜山港。",
+    "어, 할머니!":  "哎呀，奶奶！",
+    "(수첩을 슬쩍 훔쳐보고 눈을 반짝이며) 어? 탐정 수첩이다! 대박, 탐정님이세요? 저도 탐정 조수 할래요! 시켜주세요!":  "（偷偷瞄了一眼筆記本，眼睛閃閃發光）咦？這是偵探筆記本！太棒了，您是⟦DET⟧嗎？我也想當偵探助手！請讓我當吧！",
+    "잘됐구나, 탐정님이 초량초등학교 지나서 이바구길로 가신다 카네. 우리 리나가 길 잃어버리시지 않게 잘 모시고 가 봐래이.":  "太好了，聽說⟦DET⟧會經過初量小學，然後往伊巴古路走。要好好陪著我們的莉娜，別讓她迷路喔。",
+    "에이, 할머니 걱정 마세요! 초량동은 이 리나 조수 손바닥 안이거든요!":  "哎，奶奶別擔心啦！草量洞可是李娜這位助手掌心裡的呢！",
+    "짠! 여기가 저희 학교예요! 엄청 멋지죠? 무려 1937년에 지어졌어요! 근데 옛날에는 학교에 가고 싶어도 못 온 친구들이 많았대요. 책가방 대신 지게를 지고, 학교 앞을 지나서 곧장 저~쪽 길로 바쁘게 일하러 가야 했다구 하더라고요.":  "噹！這裡就是我們學校喔！超厲害吧？竟然是1937年建的呢！ 不過聽說以前有許多同學，即使想上學也來不了。他們不能背書包，而是得扛著竹篓，經過學校門口後，立刻轉向那～邊的道路，匆匆趕去工作。",
+    "바로 이 길이에요! 「이바구길」이라고 부르는데요, 「이바구」가 사투리로 「이야기」인 거 탐정님은 모르셨죠?":  "就是這條路！它被稱為「伊巴古路」，而「伊巴古」在方言中是「故事」的意思 ⟦DET⟧，您不知道吧？",
+    "헤헷, 물론 저도 우리 할머니한테 전해 들은 지식이에요! 옛날에 전쟁을 피해서 온 피난민 분들이 이 산복도로를 따라 집을 짓고 다니던 눈물 없인 못 듣는 역사적인 길이라니까요?":  "嘿嘿，當然，這也是我從奶奶那裡聽來的知識喔！這可是條充滿歷史意義的道路，據說從前為了躲避戰爭而來的難民們，曾沿著這條山麓道路一路建造房屋，聽了這段故事，誰都能感動得熱淚盈眶呢？",
+    "에이, 탐정님! 벌써 계단 보고 놀라신 거예요? 다리가 막 후들거리시는 것 같은데… 겨우 이 정도로 놀라시면 안 돼요. 나중에 눈이 번쩍 뜨일 만큼 엄~청 높은 계단이 나타날 테니까 힘내세요, 탐정님!":  "哎呀，⟦DET⟧！看到階梯就嚇到了嗎？感覺你的雙腿都開始發抖了……才這種程度就嚇成這樣可不行喔。等會兒還會出現高到讓你眼睛都瞪圓的超～高階梯，所以要加油喔，⟦DET⟧！",
+    "(음식 냄새를 킁킁 맡으며) 츄릅… 여기는 옛날 도시락을 맛볼 수 있는 곳이에요! 탐정 일 하느라 배고프시면 이따가 저랑 같이 맛봐요. 제가 특별히 맛있는 조합 알려드릴게요!":  "（嗅著食物的香氣）咕嚕……這裡是能品嚐到懷舊便當的地方喔！如果因為忙著當偵探而餓了，等會兒就跟我一起來嚐嚐吧。我會特別告訴你一些超好吃的搭配組合喔！",
+    "자, 요 맛있는 냄새를 뒤로하고 이대로 쭉 올라가야 이바구길이 이어져요. 고고!":  "好啦，先把這陣誘人的香味拋在腦後，繼續往上走，才能接上「伊巴古路」。走起！",
+    "짜잔! 여기가 바로 그 유명한 「168계단」이에요! 그리고 바로 옆을 보세요! 손님들이 맨날 바다만 보러 갈 때, 힙한 언니 오빠들은 다 여기 모인다니까요?":  "噹噹！這裡就是那著名的「168級階梯」喔！而且快看旁邊！當遊客們整天只顧著去看海的時候，那些潮潮的姊姊哥哥們可都是聚集在這裡呢？",
+    "바로 「이바구플랫폼」이에요! 옛날 건물을 개조해서 만든 곳인데, 멋진 공방도 있고 맛있는 디저트도 파는 우리 동네 제일 핫플이에요!":  "就是「伊巴古平台」！這是將老建築改建而成的場所，不僅有超棒的手作工坊，還販售美味的甜點，是我們社區最熱門的打卡景點！",
+    "탐정님 보니까 계단 다 걸어가다간 사건 해결 못 하실 것 같아서… 저흰 다리 아프니까 문명의 혜택인 엘리베이터를 타요! 저기 계신 친절하신 동네 어르신들이 타는 법 알려 주실 거예요. 인사 바르게 하셔야 해요!":  "⟦DET⟧ 看樣子，如果走完所有樓梯的話，恐怕沒辦法解決這起案件……我們因為腿痛，所以要搭乘這項文明的恩惠——電梯！那邊的親切鄰居長輩們會教我們怎麼搭的。記得要好好打招呼喔！",
+    "어때요, 예쁘죠? 바다가 이렇게 한눈에 다 보여요! 다른 곳 생각은 싹 사라지죠? 근데… 옛날 사람들은 엘리베이터도 없이 이 많은 계단을 매일 어떻게 오르락내리락했을까요?":  "怎麼樣，很美吧？整片大海盡收眼底！其他念頭都一掃而空了吧？不過……古人沒有電梯，每天究竟是怎麼上上下下這這麼多階梯的呢？",
+    "저 많은 계단으로 무거운 우물물도 나르고, 짐도 나르고, 일하러 가기도 했다고 해요. 진짜 대단하죠?":  "據說他們曾沿著那麼多階梯，既搬運沉重的井水，也搬運貨物，甚至去工作。真的非常了不起，對吧？",
+    "우리 할머니도 가끔 여기서 가만히 바다를 바라보세요. 어릴 때 할머니의 아빠… 그러니까 제 증조할아버지를 보고 싶어서 그러신 거래요. 증조할아버지는 저 넓은 바다 어디에서 일하셨던 걸까요?":  "我的奶奶也偶爾會靜靜地站在這裡望著大海。據說那是因為她想念小時候的奶奶的爸爸……也就是我的曾祖父。曾祖父當時是在那片遼闊的大海的哪個地方工作呢？",
+    "아! 그러고 보니 할머니가 제게 주신 증조할아버지의 망원경이 있어요, 어쩌면 망원경으로 바다를 바라보면...무언가 알게 될 지도 몰라요!":  "啊！說起來，我還保留著奶奶送給我的曾祖父的望遠鏡呢，說不定用那支望遠鏡望向大海的話……說不定就能發現些什麼了！",
+    "담장 갤러리":  "圍牆藝廊",
+    "이바구길":  "伊巴古路",
+    "168계단 앞":  "168級階梯前",
+    "168계단 하늘길":  "168級階梯的天空步道",
+    "리나의 증조할아버지, 정수는 어디에서 일했을까요?":  "莉娜的曾祖父鄭洙，是在哪裡工作的呢？",
+    "BUSAN을 먼저 찾다보면 무언가 나타날거예요.":  "若先造訪釜山，總會發現些什麼的。",
+    "NPC 위의 전구를 눌러서 망원경을 확인하세요.":  "請點擊NPC上方的燈泡，查看望遠鏡。",
+    "벌써 어디에서 일하신건지 알아낸거에요?":  "您已經查出他是在哪裡工作了嗎？",
+    "괜찮아요, 다시 한번 이 자리에 서서 천천히 둘러보자구요!":  "沒關係，讓我們再站在這裡，慢慢地環顧四周吧！",
+    "맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.":  "沒錯。據說以前大家都會在這座高高的山丘和階梯上氣喘吁吁地，無盡地凝視著釜山港的大海。",
+    "바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.":  "當遠處海面上駛來一艘大船時，這就意味著港口終於有活計了！據說屆時鄰里居民便會蜂擁而至，搬運沉重的貨物，一邊流著汗，一邊一點一滴地攢下微薄的錢財。",
+    "아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?":  "或許……我奶奶的爸爸，也就是我的曾祖父，當時也在那兒下面那樣努力地工作吧……？",
+    "아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!":  "啊，對了！這次來這邊看看吧！這裡是「望洋路山麓道路展示館」。我們這片街區最深厚的歷史，全都隱藏在這裡喔！",
+    "어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!":  "說不定，關於⟦DET⟧手中那個可疑包裹的秘密，也能從這裡找到線索呢！",
+    "거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!":  "去那裡的話，會有個叫伊安的哥哥，他唱歌真的超厲害，唱得跟現在的偶像一樣好，而且長得超級帥氣，對吧？快點去問問那位哥哥吧！",
+    "저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!":  "我真的真的好想一起去啊……但如果再往前走，媽媽會狠狠罵我的，所以我只到這裡囉，嘿嘿！⟦DET⟧ 請小心點喔！",
+    "영초윗길":  "永初上路",
+    "산복도로전시관으로 이동하기":  "前往山麓公路展覽館",
+    "망양로 산복도로전시관":  "望陽路山麓道路展覽館",
+    "박이안":  "朴伊安",
+    "산복도로전시관의 전시물을 통해 누나가 일하던 곳을 알아낸다.":  "透過山麓道路展覽館的展品，查出了姐姐以前工作的地方。",
+    "누나가 일하던 곳은 고무신 공장이었다.":  "姐姐以前工作的地方是一家橡膠鞋工廠。",
+    "여행객이신가요? 여기까지 올라오는 분은 흔치않은데...":  "您是遊客嗎？能爬到這裡的人可不多見呢……",
+    "안녕하세요, 인사가 늦었네요. 저는 산복도로전시관 도슨트, 박이안입니다. 여기는 어쩐 일이신가요? 이 안쪽으로 들어오시면 됩니다.":  "您好，打招呼有點晚了。我是山麓道路展覽館的導覽員朴伊安。您是來這裡辦什麼事嗎？請往裡面走即可。",
+    "소포의 비밀이라... 리나가 얼핏 이야기한 것같네요. 명란브랜드연구소 공사중에 나왔다면서요? 여기까지 오신거면 많이 알아내셨겠네요.":  "包裹裡的秘密啊……莉娜好像曾隨口提過。據說是在「明蘭品牌研究所」施工期間發現的？既然您已經來到這裡，想必已經查出不少線索了吧。",
+    "역시 명탐정이시네요, 아직 이 기차표에 대해서는 모르시는 건가요...?":  "您果然是位名偵探呢，難道您還不知道這張火車票的事嗎……？",
+    "(기차표를 바라보며)이건… 사용하지 않은 기차표네요. 옛날에는 표를 쓰면 개표가위로 구멍을 냈거든요. 그런데 이 표는 너무 깨끗해요.":  "（看著火車票）這張……是張沒用過的火車票呢。以前用完票後，會用驗票剪在票上剪個洞。可是這張票卻太乾淨了。",
+    "남매가 돈을 모아 기차표는 마련해 놓고도 끝내 쓰지 못했나 봐요.":  "看來這對兄妹雖然攢了錢買好了火車票，但最後還是沒能用上呢。",
+    "흠, 정수라는 분이 아래쪽 항구를 바라보며 일했다면...아마 누나는 반대로 이 산복도로를 넘어 일터로 향했을지도 몰라요. 옛날에 그 곳을 「누나의 길」이라고 불렀거든요.":  "嗯，如果那位名叫正秀的人是望著下方的港口工作的话……或許姊姊當時是反方向越過這條山麓道路，前往工作地點的吧。因為以前那裡被稱為「姊姊之路」呢。",
+    "누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.":  "請在展覽廳內親自尋找姊姊曾在哪間工廠製作的「物品」。它應該就在顯眼的地方。",
+    "(지금까지 모은 단서들을 보여준다.)":  "（展示迄今為止收集到的線索。）",
+    "전시 속에 숨은 단서를 통해 누나가 어디에서 일했는지 찾아볼까요?":  "讓我們透過展覽中隱藏的線索，來找出姊姊以前在哪裡工作吧？",
+    "정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?":  "正秀的姊姊往返於「姊姊之路」時製作的是什麼呢？",
+    "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫色下方、白色左側，以及深藍色對面的是什麼呢？（也可以輸入物品所在的編號！）",
+    "정수의 누나가 일하던 곳을 알아내셨나요?":  "您查出正秀的姊姊以前工作的地方了嗎？",
+    "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "請別著急。如果您逐一重新仔細端詳展品，就會發現了。",
+    "맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠":  "沒錯，是橡膠鞋……不，是曾經生產橡膠鞋的工廠！那時候的避難民，有的在那條山麓道路彼端的橡膠鞋工廠工作，有的則當挑夫……大家都在各自的位置上，想方設法撐過每一天。",
+    "이제 누나가 일하던 곳까지 밝혀졌으니, 이 모든 단서를 모아 명란브랜드연구소로 돌아가 보세요.":  "既然已經查出姊姊以前工作的地方，請將所有線索彙整後，回到明蘭品牌研究所看看吧。",
+    "명란브랜드연구소로 복귀하기":  "返回明蘭品牌研究所",
+    "명란브랜드연구소":  "明蘭品牌研究所",
+    "김초량":  "金初良",
+    "모은 단서를 모두 맞춰 소포 속 남매의 정체를 밝혀낸다.":  "將收集到的所有線索拼湊起來，揭開包裹中那對兄妹的真實身分。",
+    "정수와 함께 있던 누나는 황정월이었다.":  "和正秀在一起的那位姊姊是黃正月。",
+    "명란브랜드연구소까지 오셨네요! 이 계단 밑으로 내려가면 돼요!":  "您已經來到明蘭品牌研究所了呢！只要沿著這段樓梯往下走就行了！",
+    "미요":  "米婭",
+    "탐정님, 수고 많으셨어요. 모은 단서들을 한번 펼쳐볼까요?":  "⟦DET⟧，辛苦了。要不要把收集到的線索攤開來看看呢？",
+    "1950년, 초량동 1041번지, 정수라는 이름, 부산항을 바라보던 지게꾼 동생, 고무신 공장에서 일하던 누나, 그리고 한 번도 쓰이지 못한 기차표...":  "1950年，草梁洞1041號，名叫正秀，那個望著釜山港的挑夫弟弟，在橡膠鞋工廠工作的姊姊，以及那張從未用過的火車票……",
+    "(깜짝 놀라며)…어?! 그렇다면, 이 소포 속 「정수」라는 분… 제 할아버지가 분명해요!":  "（大吃一驚）……咦？！那樣的話，這個包裹裡那位叫「正秀」的人……肯定就是我的爺爺！",
+    "할아버지는 어릴 적 피난 시절 이야기를 잘 안 하셨지만, 일찍 세상을 떠난 누나 얘기만큼은 가끔 하셨거든요. 늘 다정하셨고, 아무리 배고프고 힘든 날에도 동생인 할아버지를 먼저 챙겨주셨다고…":  "祖父雖然很少提起小時候避難的那段經歷，但唯獨關於早逝的姊姊，他偶爾會提一提。據說姊姊一直都很體貼，即使在最飢餓、最艱難的日子裡，也總是先照顧身為弟弟的祖父……",
+    "특히 시장에서 구해온 명란젓을 따뜻한 밥 위에 올려주시던 걸 평생 못 잊으셨대요. 명란은 초량 산복도로 피난민들이 서로를 먹여 살리던 눈물겨운 정성이 담긴 「진짜 우리 전통 음식」이거든요.":  "據說，他一生都忘不了那份在市場買來的明蘭醃魚，被放在熱騰騰的白飯上的滋味。因為明蘭醃魚是蘊含著初量山麓道路上避難民們互相扶持、淚水與真摯心意的「真正的傳統美食」啊。",
+    "그 짭조름한 우리 명란의 맛이… 할아버지에겐 평생 누나를 떠올리게 하는 그리움의 맛이었나 봐요.":  "那種鹹鮮可口的韓國明蘭魚子滋味……對爺爺來說，看來是這輩子都讓他想起姐姐的懷念滋味呢。",
+    "제가 이 초량에서 명란브랜드연구소장이 되어 우리 명란을 세상에 널리 알리게 된 것도, 다 이런 이끌림 때문이었나 보네요.":  "我能在這個初量擔任明蘭品牌研究所所長，並將我們的明蘭廣為傳揚於世，看來也是全因這份引領吧。",
+    "이 소포의 주인… 아마 평생 우리 할아버지가 그토록 그리워하던, 할아버지의 누나인 제 고모할머니가 확실해요.":  "這份包裹的主人……想必就是我祖父這輩子都如此思念的、祖父的姊姊——也就是我的姑婆，這點是沒錯的。",
+    "황영숙 할머니의 아버지인 것같아요.":  "看來是黃英淑阿嬤的父親。",
+    "잊혀진 이름, 누나의 이름은 뭘까요?":  "被遺忘的名字，姐姐的名字是什麼呢？",
+    "피난민증명서의 빈 칸을 마저 채워보세요.":  "請將「避難證明書」的空白處填寫完畢。",
+    "이제 남매의 정체를 전부 알아내셨나요?":  "現在您已經完全查明這對兄妹的真實身分了嗎？",
+    "천천히 살펴보도록해요.":  "我們來慢慢看看吧。",
+    "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "……黃正月，這位就是爺爺這輩子一直如此思念的姐姐了。",
+    "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "這件包裹……原來並非那件遺失的包裹，而是您不忍寄出，便將它埋藏在草梁的泥土裡了……",
+    "보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요":  "您將那張未能寄出的火車票，視為希望而非悲傷——相信它終將綻放……並將其埋藏在草梁的泥土之中了呢",
+    "묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.":  "感謝您⟦DET⟧，終於將我們家族那項被塵封已久的承諾……帶到了世人眼前。",
+    "정답 바로보기":  "直接查看解答",
+    "정답: ":  "解答：",
+    "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "請查看右上角的新任務吧！"
+}
+};
+let LANG = 'ko';
+try{ LANG = localStorage.getItem('busan_lang') || 'ko'; }catch(e){}
+
+function tr(s){
+  if(LANG==='ko' || s==null || s==='') return s;
+  const d = TR[LANG];
+  return (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+}
+
+const DET_WORD = {
+  en: name => name ? ('Detective '+name) : 'Detective',
+  ja: name => name ? (name+'探偵さん') : '探偵さん',
+  cn: name => name ? (name+'侦探') : '侦探',
+  tw: name => name ? (name+'偵探') : '偵探'
+};
+function P(text){
+  if(text==null) return text;
+  if(LANG==='ko'){
+    return PLAYER.name ? text.replace(/탐정님/g, PLAYER.name+' 탐정님') : text;
+  }
+  return text.replace(/⟦DET⟧/g, DET_WORD[LANG](PLAYER.name));
+}
+
+const NAV_PHRASE = {
+  en: loc => 'Head to '+loc+'.',
+  ja: loc => loc+'へ移動してください。',
+  cn: loc => '请前往'+loc+'。',
+  tw: loc => '請前往'+loc+'。'
+};
+function navPhrase(location){
+  const loc = tr(location);
+  if(LANG==='ko') return withRo(location)+' 이동하세요.';
+  return NAV_PHRASE[LANG](loc);
+}
+
+function questLabel(i, title){
+  const t = tr(title);
+  if(LANG==='ko') return ORDINALS[i]+' 퀘스트: '+t;
+  const names = {en:'Quest', ja:'クエスト', cn:'任务', tw:'任務'};
+  const colon = (LANG==='cn'||LANG==='tw') ? '：' : ': ';
+  return names[LANG]+' '+i+colon+t;
+}
+
+const STEPS = [
+{
+  id:'chinatown', location:'차이나타운', npc:'wangjian', npcName:'왕지안',
+  bg:{img:'assets/backgrounds/wangjian_1.png'},
+  npcBottom:8,
+  lines:[
+    '그 낡은 소포를 들고 다니는 걸 보니, 연구소 초량이가 의뢰를 했다는 그 유명한 명탐정인가 보구만!',
+    '흠...예전에 한 번 본 적 있긴한데, 다시 볼 수 있겠나? ',
+    '(사진을 유심히 보며)...남매 중 이 남자 아이 얼굴이 낯이 익은데...?',
+    '어릴 적 골목에서 나보다 나이 조금 많던 형이 하나 있었어. 내 볼이 만두 같다며 많이 귀여워 해줬었던 그 형을 닮았어!',
+    '근데 너무 오래 전이라 가물가물하네, 나도 사느라 바빠서 말이지.',
+    '이 소포가 언제 적 물건인지부터 알아봐야할 것 같은데, 초량근대역사갤러리로 가보자고.'
+  ],
+  lineReply:{0:'네, 제가 바로 그 유명한 명탐정이에요.',1:'(소포를 건넨다.)'},
+  puzzle:null,
+  nextLabel:'초량근대역사갤러리로 이동하기'
+},
+{
+  id:'gallery', location:'초량근대역사갤러리', npc:'wangjian', npcName:'왕지안',
+  desc:'전시된 부산역 사진과 비교해 남매의 사진이 찍힌 연도를 알아낸다.',
+  result:'사진은 1950년이었다.',
+  bg:{img:'assets/backgrounds/wangjian_2.png'}, npcDir:'south-west',
+  lines:[
+    '이 갤러리에는 초량의 역사와 함게 부산의 근대 역사를 볼 수 가 있어.',
+    '어쩌면 단서가 있을지도 모르겠네!',
+  ],
+  puzzle:{
+    type:'number', q:'남매의 사진은 몇 년도에 찍혔을까요?',
+    hint:'6.25 전쟁이 시작된 해예요.',
+    answers:['1950'],
+    confirmQ:'소포 속 남매의 사진은 언제 찍혔는지 알아냈는가?',
+    confirmNo:['그래? 그럼 사진들을 다시 한 번 꼼꼼히 비교해봐. 서두르지 않아도 괜찮아.'],
+    solvedLines:['맞아, 1950년. 그 해에 정말 많은 사람들이 피난민 신분으로 부산에 내려왔지. 아마 사진 속 남매도 그중 하나였을 거야.']
+  },
+  nextLabel:'삼국지벽화거리로 이동하기'
+},
+{
+  id:'mural', location:'삼국지벽화거리', npc:'wangjian', npcName:'왕지안',
+  desc:'삼국지벽화거리를 걸으며 발밑에 숨은 남매가 살던 옛 골목의 주소를 알아내자.',
+  result:'남매가 살던 곳은 초량동1041번지였다.',
+  navTitleOverride:'초량동1041번지로 가세요.',
+  navBg:'assets/backgrounds/bg_2.png',
+  navMiyoLine:'초량동1041번지는 현재 초량중로47번길에 있어요.',
+  bg:{img:'assets/backgrounds/wangjian_3.png'}, npcDir:'east',
+  lines:[
+    '이 그림들은 나중에 생긴 거야. 그땐 그냥 담벼락이었지.',
+    '이 벽화거리는 도원결의부터 시작해. 이 동네랑 참 잘 어울리는 이야기지. 그때 여기 모여 살던 사람들도 삼국지 속 사람들처럼 새로운 세상을 만들고 싶었나 봐.',
+    '그 형은 매일 이 담벼락 길을 걸어 올라갔어. 가끔은 키가 조금 더 큰 누나랑 손을 잡고 가기도 했지.',
+    '그땐 이 길이 그 집으로 가는 제일 빠른 길이었거든.',
+    '내 기억이 맞다면… 아마도 그 골목 어디쯤에 살았을 텐데. 번지수는 통 생각이 안 나네.',
+  ],
+  puzzle:{
+    type:'number', q:'발밑의 단서를 통해 드러나는 네 자리 숫자는?',
+    hint:'발밑의 그림을 순서대로 노트북에 적고 선을 그어보세요!',
+    answers:['1041'],
+    answerImage:'assets/ui/hint.1041.png',
+    confirmQ:'발밑의 숨은 단서를 통해 번지수를 알아냈는가?',
+    confirmNo:['천천히 바닥 속 타일과 노트를 비교하다보면 답이 나올 거야.'],
+    solvedLines:['그래, 초량동 1041번지. 아주 좁은 골목이었지. 그 시절 피난민들이 정말 많이 모여 살았어.','이젠, 남매가 살던 그 곳으로 가 봐.']
+  },
+  nextLabel:'초량동 1041번지로 이동하기'
+},
+{
+  id:'fence', location:'초량동 1041번지', npc:'yeongsuk', npcName:'황영숙',
+  desc:'노트북 속 집으로 향하는 길에 남겨진 글자를 찾아내보자.',
+  result:'소년의 이름은 정수였다.',
+  autoNext:true,
+  bg:{img:'assets/backgrounds/yeongsuk_1.png'}, npcDir:'south-west',
+  npcLeft:'calc(50% - 20px)',
+  lineNpcLeft:{7:'50%'},
+  lines:[
+    '어이구, 어서 오이소! 내가 이 동네서 평생을 살았거든예. 못 보던 얼굴이 오믄 내가 먼저 눈이 가요.',
+    '낡은 소포까지 들고 댕기는 거 보이, 산책 나온 건 아이네. 뭐 찾는 게 있는 갑제?',
+    '아이고야, 그 초량이가 부른다던 명탐정인갑네!',
+    '1041번지 남매라꼬? 그 시절 그 골목에 남매가 한둘이었나. 천지삐까리였다 아이가!',
+    '피난민이 하도 많아가 한 방에 서너 집이 같이 살았지. 저 집 아가 이 집 아인가 분간이 안 될 정도였지.',
+    '나야 그때 태어나지도 안 했지마는, 우리 아버지가 이 근처서 컸다 카데예.',
+    '맨날 좁은 골목을 뛰댕기고, 뭘 짊어지고 오르락내리락하고~',
+    '아무튼 사진은 바래도 글은 희한하게 오래 가는 기라.',
+    '이 담장에 적힌 시들에는 이 동네 살던 사람들 사는 이야기가 있다 아이가.',
+    '동물은 죽어서 가죽을 남기고 사람은 죽어서 이름을 남긴다고 안카드나. 동생의 길에도 이름이 남겨져있을지도 모른다.',
+  ],
+  lineBgs:{7:'assets/backgrounds/yeongsuk_2.png'},
+  lineDirs:{7:'north-west'},
+  lineLocation:{7:'담장갤러리'},
+  lineReply:{1:'잃어버린 소포의 비밀을 찾으러 왔어요.'},
+  puzzle:{
+    type:'text', q:'골목에 남겨진 이름은?',
+    hint:'노트북에 적힌 규칙을 따라 특정 단어의 글자를 짚어보세요.',
+    answers:['정수','황정수','jeongsoo'],
+    confirmQ:'골목에 남겨진 이름을 벌써 알아낸기가?',
+    confirmNo:['천천히 다시 봐봐라, 지나온 길에 이름이 남겨지는 법이지.'],
+    lineReply:{0:'(사진을 내민다.)'},
+    solvedLines:[
+      '정수라꼬? 아이고야… 우리 아버지 이름도 정수였는데.',
+      '(사진을 한참 들여다보며)...우리 막내 동생 어릴 때 얼굴이랑 똑 닮았네. 이 누나는 우리 언니를 닮았고...',
+      '(눈가를 훔치며) 아이고, 나이 드니까 눈에 자꾸 뭐가 들어가네. 아버지가 그카데. 학교가 그래 가고 싶었는데 일하러 댕기느라 맨날 학교 앞만 지나갔다꼬.',
+      '언제나 마을의 높은 곳에서 매일 누나를 그리워하셨는데...그 쪽을 한 번 가봐래이!',
+    ],
+    lineDirs:{0:'south'}
+  },
+  nextLabel:'초량초등학교로 이동하기'
+},
+{
+  id:'steps168', location:'초량초등학교', npc:'lina', npcName:'한리나',
+  desc:'168계단 위에서 소년이 일하던 곳을 찾는다.',
+  result:'정수가 바라보던 곳은 부산항이었다.',
+  bg:{cls:'bg-steps'}, deco:'deco-stairs',
+  lines:[
+    '어, 할머니!',
+    '(수첩을 슬쩍 훔쳐보고 눈을 반짝이며) 어? 탐정 수첩이다! 대박, 탐정님이세요? 저도 탐정 조수 할래요! 시켜주세요!',
+    '잘됐구나, 탐정님이 초량초등학교 지나서 이바구길로 가신다 카네. 우리 리나가 길 잃어버리시지 않게 잘 모시고 가 봐래이.',
+    '에이, 할머니 걱정 마세요! 초량동은 이 리나 조수 손바닥 안이거든요!',
+    '짠! 여기가 저희 학교예요! 엄청 멋지죠? 무려 1937년에 지어졌어요! 근데 옛날에는 학교에 가고 싶어도 못 온 친구들이 많았대요. 책가방 대신 지게를 지고, 학교 앞을 지나서 곧장 저~쪽 길로 바쁘게 일하러 가야 했다구 하더라고요.',
+    '바로 이 길이에요! 「이바구길」이라고 부르는데요, 「이바구」가 사투리로 「이야기」인 거 탐정님은 모르셨죠?',
+    '헤헷, 물론 저도 우리 할머니한테 전해 들은 지식이에요! 옛날에 전쟁을 피해서 온 피난민 분들이 이 산복도로를 따라 집을 짓고 다니던 눈물 없인 못 듣는 역사적인 길이라니까요?',
+    '에이, 탐정님! 벌써 계단 보고 놀라신 거예요? 다리가 막 후들거리시는 것 같은데… 겨우 이 정도로 놀라시면 안 돼요. 나중에 눈이 번쩍 뜨일 만큼 엄~청 높은 계단이 나타날 테니까 힘내세요, 탐정님!',
+    '(음식 냄새를 킁킁 맡으며) 츄릅… 여기는 옛날 도시락을 맛볼 수 있는 곳이에요! 탐정 일 하느라 배고프시면 이따가 저랑 같이 맛봐요. 제가 특별히 맛있는 조합 알려드릴게요!', 
+    '자, 요 맛있는 냄새를 뒤로하고 이대로 쭉 올라가야 이바구길이 이어져요. 고고!',
+    '짜잔! 여기가 바로 그 유명한 「168계단」이에요! 그리고 바로 옆을 보세요! 손님들이 맨날 바다만 보러 갈 때, 힙한 언니 오빠들은 다 여기 모인다니까요?',
+    '바로 「이바구플랫폼」이에요! 옛날 건물을 개조해서 만든 곳인데, 멋진 공방도 있고 맛있는 디저트도 파는 우리 동네 제일 핫플이에요!',
+    '탐정님 보니까 계단 다 걸어가다간 사건 해결 못 하실 것 같아서… 저흰 다리 아프니까 문명의 혜택인 엘리베이터를 타요! 저기 계신 친절하신 동네 어르신들이 타는 법 알려 주실 거예요. 인사 바르게 하셔야 해요!',
+    '어때요, 예쁘죠? 바다가 이렇게 한눈에 다 보여요! 다른 곳 생각은 싹 사라지죠? 근데… 옛날 사람들은 엘리베이터도 없이 이 많은 계단을 매일 어떻게 오르락내리락했을까요?',
+    '저 많은 계단으로 무거운 우물물도 나르고, 짐도 나르고, 일하러 가기도 했다고 해요. 진짜 대단하죠?',
+    '우리 할머니도 가끔 여기서 가만히 바다를 바라보세요. 어릴 때 할머니의 아빠… 그러니까 제 증조할아버지를 보고 싶어서 그러신 거래요. 증조할아버지는 저 넓은 바다 어디에서 일하셨던 걸까요?',
+    '아! 그러고 보니 할머니가 제게 주신 증조할아버지의 망원경이 있어요, 어쩌면 망원경으로 바다를 바라보면...무언가 알게 될 지도 몰라요!',
+  ],
+  lineBgs:{
+    0:'assets/backgrounds/lina_1.png',
+    4:'assets/backgrounds/lina_2.png',
+    5:'assets/backgrounds/lina_3.png',
+    7:'assets/backgrounds/lina_4.png',
+    8:'assets/backgrounds/lina_5.png',
+    10:'assets/backgrounds/lina_6.png',
+    13:'assets/backgrounds/lina_7.png'
+  },
+  lineDirs:{4:'north',5:'south-west',7:'south',8:'south',10:'south',13:'west'},
+  lineNpcBottom:{0:'calc(15% + 40px)',4:'15%',5:'calc(15% - 50px)',8:'calc(15% - 5px)',10:'calc(15% - 65px)',13:'calc(15% - 5px)'},
+  lineNpcLeft:{0:'calc(78% + 5px)',4:'50%',5:'calc(100% - 178px)',7:'calc(100% - 118px)',8:'50%',10:'calc(50% + 5px)',13:'calc(25% + 30px)'},
+  lineNpcScale:{10:0.75,13:1},
+  lineLocation:{0:'담장 갤러리',4:'초량초등학교',5:'이바구길',10:'168계단 앞',13:'168계단 하늘길'},
+  lineSpeaker:{2:{npc:'yeongsuk',name:'황영숙'},3:{npc:'lina',name:'한리나'}},
+  questMarkFromLine:13,
+  pauseAtQuestMark:true,
+  puzzle:{
+    type:'cryptex', q:'리나의 증조할아버지, 정수는 어디에서 일했을까요?',
+    hint:'BUSAN을 먼저 찾다보면 무언가 나타날거예요.',
+    cryptexAnswer:'BUSAN',
+    cryptexBelow:' PORT',
+    skipConfirm:true,
+    readyHint:'NPC 위의 전구를 눌러서 망원경을 확인하세요.',
+    answers:['PORT'],
+    confirmQ:'벌써 어디에서 일하신건지 알아낸거에요?',
+    confirmNo:['괜찮아요, 다시 한번 이 자리에 서서 천천히 둘러보자구요!'],
+    solvedLines:[
+      '맞아요. 예전에는 이 높은 언덕이랑 계단 위에서 다들 숨을 헐떡이면서 부산항 바다를 하염없이 바라봤다고 해요.',
+      '바다 저 멀리서 커다란 배가 들어오면, 드디어 항구에 일거리가 생겼다는 뜻이거든요! 그럼 동네 사람들이 우르르 달려가서 무거운 짐을 나르고, 땀 흘려 가면서 아주 작은 돈을 차곡차곡 모으셨대요.',
+      '아마… 우리 할머니의 아빠, 제 증조할아버지도 저 아래에서 그렇게 열심히 일하셨겠죠…?',
+      '아참! 이번엔 이쪽으로 와보세요! 「망양로 산복도로전시관」이라는 곳인데요. 우리 동네의 진짜 깊은 역사는 몽땅 여기에 숨겨져 있거든요!',
+      '어쩌면 탐정님이 들고 계신 그 수상한 소포에 대한 비밀도, 여기서 힌트를 찾을 수 있을지도 몰라요!',
+      '거기 가면 요즘 아이돌만큼 노래도 진짜 대박 잘 부르고, 엄청나게 잘생긴 이안 오빠가 있거든요? 얼른 가서 그 오빠한테 꼭 물어보세요!',
+      '저도 진짜 진짜 같이 가고 싶은데… 여기서 더 멀어지면 엄마한테 엄청 혼나서 요기까지만 갈게요, 헤헷! 탐정님 조심히 가세요!',
+    ],
+    lineBgs:{3:'assets/backgrounds/lina_8.png'},
+    lineDirs:{0:'south',3:'north'},
+    lineNpcLeft:{3:'50%'},
+    lineLocation:{3:'영초윗길'}
+  },
+  nextLabel:'산복도로전시관으로 이동하기'
+},
+{
+  id:'hall', location:'망양로 산복도로전시관', npc:'ian', npcName:'박이안',
+  desc:'산복도로전시관의 전시물을 통해 누나가 일하던 곳을 알아낸다.',
+  result:'누나가 일하던 곳은 고무신 공장이었다.',
+  bg:{img:'assets/backgrounds/ian_1.png'},
+  greetLine:'여행객이신가요? 여기까지 올라오는 분은 흔치않은데...',
+  greetNextBg:'assets/backgrounds/ian_2.png',
+  greetNpcLeft:'calc(50% - 10px)',
+  lines:[
+    '안녕하세요, 인사가 늦었네요. 저는 산복도로전시관 도슨트, 박이안입니다. 여기는 어쩐 일이신가요? 이 안쪽으로 들어오시면 됩니다.',
+    '소포의 비밀이라... 리나가 얼핏 이야기한 것같네요. 명란브랜드연구소 공사중에 나왔다면서요? 여기까지 오신거면 많이 알아내셨겠네요.',
+    '역시 명탐정이시네요, 아직 이 기차표에 대해서는 모르시는 건가요...?',
+    '(기차표를 바라보며)이건… 사용하지 않은 기차표네요. 옛날에는 표를 쓰면 개표가위로 구멍을 냈거든요. 그런데 이 표는 너무 깨끗해요.',
+    '남매가 돈을 모아 기차표는 마련해 놓고도 끝내 쓰지 못했나 봐요.',
+    '흠, 정수라는 분이 아래쪽 항구를 바라보며 일했다면...아마 누나는 반대로 이 산복도로를 넘어 일터로 향했을지도 몰라요. 옛날에 그 곳을 「누나의 길」이라고 불렀거든요.',
+    '누나가 어떤 물건을 만드는 공장에서 일했는지, 전시실 안에서 그 「물건」을 직접 찾아보세요. 아마 눈에 띄는 곳에 있을 거예요.'
+  ],
+  lineReply:{0:'잃어버린 소포의 비밀을 찾으러 왔어요.',1:'(지금까지 모은 단서들을 보여준다.)'},
+  puzzle:{
+    type:'text', q:'정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?',
+    hint:'보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)',
+    answers:['고무신','고무신 공장','고무신공장','1','1번'],
+    confirmQ:'정수의 누나가 일하던 곳을 알아내셨나요?',
+    confirmNo:['서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.'],
+    solvedLines:['맞아요, 고무신... 이 아니라 고무신을 만들던 공장이었어요! 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서, 또 지게꾼으로… 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠','이제 누나가 일하던 곳까지 밝혀졌으니, 이 모든 단서를 모아 명란브랜드연구소로 돌아가 보세요.']
+  },
+  nextLabel:'명란브랜드연구소로 복귀하기'
+},
+{
+  id:'lab-end', location:'명란브랜드연구소', npc:'choryang', npcName:'김초량',
+  desc:'모은 단서를 모두 맞춰 소포 속 남매의 정체를 밝혀낸다.',
+  result:'정수와 함께 있던 누나는 황정월이었다.',
+  bg:{img:'assets/backgrounds/choryang_1.png'},
+  greetLine:'명란브랜드연구소까지 오셨네요! 이 계단 밑으로 내려가면 돼요!',
+  greetPortrait:'assets/characters/miyo/portrait.png',
+  greetNpcName:'미요',
+  greetNextBg:'assets/backgrounds/choryang_2.png',
+  greetAutoContinue:true,
+  greetHideNpc:true,
+  questMarkFromLine:6,
+  lineNpcLeft:{0:'calc(50% - 20px)'},
+  lines:[
+    '탐정님, 수고 많으셨어요. 모은 단서들을 한번 펼쳐볼까요?',
+    '1950년, 초량동 1041번지, 정수라는 이름, 부산항을 바라보던 지게꾼 동생, 고무신 공장에서 일하던 누나, 그리고 한 번도 쓰이지 못한 기차표...',
+    '(깜짝 놀라며)…어?! 그렇다면, 이 소포 속 「정수」라는 분… 제 할아버지가 분명해요!',
+    '할아버지는 어릴 적 피난 시절 이야기를 잘 안 하셨지만, 일찍 세상을 떠난 누나 얘기만큼은 가끔 하셨거든요. 늘 다정하셨고, 아무리 배고프고 힘든 날에도 동생인 할아버지를 먼저 챙겨주셨다고…',
+    '특히 시장에서 구해온 명란젓을 따뜻한 밥 위에 올려주시던 걸 평생 못 잊으셨대요. 명란은 초량 산복도로 피난민들이 서로를 먹여 살리던 눈물겨운 정성이 담긴 「진짜 우리 전통 음식」이거든요.',
+    '그 짭조름한 우리 명란의 맛이… 할아버지에겐 평생 누나를 떠올리게 하는 그리움의 맛이었나 봐요.',
+    '제가 이 초량에서 명란브랜드연구소장이 되어 우리 명란을 세상에 널리 알리게 된 것도, 다 이런 이끌림 때문이었나 보네요.',
+    '이 소포의 주인… 아마 평생 우리 할아버지가 그토록 그리워하던, 할아버지의 누나인 제 고모할머니가 확실해요.'
+  ],
+  lineReply:{1:'황영숙 할머니의 아버지인 것같아요.'},
+  puzzle:{
+    type:'text', q:'잊혀진 이름, 누나의 이름은 뭘까요?',
+    hint:'피난민증명서의 빈 칸을 마저 채워보세요.',
+    answers:['정월','jeongwol'],
+    confirmQ:'이제 남매의 정체를 전부 알아내셨나요?',
+    confirmNo:['천천히 살펴보도록해요.'],
+    solvedLines:[
+      '...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.',
+      '이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...',
+      '보내지 못한 기차표를 슬픔이 아니라 언젠가 피어날 희망이라 믿으며… 초량의 흙 속에 묻어두셨던 거네요',
+      '묻혀있던 우리 가족의 오랜 약속을… 마침내 세상 밖으로 꺼내주셔서 정말 고맙습니다, 탐정님.'
+    ]
+  },
+  nextLabel:null
+}
+];
+
+/* 차이나타운(STEPS[0])은 문제/정답 팝업이 없는 이동 안내 구간이라 퀘스트로 세지 않는다.
+   실제 퀘스트는 문제가 있는 STEPS[1]~STEPS[6] 여섯 개뿐 — 배열 인덱스를 STEPS 인덱스에 그대로 맞춘다. */
+const QUEST_TITLES = [null,'사진 속 시간','발밑의 단서','골목에 남겨진 이름','계단 위의 시선','누나의 흔적','잊혀진 이름'];
+const ORDINALS = [null,'첫번째','두번째','세번째','네번째','다섯번째','여섯번째'];
+
+let idx = 0;
+let dlgLine = 0, dlgChar = 0, dlgTimer = null, dlgDone = false, dlgPlayingSolved = false;
+let dlgConfirmMode = false, dlgCustomLines = null, dlgGreetMode = false;
+let dlgReplyPending = null;
+let dlgPausedAtQuestMark = false;
+let npcLocked = false;
+let solved = STEPS.map(()=>false);
+let dlgSeenOnce = STEPS.map(()=>false);
+
+const SAVE_KEY = 'busan_lostparcel_save_v1';
+function saveProgress(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ player:PLAYER, idx, solved, dlgSeenOnce }));
+  }catch(e){}
+}
+function loadSavedProgress(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    const save = JSON.parse(raw);
+    if(!save || typeof save.idx!=='number' || !Array.isArray(save.solved) || save.solved.length!==STEPS.length) return null;
+    return save;
+  }catch(e){ return null; }
+}
+function clearProgress(){
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+}
+
+const $ = id=>document.getElementById(id);
+const titleEl=$('title'), registerEl=$('register'), gameEl=$('game');
+const narrativeEl=$('narrative'), narrativeText=$('narrative-text'), narrativeNext=$('narrative-next');
+const legacyEl=$('legacy'), legacyImg1=$('legacy-img1'), legacyImg2=$('legacy-img2'), legacyCaption=$('legacy-caption');
+const completeEl=$('complete');
+const sceneWrapEl=$('scene-wrap'), sceneEl=$('scene'), decoEl=$('scene-deco'), npcImg=$('npc-img'),
+      npcShadow=$('npc-shadow'), questMark=$('quest-mark'), tapHint=$('tap-hint');
+const dlgEl=$('dlg'), dlgTitle=$('dlg-title'), dlgBody=$('dlg-body'), dlgName=$('dlg-name'), dlgPortrait=$('dlg-portrait'), dlgChoices=$('dlg-choices');
+const dlgReplyBtn=$('dlg-reply-btn');
+const questBadge=$('quest-badge'), questBadgeImg=$('quest-badge-img');
+const hintIcon=$('hint-icon'), hintModal=$('hint-modal'), hintText=$('hint-text'), hintPortrait=$('hint-portrait');
+const navMiyo=$('nav-miyo'), navMiyoText=$('nav-miyo-text');
+const pzModal=$('puzzle-modal'), pzQ=$('pz-q'), pzInputRow=$('pz-input-row'), pzInput=$('pz-input'),
+      pzChoices=$('pz-choices'), pzFeed=$('pz-feed');
+const pzCryptex=$('pz-cryptex'), pzCryptexReels=$('pz-cryptex-reels');
+const pzForm=$('pz-form');
+const questModal=$('quest-modal'), questLeft=$('quest-left'), questRight=$('quest-right');
+const navModal=$('nav-modal'), navTitle=$('nav-title'), navMap=$('nav-map'), navObj=$('nav-obj'), navGo=$('nav-go');
+const newQuestToast=$('new-quest-toast');
+function showNewQuestToast(){
+  newQuestToast.classList.add('show');
+  setTimeout(()=>{
+    newQuestToast.classList.remove('show');
+    questBadgeImg.src='assets/ui/quest_on.png';
+    questBadge.classList.add('pulse');
+  },1200);
+}
+
+function showScreen(el){
+  [titleEl,registerEl,gameEl,narrativeEl,legacyEl,completeEl].forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function withRo(word){
+  const last=word.charCodeAt(word.length-1)-0xAC00;
+  if(last<0||last>11171) return word+'로';
+  const jong=last%28;
+  return (jong===0||jong===8) ? word+'로' : word+'으로';
+}
+
+function applyStaticI18n(){
+  document.title = tr('잃어버린 소포 — 미션투어');
+  $('reg-h2').textContent = tr('탐 정 방 문 기 록');
+  $('reg-notice').textContent = tr('정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.');
+  $('label-name').textContent = tr('탐정명');
+  $('label-addr').textContent = tr('사는곳');
+  $('f-name').placeholder = tr('예: 홍길동');
+  $('f-addr').placeholder = tr('예: 부산 동구');
+  $('consent-ttl').textContent = tr('※ 개인정보 수집 및 이용 안내');
+  $('consent-text').textContent = tr('본 프로그램은 결과 보고(KPI) 통계 작성을 위해 이름 및 거주지를 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.');
+  $('consent-label').textContent = tr('위 내용을 확인했으며 동의합니다');
+  $('tip').textContent = tr('⚠️ 이동하실 때는 화면 대신 주변을 살펴주세요.');
+  $('register-btn').textContent = tr('등록하고 시작하기');
+  $('dlg-choice-yes').textContent = tr('▶ 네');
+  $('dlg-choice-no').textContent = tr('▶ 아니오');
+  $('hint-name').textContent = tr('미요');
+  $('hint-reveal').textContent = tr('정답 바로보기');
+  $('hint-close').textContent = tr('닫기');
+  document.querySelector('#quest-modal h3').textContent = tr('퀘스트 목록');
+  $('pz-input').placeholder = tr('정답 입력');
+  $('pz-submit').textContent = tr('확인');
+  $('complete-desc').innerHTML = tr('이 화면을 명란스토리지 직원에게 보여주고<br>완료 기념품을 받으세요.');
+  $('survey-title').textContent = tr('만족도조사');
+  if(LANG==='ko'){
+    $('survey-sub').innerHTML = '만족도 조사를 완료한 참여자 중<br>총 50분을 추첨하여 소정의 선물을 드립니다.';
+    $('survey-sub').style.display='';
+  } else {
+    $('survey-sub').style.display='none';
+  }
+  $('spots-title').textContent = tr('추천 부산관광명소');
+  $('other-escape-title').textContent = tr('다른 야외방탈출하기');
+  $('complete-replay').textContent = tr('처음부터 다시하기');
+  $('new-quest-toast').textContent = tr('새로운 퀘스트');
+  $('legacy-caption').textContent = tr("'잃어버린 소포'는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.");
+}
+
+const langMenu = $('lang-menu');
+$('play-btn').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  langMenu.classList.toggle('show');
+});
+document.addEventListener('click', ()=>{ langMenu.classList.remove('show'); });
+langMenu.addEventListener('click', e=>e.stopPropagation());
+langMenu.querySelectorAll('.lang-opt').forEach(btn=>{
+  if(btn.dataset.lang===LANG) btn.classList.add('active');
+  btn.addEventListener('click', ()=>{
+    LANG = btn.dataset.lang;
+    try{ localStorage.setItem('busan_lang', LANG); }catch(e){}
+    langMenu.querySelectorAll('.lang-opt').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    langMenu.classList.remove('show');
+    applyStaticI18n();
+
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if(req){
+      try{
+        const p = req.call(el);
+        if(p && p.catch) p.catch(()=>{});
+      }catch(e){}
+    }
+    showScreen(registerEl);
+  });
+});
+applyStaticI18n();
+
+const fName=$('f-name'), fAddr=$('f-addr'), fConsent=$('f-consent'), regBtn=$('register-btn');
+function refreshRegBtn(){ regBtn.disabled = !(fName.value.trim() && fAddr.value.trim() && fConsent.checked); }
+[fName,fAddr,fConsent].forEach(el=>el.addEventListener('input',refreshRegBtn));
+fConsent.addEventListener('change',refreshRegBtn);
+const REGISTER_SHEET_URL='https://script.google.com/macros/s/AKfycbzfkUVLYTSHc4yJBeAqX-qurV-mOd8mUEWigHolaKySoO-rluWTX_3pmBdlGLwSqxXj/exec';
+function sendRegistrationToSheet(){
+  try{
+    fetch(REGISTER_SHEET_URL, {
+      method:'POST',
+      body: JSON.stringify({ name:PLAYER.name, addr:PLAYER.addr, consent:fConsent.checked })
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+regBtn.onclick=()=>{
+  PLAYER.name=fName.value.trim(); PLAYER.addr=fAddr.value.trim();
+  sendRegistrationToSheet();
+  showScreen(gameEl); showOpeningQuest();
+};
+
+
+function loadStep(i){
+  idx=i;
+  const s=STEPS[i];
+  clearTimeout(dlgTimer);
+  dlgEl.classList.remove('on');
+  dlgReplyPending=null;
+  dlgPausedAtQuestMark=false;
+  npcLocked=false;
+  dlgReplyBtn.classList.remove('show');
+  pzModal.classList.remove('on');
+  hintModal.classList.remove('on');
+  questModal.classList.remove('on');
+  navModal.classList.remove('on');
+  pzFeed.textContent='';
+  pzInput.value='';
+
+  sceneEl.className='';
+  if(s.bg.img){ sceneEl.style.backgroundImage="url('"+s.bg.img+"')"; }
+  else { sceneEl.style.backgroundImage=''; sceneEl.classList.add(s.bg.cls); }
+  decoEl.className='scene-deco'+(s.deco?' '+s.deco:'');
+
+  npcImg.src='assets/characters/'+s.npc+'/'+(s.npcDir||'south')+'.png';
+  npcImg.alt=s.npcName;
+  npcImg.style.display='';
+  npcShadow.style.display='';
+
+  if(s.npcBottom!=null){
+    sceneWrapEl.style.setProperty('--npc-bottom', s.npcBottom+'%');
+    sceneWrapEl.style.setProperty('--npc-shadow-bottom', Math.max(0,s.npcBottom-1)+'%');
+  } else {
+    sceneWrapEl.style.removeProperty('--npc-bottom');
+    sceneWrapEl.style.removeProperty('--npc-shadow-bottom');
+  }
+  sceneWrapEl.style.setProperty('--npc-left', s.npcLeft || '50%');
+  sceneWrapEl.style.setProperty('--npc-scale', '1');
+
+  navMiyo.classList.remove('show');
+
+  questMark.style.display = (isStepClear(i) || s.questMarkFromLine!=null || (s.greetLine && !dlgSeenOnce[i])) ? 'none' : 'block';
+  updateIdleHint();
+
+  if(s.greetLine && !dlgSeenOnce[i]){ playGreetLine(s); }
+  saveProgress();
+}
+
+function playGreetLine(s){
+  tapHint.classList.add('hide');
+  dlgGreetMode=true;
+  dlgCustomLines=[s.greetLine];
+  dlgConfirmMode=false;
+  dlgChoices.classList.remove('show');
+  dlgReplyPending=null;
+  dlgReplyBtn.classList.remove('show');
+  $('dlg-next').style.display='';
+  dlgTitle.textContent=tr(s.location);
+  dlgName.textContent=tr(s.greetNpcName || s.npcName);
+  dlgPortrait.style.backgroundImage="url('"+(s.greetPortrait || ('assets/characters/'+s.npc+'/south.png'))+"')";
+  if(s.greetHideNpc){
+    npcImg.style.display='none';
+    npcShadow.style.display='none';
+  } else if(s.greetNpcLeft){
+    sceneWrapEl.style.setProperty('--npc-left', s.greetNpcLeft);
+  }
+  dlgEl.classList.add('on');
+  dlgLine=0; dlgChar=0; dlgDone=false; dlgPlayingSolved=false;
+  typeLine(dlgCustomLines);
+}
+
+function isStepClear(i){ return STEPS[i].puzzle ? solved[i] : dlgSeenOnce[i]; }
+
+function refreshHintVisibility(){
+  const s=STEPS[idx];
+  hintIcon.classList.toggle('show', !!s.puzzle && !solved[idx] && dlgSeenOnce[idx] && !npcLocked);
+}
+function updateIdleHint(){
+  if(openingQuest) return;
+  const s=STEPS[idx];
+  refreshHintVisibility();
+  if(isStepClear(idx)){
+    tapHint.classList.add('hide');
+    return;
+  }
+  if(npcLocked){
+    tapHint.textContent = tr('오른쪽 위에서 새로운 퀘스트를 확인해보세요!');
+    tapHint.classList.remove('hide');
+    return;
+  }
+  if(s.puzzle && dlgSeenOnce[idx]){
+    if(s.puzzle.readyHint){
+      tapHint.textContent = tr(s.puzzle.readyHint);
+      tapHint.classList.remove('hide');
+    } else {
+      tapHint.classList.add('hide');
+    }
+    return;
+  }
+  tapHint.textContent = tr('NPC 위의 전구를 눌러 대화를 시작하세요.');
+  tapHint.classList.remove('hide');
+}
+
+function openDialogue(){
+  const s=STEPS[idx];
+  tapHint.classList.add('hide');
+  dlgEl.classList.add('on');
+  dlgName.textContent = tr(s.npcName);
+  dlgPortrait.style.backgroundImage = "url('assets/characters/"+s.npc+"/south.png')";
+  dlgConfirmMode=false; dlgCustomLines=null;
+  dlgChoices.classList.remove('show');
+  dlgReplyPending=null;
+  dlgReplyBtn.classList.remove('show');
+  $('dlg-next').style.display='';
+
+  if(isStepClear(idx)){
+    dlgTitle.textContent = tr(s.location);
+    dlgPlayingSolved=false;
+    dlgLine=s.lines.length; dlgChar=0; dlgDone=true;
+    dlgBody.textContent = P(tr(s.lines[s.lines.length-1]));
+    $('dlg-next').textContent='▼';
+    return;
+  }
+  if(s.puzzle && dlgSeenOnce[idx]){
+    if(s.puzzle.skipConfirm){
+      dlgEl.classList.remove('on');
+      openPuzzleModal(s);
+      return;
+    }
+    dlgTitle.textContent = tr(s.location);
+    showConfirmPrompt(s);
+    return;
+  }
+  dlgTitle.textContent = tr(s.location);
+  dlgLine=0; dlgChar=0; dlgDone=false; dlgPlayingSolved=false;
+  typeLine(s.lines);
+}
+
+function showConfirmPrompt(s){
+  dlgConfirmMode=true;
+  dlgChoices.classList.remove('show');
+  $('dlg-next').style.display='none';
+  dlgChar=0; dlgDone=false;
+  const cur=P(tr(s.puzzle.confirmQ));
+  clearTimeout(dlgTimer);
+  function tick(){
+    if(dlgChar<cur.length){
+      dlgChar++;
+      dlgBody.textContent=cur.slice(0,dlgChar);
+      dlgTimer=setTimeout(tick,20);
+    } else {
+      dlgDone=true;
+      dlgChoices.classList.add('show');
+    }
+  }
+  dlgBody.textContent=''; tick();
+}
+
+function lineCfgFor(lines){
+  const s=STEPS[idx];
+  if(lines===s.lines){ return s; }
+  if(s.puzzle && lines===s.puzzle.solvedLines){ return s.puzzle; }
+  return null;
+}
+function applyLineVisuals(lines, ln){
+  const s=STEPS[idx];
+  const cfg=lineCfgFor(lines);
+  if(cfg){
+    if(cfg.lineBgs && cfg.lineBgs[ln]){ sceneEl.style.backgroundImage="url('"+cfg.lineBgs[ln]+"')"; }
+    if(cfg.lineDirs && cfg.lineDirs[ln]){ npcImg.src='assets/characters/'+s.npc+'/'+cfg.lineDirs[ln]+'.png'; }
+    if(cfg.lineNpcBottom && cfg.lineNpcBottom[ln]!=null){
+      sceneWrapEl.style.setProperty('--npc-bottom', cfg.lineNpcBottom[ln]);
+    }
+    if(cfg.lineNpcLeft && cfg.lineNpcLeft[ln]!=null){
+      sceneWrapEl.style.setProperty('--npc-left', cfg.lineNpcLeft[ln]);
+    }
+    if(cfg.lineNpcScale && cfg.lineNpcScale[ln]!=null){
+      sceneWrapEl.style.setProperty('--npc-scale', cfg.lineNpcScale[ln]);
+    }
+    if(cfg.lineLocation && cfg.lineLocation[ln]){
+      dlgTitle.textContent = tr(cfg.lineLocation[ln]);
+    }
+    if(cfg.lineSpeaker && cfg.lineSpeaker[ln]){
+      const sp=cfg.lineSpeaker[ln];
+      dlgName.textContent=tr(sp.name);
+      dlgPortrait.style.backgroundImage="url('assets/characters/"+sp.npc+"/south.png')";
+    }
+  }
+}
+function typeLine(lines){
+  const s=STEPS[idx];
+  applyLineVisuals(lines, dlgLine);
+  const cur=P(tr(lines[dlgLine]||''));
+  clearTimeout(dlgTimer);
+  $('dlg-next').textContent='▼';
+  function tick(){
+    if(dlgChar<cur.length){
+      dlgChar++;
+      dlgBody.textContent=cur.slice(0,dlgChar);
+      dlgTimer=setTimeout(tick,20);
+    } else {
+      finishLine();
+    }
+  }
+  dlgBody.textContent=''; dlgDone=false; tick();
+}
+
+function finishLine(){
+  dlgDone=true;
+  const s=STEPS[idx];
+  const lines = dlgCustomLines || (dlgPlayingSolved ? s.puzzle.solvedLines : s.lines);
+  let cfg=null;
+  if(lines===s.lines){ cfg=s; }
+  else if(s.puzzle && lines===s.puzzle.solvedLines){ cfg=s.puzzle; }
+  const reply = cfg && cfg.lineReply && cfg.lineReply[dlgLine];
+  if(reply){
+    dlgReplyPending=reply;
+    $('dlg-next').style.display='none';
+    dlgReplyBtn.textContent='▶ '+tr(reply);
+    dlgReplyBtn.classList.add('show');
+  }
+}
+
+function advanceDialogue(){
+  const s=STEPS[idx];
+  if(dlgReplyPending) return;
+  if(dlgConfirmMode){
+    if(!dlgDone){
+      clearTimeout(dlgTimer);
+      const cq=P(tr(s.puzzle.confirmQ));
+      dlgChar=cq.length;
+      dlgBody.textContent=cq;
+      dlgDone=true;
+      dlgChoices.classList.add('show');
+    }
+    return;
+  }
+  const lines = dlgCustomLines || (dlgPlayingSolved ? s.puzzle.solvedLines : s.lines);
+  const cur=P(tr(lines[dlgLine]||''));
+  if(!dlgDone){
+    clearTimeout(dlgTimer);
+    dlgChar=cur.length; dlgBody.textContent=cur; finishLine();
+    return;
+  }
+  dlgLine++;
+  if(dlgLine>=lines.length){
+    if(dlgPlayingSolved){
+      dlgEl.classList.remove('on');
+      dlgSeenOnce[idx]=true;
+      if(s.autoNext && idx<STEPS.length-1){
+        hintIcon.classList.remove('show');
+        questMark.style.display='none';
+        loadStep(idx+1);
+        openDialogue();
+      } else {
+        markStepReady();
+      }
+      return;
+    }
+    if(dlgCustomLines){
+      dlgEl.classList.remove('on');
+      dlgCustomLines=null;
+      if(dlgGreetMode){
+        dlgGreetMode=false;
+        if(s.greetNextBg){
+          sceneEl.className='';
+          sceneEl.style.backgroundImage="url('"+s.greetNextBg+"')";
+        }
+        if(s.greetHideNpc){
+          npcImg.style.display='';
+          npcShadow.style.display='';
+        }
+        sceneWrapEl.style.setProperty('--npc-left', '50%');
+        if(s.greetAutoContinue){
+          openDialogue();
+          return;
+        }
+        questMark.style.display='block';
+      }
+      updateIdleHint();
+      return;
+    }
+    dlgEl.classList.remove('on');
+    dlgSeenOnce[idx]=true;
+    saveProgress();
+    if(!s.puzzle){ markStepReady(); } else { npcLocked=true; updateIdleHint(); showNewQuestToast(); if(s.puzzle.readyHint){ questMark.style.display='block'; } }
+    return;
+  }
+  if(lines===s.lines && s.pauseAtQuestMark && s.questMarkFromLine===dlgLine){
+    applyLineVisuals(lines, dlgLine);
+    questMark.style.display='block';
+    dlgEl.classList.remove('on');
+    dlgPausedAtQuestMark=true;
+    updateIdleHint();
+    return;
+  }
+  dlgChar=0; dlgDone=false;
+  typeLine(lines);
+}
+
+function playSolvedLines(){
+  const s=STEPS[idx];
+  dlgPlayingSolved=true; dlgLine=0; dlgChar=0; dlgDone=false;
+  dlgEl.classList.add('on');
+  dlgName.textContent=tr(s.npcName);
+  typeLine(s.puzzle.solvedLines);
+}
+
+function markStepReady(){
+  hintIcon.classList.remove('show');
+  questMark.style.display='none';
+  updateIdleHint();
+  showNavAuto();
+}
+
+function openPuzzleModal(s){
+  pzModal.classList.add('on');
+  pzQ.textContent=tr(s.puzzle.q);
+  pzFeed.textContent='';
+  pzChoices.style.display='none';
+  pzInputRow.style.display='none';
+  pzCryptex.classList.remove('show');
+  pzForm.classList.remove('show');
+  if(s.puzzle.type==='choice'){
+    pzChoices.style.display='flex';
+    pzChoices.innerHTML='';
+    s.puzzle.options.forEach((opt,oi)=>{
+      const b=document.createElement('button');
+      b.className='pz-choice rbtn rbtn--choice'; b.textContent=opt;
+      b.onclick=()=>{ tryAnswer(oi===s.puzzle.answerIndex); };
+      pzChoices.appendChild(b);
+    });
+  } else if(s.puzzle.type==='form'){
+    pzForm.classList.add('show');
+    pzForm.querySelectorAll('.pz-form-input').forEach(inp=>inp.value='');
+    setTimeout(()=>{ const first=pzForm.querySelector('.pz-form-input'); if(first) first.focus(); },80);
+  } else {
+    if(s.puzzle.type==='cryptex'){
+      pzCryptex.classList.add('show');
+      buildCryptexReels(s.puzzle.cryptexAnswer, s.puzzle.cryptexBelow);
+    }
+    pzInputRow.style.display='flex';
+    pzInput.value='';
+    pzInput.type = s.puzzle.type==='number' ? 'tel' : 'text';
+    pzInput.maxLength = s.puzzle.type==='number' ? 4 : 20;
+    setTimeout(()=>pzInput.focus(),80);
+  }
+}
+function checkFormAnswer(){
+  const s=STEPS[idx];
+  const fa=s.puzzle.formAnswers;
+  let ok=true;
+  pzForm.querySelectorAll('.pz-form-input').forEach(inp=>{
+    const expected=fa[inp.dataset.field]||[];
+    const v=normalize(inp.value);
+    if(!expected.some(e=>normalize(e)===v)) ok=false;
+  });
+  tryAnswer(ok);
+}
+$('pz-form-submit').onclick=checkFormAnswer;
+pzForm.querySelectorAll('.pz-form-input').forEach(inp=>{
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkFormAnswer(); });
+});
+
+const CRYPTEX_ROW_H = 34;
+function shuffledAlphabetWithNext(target, nextChar){
+  let arr, ti;
+  do{
+    arr = Array.from({length:26},(_,i)=>String.fromCharCode(65+i));
+    for(let i=arr.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    ti = arr.indexOf(target);
+  } while(ti>=25);
+  if(nextChar && nextChar!==' ' && arr[ti+1]!==nextChar){
+    const ni=arr.indexOf(nextChar);
+    arr[ni]=arr[ti+1];
+    arr[ti+1]=nextChar;
+  }
+  if(target==='B'){
+    const bi=arr.indexOf('B');
+    if(bi!==25){ arr[bi]=arr[25]; arr[25]='B'; }
+  }
+  return arr;
+}
+function buildCryptexReels(answer, belowWord){
+  pzCryptexReels.innerHTML='';
+  answer.toUpperCase().split('').forEach((ch,colIdx)=>{
+    const belowCh = belowWord ? belowWord[colIdx] : null;
+    const letters = shuffledAlphabetWithNext(ch, belowCh);
+    const reel=document.createElement('div');
+    reel.className='cryptex-reel';
+    const inner=document.createElement('div');
+    inner.className='cryptex-reel-inner';
+    letters.forEach(l=>{
+      const cell=document.createElement('div');
+      cell.className='cryptex-letter';
+      cell.textContent=l;
+      inner.appendChild(cell);
+    });
+    reel.appendChild(inner);
+    pzCryptexReels.appendChild(reel);
+    reel.scrollTop = Math.floor(Math.random()*26)*CRYPTEX_ROW_H;
+  });
+}
+
+function normalize(v){ return v.trim().replace(/\s+/g,'').toUpperCase(); }
+function checkTextAnswer(){
+  const s=STEPS[idx];
+  const v=normalize(pzInput.value);
+  const ok = s.puzzle.answers.some(a=>normalize(a)===v);
+  tryAnswer(ok);
+}
+function tryAnswer(ok){
+  if(ok){
+    solved[idx]=true;
+    saveProgress();
+    questMark.style.display='none';
+    hintIcon.classList.remove('show');
+    pzFeed.textContent='';
+    setTimeout(()=>{ pzModal.classList.remove('on'); playSolvedLines(); },200);
+  } else {
+    pzFeed.textContent=tr('다시 한번 살펴봐 주세요.');
+  }
+}
+$('pz-submit').onclick=checkTextAnswer;
+pzInput.addEventListener('keydown',e=>{ if(e.key==='Enter') checkTextAnswer(); });
+
+/* 힌트 (미요) */
+const hintAnswer=$('hint-answer');
+const hintAnswerImg=$('hint-answer-img');
+const imgLightbox=$('img-lightbox'), imgLightboxImg=$('img-lightbox-img');
+hintAnswerImg.addEventListener('click',(e)=>{
+  e.stopPropagation();
+  imgLightboxImg.src=hintAnswerImg.src;
+  imgLightbox.classList.add('show');
+});
+imgLightbox.addEventListener('click',()=>{ imgLightbox.classList.remove('show'); imgLightboxImg.src=''; });
+hintIcon.addEventListener('click',()=>{
+  const s=STEPS[idx];
+  if(!s.puzzle) return;
+  hintPortrait.style.backgroundImage="url('assets/characters/miyo/portrait.png')";
+  hintText.textContent='💡 '+tr(s.puzzle.hint);
+  hintAnswer.textContent='';
+  hintAnswer.classList.remove('show');
+  hintAnswerImg.classList.remove('show');
+  hintAnswerImg.src='';
+  hintModal.classList.add('on');
+});
+$('hint-reveal').onclick=()=>{
+  const s=STEPS[idx];
+  if(!s.puzzle) return;
+  hintAnswer.textContent=tr('정답: ')+s.puzzle.answers[0];
+  hintAnswer.classList.add('show');
+  if(s.puzzle.answerImage){
+    hintAnswerImg.src=s.puzzle.answerImage;
+    hintAnswerImg.classList.add('show');
+  } else {
+    hintAnswerImg.classList.remove('show');
+    hintAnswerImg.src='';
+  }
+};
+$('hint-close').onclick=()=>{ hintModal.classList.remove('on'); updateIdleHint(); };
+
+/* 퀘스트 배지 → 퀘스트 목록 팝업
+   차이나타운(STEPS[0])은 이동 안내일 뿐 퀘스트가 아니라서 목록에서 완전히 제외한다. */
+function isQuestStep(i){ return !!STEPS[i].puzzle; }
+
+function questState(){
+  if(openingQuest) return {kind:'pre'};
+  if(!isStepClear(idx)) return isQuestStep(idx) ? {kind:'progress', index:idx} : {kind:'pre'};
+  if(idx>=STEPS.length-1) return {kind:'final', index:idx};
+  return {kind:'next', index:idx+1};
+}
+
+function questRowStatus(i, state){
+  if(state.kind==='pre') return 'locked';
+  if(state.kind==='progress' || state.kind==='final') return i<idx ? 'done' : (i===idx ? 'active' : 'locked');
+  return i<=idx ? 'done' : (i===state.index ? 'active' : 'locked');
+}
+
+function renderQuestDetail(i, state){
+  const s=STEPS[i];
+  questRight.innerHTML='';
+  const npcRow=document.createElement('div'); npcRow.className='qd-npc-row';
+  const npcImg=document.createElement('div'); npcImg.className='qd-npc-img';
+  npcImg.style.backgroundImage="url('assets/characters/"+s.npc+"/south.png')";
+  const npcName=document.createElement('span'); npcName.className='qd-npc-name'; npcName.textContent=tr(s.npcName);
+  npcRow.appendChild(npcImg); npcRow.appendChild(npcName);
+  const title=document.createElement('div'); title.className='qd-title'; title.textContent=questLabel(i, QUEST_TITLES[i]);
+  const isSolved=solved[i];
+  const desc=document.createElement('div');
+  desc.className='qd-desc'+(isSolved?' qd-desc--solved':'');
+  desc.textContent=tr(isSolved?s.result:s.desc);
+  questRight.appendChild(npcRow); questRight.appendChild(title); questRight.appendChild(desc);
+  if(!isSolved && i===idx && dlgSeenOnce[i]){
+    const tip=document.createElement('div');
+    tip.className='qd-tip';
+    tip.textContent=tr('정답을 알아내면 NPC를 눌러 정답을 입력하세요!');
+    questRight.appendChild(tip);
+  }
+
+  if(i===state.index){
+    const btn=document.createElement('button'); btn.className='qd-btn rbtn rbtn--primary';
+    if(state.kind==='final'){
+      btn.textContent=tr('결과 보기');
+      btn.onclick=()=>{ questModal.classList.remove('on'); showEnding(); };
+    } else if(state.kind==='next'){
+      btn.textContent=tr('알아내보자');
+      btn.onclick=()=>{ questModal.classList.remove('on'); if(idx<STEPS.length-1) loadStep(idx+1); };
+    }
+    if(state.kind!=='progress') questRight.appendChild(btn);
+  }
+}
+
+function renderQuestModal(){
+  const state=questState();
+  questLeft.innerHTML='';
+  let activeShown=false;
+  for(let i=1;i<STEPS.length;i++){
+    const status=questRowStatus(i,state);
+    const item=document.createElement('div');
+    const label = status==='locked' ? '???' : QUEST_TITLES[i];
+    item.textContent=(status==='done'?'✓ ':'')+questLabel(i, label);
+    item.className='qitem'+(status==='locked'?'':' clickable')+(status==='done'?' done':'')+(status==='active'?' selected':'');
+    if(status!=='locked'){
+      item.addEventListener('click',()=>{
+        questLeft.querySelectorAll('.qitem').forEach(el=>el.classList.remove('selected'));
+        item.classList.add('selected');
+        renderQuestDetail(i,state);
+      });
+    }
+    if(status==='active') activeShown=true;
+    questLeft.appendChild(item);
+  }
+  if(activeShown){ renderQuestDetail(state.index,state); }
+  else { questRight.innerHTML='<div class="qd-empty">'+tr('아직 시작한 퀘스트가 없어요.<br>먼저 이동을 완료해주세요.')+'</div>'; }
+  questModal.classList.add('on');
+}
+
+function mapForStep(i){
+  const table=[2,3,4,null,5,6]; // map1은 오프닝(차이나타운 이동) 전용, fence는 autoNext라 지도 안 씀
+  return 'assets/maps/map'+table[i];
+}
+
+let navBlinkTimer=null, navBlinkOn=false;
+function startNavBlink(base){
+  stopNavBlink();
+  navBlinkOn=false;
+  navMap.src=base+'.png';
+  navBlinkTimer=setInterval(()=>{
+    navBlinkOn=!navBlinkOn;
+    navMap.src=base+(navBlinkOn?'_2':'')+'.png';
+  },500);
+}
+function stopNavBlink(){
+  clearInterval(navBlinkTimer); navBlinkTimer=null;
+}
+function closeNavModal(){
+  navModal.classList.remove('on');
+  stopNavBlink();
+  updateIdleHint();
+}
+
+function showNavAuto(){
+  const s=STEPS[idx];
+  if(!s.nextLabel){
+    navTitle.textContent=tr('사건 해결');
+    navMap.style.display='none';
+    stopNavBlink();
+    navObj.textContent=tr('모든 단서를 모았어요. 결과를 확인해볼까요?');
+    navGo.textContent=tr('결과 보기');
+    navGo.onclick=()=>{ closeNavModal(); showEnding(); };
+  } else {
+    navTitle.textContent=s.navTitleOverride ? tr(s.navTitleOverride) : navPhrase(STEPS[idx+1].location);
+    navMap.style.display='block';
+    startNavBlink(mapForStep(idx));
+    navObj.textContent='';
+    navGo.textContent=tr('도착완료');
+
+    if(s.navMiyoLine){
+      sceneEl.className='';
+      sceneEl.style.backgroundImage="url('"+(s.navBg||'assets/backgrounds/bg_2.png')+"')";
+      decoEl.className='scene-deco';
+      npcImg.style.display='none';
+      npcShadow.style.display='none';
+      navMiyoText.textContent=tr(s.navMiyoLine);
+      navMiyo.classList.add('show');
+    }
+    navGo.onclick=()=>{ closeNavModal(); if(idx<STEPS.length-1) loadStep(idx+1); };
+  }
+  navModal.classList.add('on');
+}
+
+let openingQuest=false;
+function showOpeningQuest(){
+  openingQuest=true;
+  sceneEl.className=''; sceneEl.style.backgroundImage='';
+  decoEl.className='scene-deco';
+  npcImg.style.display='none'; npcImg.src=''; npcImg.alt='';
+  npcShadow.style.display='none';
+  questMark.style.display='none';
+  tapHint.classList.add('hide');
+  hintIcon.classList.remove('show');
+
+  navTitle.textContent=navPhrase(STEPS[0].location);
+  navMap.style.display='block';
+  startNavBlink('assets/maps/map1');
+  navObj.textContent='';
+  navGo.textContent=tr('도착했어요');
+  navGo.onclick=()=>{
+    closeNavModal(); openingQuest=false;
+    npcImg.style.display=''; npcShadow.style.display=''; sceneWrapEl.style.background='';
+    loadStep(0);
+  };
+  navModal.classList.add('on');
+}
+
+const homeBtn=$('home-btn');
+homeBtn.addEventListener('click',()=>{
+  if(!confirm(tr('처음부터 다시 시작할까요? 지금까지의 진행 상황이 초기화됩니다.'))) return;
+  clearTimeout(dlgTimer);
+  dlgEl.classList.remove('on');
+  pzModal.classList.remove('on');
+  hintModal.classList.remove('on');
+  questModal.classList.remove('on');
+  navModal.classList.remove('on');
+  questBadge.classList.remove('pulse');
+  questBadgeImg.src='assets/ui/quest_list.png';
+  solved = STEPS.map(()=>false);
+  dlgSeenOnce = STEPS.map(()=>false);
+  dlgPausedAtQuestMark = false;
+  openingQuest = false;
+  clearProgress();
+  fName.value=''; fAddr.value=''; fConsent.checked=false; refreshRegBtn();
+  PLAYER.name=''; PLAYER.addr='';
+  showScreen(titleEl);
+});
+
+questBadge.addEventListener('click',()=>{
+  questBadgeImg.src='assets/ui/quest_list.png';
+  questBadge.classList.remove('pulse');
+  npcLocked=false;
+  refreshHintVisibility();
+  renderQuestModal();
+});
+$('quest-close').addEventListener('click',()=>{ questModal.classList.remove('on'); updateIdleHint(); });
+
+function isSceneBusy(){
+  return dlgEl.classList.contains('on') || pzModal.classList.contains('on') ||
+    hintModal.classList.contains('on') || questModal.classList.contains('on') || navModal.classList.contains('on');
+}
+function resumeOrOpenDialogue(){
+  if(npcLocked) return;
+  questModal.classList.remove('on');
+  if(dlgPausedAtQuestMark){
+    dlgPausedAtQuestMark=false;
+    questMark.style.display='none';
+    dlgEl.classList.add('on');
+    dlgChar=0; dlgDone=false;
+    typeLine(STEPS[idx].lines);
+    return;
+  }
+  questMark.style.display='none'; openDialogue();
+}
+questMark.addEventListener('click',()=>{
+  if(isSceneBusy()) return;
+  resumeOrOpenDialogue();
+});
+npcImg.addEventListener('click',()=>{
+  if(isSceneBusy()) return;
+  resumeOrOpenDialogue();
+});
+dlgEl.addEventListener('click',advanceDialogue);
+dlgReplyBtn.addEventListener('click',(e)=>{
+  e.stopPropagation();
+  dlgReplyPending=null;
+  dlgReplyBtn.classList.remove('show');
+  $('dlg-next').style.display='';
+  advanceDialogue();
+});
+$('dlg-choice-yes').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  const s=STEPS[idx];
+  dlgConfirmMode=false;
+  dlgChoices.classList.remove('show');
+  dlgEl.classList.remove('on');
+  openPuzzleModal(s);
+});
+$('dlg-choice-no').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  const s=STEPS[idx];
+  dlgConfirmMode=false;
+  dlgChoices.classList.remove('show');
+  $('dlg-next').style.display='';
+  dlgCustomLines = s.puzzle.confirmNo || ['음... 조금 더 살펴봐야겠어.'];
+  dlgLine=0; dlgChar=0; dlgDone=false;
+  typeLine(dlgCustomLines);
+});
+
+const NARRATIVE_PAGES = [
+  '1950년 겨울,\n피란수도 부산으로 온 두 남매가 있었습니다.\n초량동 1041번지 단칸방.\n남매는 서로를 의지하고\n이웃들과 온기를 나누며 하루하루를 버텨냈습니다.',
+  '누나는 산복도로를 넘어 고무신 공장으로 향했고,\n동생은 168계단을 오르내리며 부두의 짐을 날랐습니다.\n고된 하루 끝에 동생이 사 온 짭조름한 명란젓 한 덩이.\n푹 익은 시래기국에 명란을 얹어\n이웃들과 나누어 먹던 그 한 입은\n추위와 배고픔을 잊게 해 준 유일한 구원이었습니다.',
+  '밤마다 가족사진을 보며 울던 동생을 위해,\n누나는 피땀 흘려 \n부모님을 모셔 올 \'기차표\'를 마련했습니다.',
+  '하지만 차갑게 막혀버린 철길 앞에\n그 기차표는 끝내 쓰이지 못하고,\n차마 보내지 못한 소포가 되어 초량의 흙 속에 묻혔습니다.\n 소포 위에 흙을 덮으며,\n누나는 동생의 눈물을 닦아주며 밝게 웃어 보였습니다.',
+  '"정수야. 우리는 가족을 묻는 게 아니야.\n우리 마음에 가족을 굳건히 세우는 거지.\n철길이 다시 열릴 때까지,\n우리는 여기서 더 억척스럽게 살아가야 해.\n부모님이 오셨을 때 잘 살고 있었다고 웃으며\n이 기차표를 보여드려야 하니까!"',
+  '남매는 흙을 털고 일어나\n언덕 너머 떠오르는 아침 해를 바라보았습니다.\n초량의 흙 속에 묻은 그 소포는\n끝내 부치지 못한 슬픔이 아니라,\n언젠가 피어날 \'희망의 씨앗\'이었습니다.',
+  '이제 피란수도 부산, 그리고 초량은\n더 이상 남매가 쫓겨와 머무는 쓸쓸한 피란지가 아니었습니다.\n가족과의 약속을 가슴에 품고 내일을 향해 달려가는,\n새로운 삶의 출발점이었습니다.'
+];
+
+let narrLine=0, narrChar=0, narrDone=false, narrTimer=null;
+
+function showEnding(){ showNarrative(); }
+
+function showNarrative(){
+  showScreen(narrativeEl);
+  narrLine=0;
+  typeNarrLine();
+}
+function typeNarrLine(){
+  narrDone=false;
+  clearTimeout(narrTimer);
+  narrativeNext.style.opacity='0';
+  narrativeText.style.transition='none';
+  narrativeText.style.opacity='0';
+  narrativeText.textContent=tr(NARRATIVE_PAGES[narrLine]);
+  void narrativeText.offsetWidth;
+  narrativeText.style.transition='opacity 1.6s ease';
+  narrativeText.style.opacity='1';
+  narrTimer=setTimeout(()=>{
+    narrDone=true;
+    narrativeNext.style.opacity='1';
+  },1600);
+}
+narrativeEl.addEventListener('click',()=>{
+  if(!narrDone){
+    clearTimeout(narrTimer);
+    narrativeText.style.opacity='1';
+    narrDone=true;
+    narrativeNext.style.opacity='1';
+    return;
+  }
+  narrLine++;
+  if(narrLine>=NARRATIVE_PAGES.length){ showLegacy(); return; }
+  typeNarrLine();
+});
+
+function showLegacy(){
+  showScreen(legacyEl);
+  legacyImg1.src='assets/backgrounds/hwang_1.png';
+  legacyImg2.src='assets/backgrounds/hwang_2.png';
+  legacyImg2.style.transition='none';
+  legacyImg2.style.opacity='0';
+  legacyCaption.style.transition='none';
+  legacyCaption.style.opacity='0';
+  void legacyImg2.offsetWidth;
+  legacyImg2.style.transition='opacity 2.6s ease';
+  legacyCaption.style.transition='opacity .8s ease';
+  requestAnimationFrame(()=>{ legacyCaption.style.opacity='1'; });
+  setTimeout(()=>{
+    legacyCaption.style.opacity='0';
+    legacyImg2.style.opacity='1';
+    setTimeout(()=>{
+      legacyEl.style.transition='opacity 1.4s ease';
+      legacyEl.style.opacity='0';
+      setTimeout(()=>{
+        showComplete();
+        legacyEl.style.transition='';
+        legacyEl.style.opacity='';
+      },1400);
+    },4800);
+  },2800);
+}
+
+function showComplete(){
+  showScreen(completeEl);
+  clearProgress();
+}
+
+$('survey-btn').addEventListener('click',()=>{ window.open('https://walla.my/a/lost.parcel','_blank'); });
+$('spots-btn').addEventListener('click',()=>{ window.open('https://escape.dawoom.io/busan.spots.html','_blank'); });
+$('other-escape-btn').addEventListener('click',()=>{ window.open('https://escape.dawoom.io','_blank'); });
+$('complete-replay').addEventListener('click',()=>{
+  clearProgress();
+  solved = STEPS.map(()=>false); dlgSeenOnce = STEPS.map(()=>false);
+  openingQuest=false;
+  fName.value=''; fAddr.value=''; fConsent.checked=false; refreshRegBtn();
+  PLAYER.name=''; PLAYER.addr='';
+  showScreen(titleEl);
+});
+
+(function tryResume(){
+  const save = loadSavedProgress();
+  if(!save) return;
+  PLAYER.name = save.player && save.player.name || '';
+  PLAYER.addr = save.player && save.player.addr || '';
+  solved = save.solved;
+  dlgSeenOnce = (Array.isArray(save.dlgSeenOnce) && save.dlgSeenOnce.length===STEPS.length) ? save.dlgSeenOnce : STEPS.map(()=>false);
+  openingQuest = false;
+  showScreen(gameEl);
+  loadStep(save.idx);
+})();
+</script>
+</body>
+</html>
