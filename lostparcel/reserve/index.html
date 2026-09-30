@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lost Parcel — Reservation</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8E%3C/text%3E%3C/svg%3E">
+<style>
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');font-weight:normal;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Medium.woff2') format('woff2');font-weight:500;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Bold.woff2') format('woff2');font-weight:700;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraBold.woff2') format('woff2');font-weight:800;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Heavy.woff2') format('woff2');font-weight:900;font-display:swap;}
+
+  :root{
+    --blue:#4169E1;
+    --blue-deep:#2F4FC4;
+    --blue-soft:#EEF1FF;
+    --navy:#16225A;
+    --red:#E1332E;
+    --red-soft:#FDECEC;
+    --gray:#E0E0E0;
+    --panel:#F5F6F8;
+    --ink:#141414;
+    --ink-soft:#5B6B82;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  html, body{min-height:100%;}
+  body{
+    background:#0C1219;
+    color:var(--ink);
+    font-family:'Suit', -apple-system, 'Apple SD Gothic Neo', 'Hiragino Sans', 'PingFang SC', 'Microsoft JhengHei', sans-serif;
+    display:flex;
+    justify-content:center;
+  }
+  .stage{
+    position:relative;
+    width:min(100vw, 520px);
+    min-height:100dvh;
+    background:#fff;
+  }
+  @media (min-width:560px){
+    .stage{ box-shadow:0 0 0 1px var(--gray), 0 24px 70px rgba(0,0,0,0.45); }
+  }
+
+  /* ---- Top bar ---- */
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 16px;
+    background:rgba(22,34,90,0.92);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+  }
+  .topbar .back{color:#C3CEFF; font-size:13px; font-weight:600; text-decoration:none;}
+  .topbar .right{display:flex; gap:8px; align-items:center;}
+  .topbar .cta-mini{
+    color:var(--navy); background:#fff;
+    font-size:12.5px; font-weight:800;
+    padding:8px 13px; border-radius:999px;
+    text-decoration:none;
+  }
+
+  .lang-switch{position:relative;}
+  .lang-globe{
+    height:32px; padding:0 11px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.28);
+    background:rgba(255,255,255,0.12);
+    color:#fff;
+    font-family:inherit; font-size:12.5px; font-weight:600;
+    display:flex; align-items:center; gap:6px;
+    cursor:pointer;
+  }
+  .lang-globe:hover{background:rgba(255,255,255,0.22);}
+  .lang-menu{
+    display:none;
+    position:absolute; top:38px; right:0; z-index:30;
+    flex-direction:column; gap:3px;
+    background:#fff; border-radius:12px; padding:6px;
+    box-shadow:0 16px 40px rgba(0,0,0,0.4);
+    min-width:134px;
+  }
+  .lang-menu.open{display:flex;}
+  .lang-opt{
+    border:none; background:transparent; color:var(--ink);
+    font-family:inherit; font-size:13px; font-weight:600;
+    text-align:left; padding:9px 12px; border-radius:8px;
+    cursor:pointer; white-space:nowrap;
+  }
+  .lang-opt:hover{background:var(--panel);}
+  .lang-opt.active{background:var(--blue); color:#fff;}
+
+  /* ---- Hero ---- */
+  .hero{
+    position:relative;
+    background:linear-gradient(160deg,#22317A,var(--navy));
+    color:#EEF1F8;
+    overflow:hidden;
+  }
+  .hero .art{
+    display:block;
+    width:100%;
+    height:auto;
+    aspect-ratio:1/1;   /* square key visual (1772×1772) — shown whole, space reserved before it loads */
+    object-fit:cover;
+  }
+  .hero .copy{position:relative; padding:22px 18px 26px;}
+  .hero .kicker{font-size:11px; color:#C3CEFF; font-weight:700; letter-spacing:.06em;}
+  .hero h1{font-size:25px; font-weight:900; margin-top:6px; line-height:1.3;}
+  .hero .tagline{font-size:13.5px; color:#C2CAE0; margin-top:8px; line-height:1.6;}
+  .hero .period{font-size:15px; font-weight:800; margin-top:14px; letter-spacing:.02em;}
+  .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;}
+  .chip{
+    font-size:12px; font-weight:700;
+    padding:5px 11px; border-radius:999px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.22);
+    color:#fff;
+  }
+  .chip.free{background:#fff; color:var(--blue); border-color:#fff;}
+  .hero .cta{
+    display:block; margin-top:20px;
+    text-align:center;
+    background:#fff; color:var(--blue);
+    font-weight:800; font-size:15px;
+    padding:14px 0; border-radius:12px;
+    text-decoration:none;
+  }
+  .hero .cta:hover{background:var(--blue-soft);}
+
+  /* ---- Sections ---- */
+  .sec{padding:30px 18px 6px;}
+  .sec + .sec{border-top:1px solid var(--gray); margin-top:24px;}
+  .sec-head{display:flex; align-items:baseline; gap:10px; margin-bottom:14px;}
+  .sec-head .num{font-size:13px; font-weight:900; color:var(--blue);}
+  .sec-head h2{font-size:19px; font-weight:800;}
+  .story p{font-size:14px; line-height:1.85; color:var(--ink); margin-bottom:12px;}
+  .story .from{
+    display:flex; align-items:center; gap:10px;
+    background:var(--panel); border:1px solid var(--gray);
+    border-radius:12px; padding:10px 12px;
+    margin-bottom:14px;
+    font-size:12.5px; color:var(--ink-soft);
+  }
+  .story .from b{color:var(--ink); display:block; font-size:13px;}
+  .story .from .ic{
+    width:32px; height:32px; border-radius:9px;
+    background:linear-gradient(160deg,#4169E1,#2F4FC4);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-size:15px; flex-shrink:0;
+  }
+
+  .info{display:grid; gap:8px;}
+  .info-row{
+    display:grid; grid-template-columns:30px 1fr; gap:10px;
+    align-items:start;
+    padding:12px;
+    background:var(--panel);
+    border-radius:12px;
+  }
+  .info-row .ic{font-size:18px; line-height:1.3; text-align:center;}
+  .info-row dt{font-size:11.5px; font-weight:700; color:var(--ink-soft); letter-spacing:.02em;}
+  .info-row dd{font-size:14px; font-weight:700; color:var(--ink); margin-top:2px; line-height:1.5;}
+  .info-row dd small{display:block; font-size:12px; font-weight:500; color:var(--ink-soft); margin-top:2px;}
+  .info-row dd a{color:var(--blue); font-size:12.5px; font-weight:700; text-decoration:none;}
+
+  .steps{list-style:none; display:grid; gap:10px; counter-reset:step;}
+  .steps li{
+    position:relative;
+    padding:14px 14px 14px 58px;
+    border:1px solid var(--gray);
+    border-radius:12px;
+  }
+  .steps li::before{
+    counter-increment:step;
+    content:counter(step, decimal-leading-zero);
+    position:absolute; left:14px; top:14px;
+    width:32px; height:32px; border-radius:50%;
+    background:var(--blue); color:#fff;
+    font-size:12px; font-weight:900;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .steps b{display:block; font-size:14px; font-weight:800;}
+  .steps span{display:block; font-size:12.5px; color:var(--ink-soft); line-height:1.6; margin-top:3px;}
+
+  .notes{list-style:none; display:grid; gap:8px;}
+  .notes li{
+    display:grid; grid-template-columns:22px 1fr; gap:8px;
+    font-size:13px; line-height:1.65; color:var(--ink);
+    padding:11px 12px;
+    background:var(--panel);
+    border-radius:12px;
+  }
+  .notes li.warn{background:var(--red-soft); color:#7A1512;}
+  .notes li .ic{text-align:center;}
+
+  /* ---- Booking form ---- */
+  #book{scroll-margin-top:52px;}
+  form{padding-bottom:40px;}
+  .field{margin-bottom:18px;}
+  .field > label, .field > .label{
+    display:block; font-size:13px; font-weight:700; color:var(--ink); margin-bottom:7px;
+  }
+  .field .req{color:var(--red); margin-left:2px;}
+  .field .help{font-size:11.5px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+  input[type=text], input[type=email], input[type=tel], select{
+    width:100%;
+    border:1.5px solid var(--gray);
+    background:#fff;
+    border-radius:10px;
+    padding:12px 13px;
+    font-size:15px; font-family:inherit; color:var(--ink);
+    outline:none;
+    -webkit-appearance:none; appearance:none;
+  }
+  select{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235B6B82' stroke-width='1.8' fill='none'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center;
+    padding-right:36px;
+  }
+  input::placeholder{color:#9AA3B2;}
+  input:focus, select:focus{border-color:var(--blue);}
+  #name{text-transform:uppercase;}
+  #name::placeholder{text-transform:none;}
+  .field.invalid input, .field.invalid select, .field.invalid .cal{border-color:var(--red);}
+  .err{display:none; font-size:12px; font-weight:600; color:var(--red); margin-top:6px;}
+  .field.invalid .err{display:block;}
+
+  /* calendar */
+  .cal{border:1.5px solid var(--gray); border-radius:12px; padding:12px;}
+  .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .cal-head .month{font-size:14.5px; font-weight:800;}
+  .cal-nav{
+    width:32px; height:32px; border-radius:50%;
+    border:1px solid var(--gray); background:#fff;
+    font-size:15px; color:var(--ink); cursor:pointer;
+  }
+  .cal-nav:disabled{opacity:.3; cursor:default;}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:3px; text-align:center;}
+  .cal-grid .dow{font-size:11px; font-weight:700; color:var(--ink-soft); padding:4px 0;}
+  .cal-grid .dow.sun{color:var(--red);}
+  .day{
+    aspect-ratio:1;
+    border:none; border-radius:9px;
+    background:transparent;
+    font-family:inherit; font-size:13.5px; font-weight:700;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .day.open{background:var(--blue-soft); color:var(--blue);}
+  .day.open:hover{background:#DCE3FF;}
+  .day.sel{background:var(--blue); color:#fff;}
+  .day:disabled{color:#C4C9D2; cursor:default; background:transparent; font-weight:500;}
+  .day.closed:disabled{text-decoration:line-through;}
+  .cal-legend{display:flex; gap:14px; margin-top:10px; font-size:11.5px; color:var(--ink-soft);}
+  .cal-legend i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px;}
+  .cal-picked{margin-top:8px; font-size:13px; font-weight:700; color:var(--blue); min-height:18px;}
+
+  .stepper{
+    display:inline-flex; align-items:center;
+    border:1.5px solid var(--gray); border-radius:12px; overflow:hidden;
+  }
+  .stepper button{
+    width:48px; height:46px; border:none;
+    background:var(--panel); color:var(--blue);
+    font-family:inherit; font-size:20px; font-weight:800;
+    cursor:pointer;
+  }
+  .stepper button:disabled{color:#C4C9D2; cursor:default;}
+  .stepper output{min-width:64px; text-align:center; font-size:17px; font-weight:800;}
+
+  .seg{display:flex; gap:6px; margin-bottom:8px;}
+  .seg label{flex:1; cursor:pointer;}
+  .seg input{position:absolute; opacity:0; pointer-events:none;}
+  .seg span{
+    display:block; text-align:center; padding:10px 0;
+    border:1.5px solid var(--gray); border-radius:10px;
+    font-size:13.5px; font-weight:600; color:var(--ink-soft);
+  }
+  .seg input:checked + span{border-color:var(--blue); background:var(--blue-soft); color:var(--blue);}
+  .seg input:focus-visible + span{outline:2px solid var(--blue); outline-offset:2px;}
+
+  .consent{
+    background:var(--panel); border:1px solid var(--gray);
+    border-radius:12px; padding:14px;
+    font-size:12px; color:var(--ink-soft); line-height:1.6;
+  }
+  .consent-title{font-size:12.5px; font-weight:800; color:var(--ink); margin-bottom:10px;}
+  .consent-refuse{margin:-2px 0 12px;}
+  .consent dl{display:grid; grid-template-columns:auto 1fr; gap:4px 10px; margin-bottom:12px;}
+  .consent dt{font-weight:700; color:var(--ink);}
+  .consent .check{display:flex; gap:9px; align-items:flex-start; font-size:13px; font-weight:600; color:var(--ink); cursor:pointer;}
+  .consent .check input{width:18px; height:18px; margin-top:1px; accent-color:var(--blue); flex-shrink:0;}
+  .field.invalid .consent{border-color:var(--red);}
+
+  .submit{
+    width:100%; border:none;
+    background:var(--blue); color:#fff;
+    font-family:inherit; font-weight:800; font-size:15px;
+    padding:15px 0; border-radius:12px;
+    cursor:pointer; margin-top:6px;
+  }
+  .submit:hover{background:var(--blue-deep);}
+  .submit:disabled{opacity:.6; cursor:wait;}
+  .form-msg{font-size:12.5px; font-weight:600; color:var(--red); text-align:center; margin-top:12px; min-height:16px;}
+
+  /* ---- Done ---- */
+  .done{display:none; text-align:center; padding-bottom:40px;}
+  .done.show{display:block; animation:fadeUp .5s ease;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);}}
+  .done img{width:88px; height:auto; margin:4px auto 6px; display:block;}
+  .done h2{font-size:19px; font-weight:800; margin-top:6px;}
+  .done > p{font-size:13px; color:var(--ink-soft); margin-top:8px; line-height:1.6;}
+  .summary{
+    text-align:left; margin-top:20px;
+    background:var(--panel); border:1px solid var(--gray);
+    border-radius:12px; padding:14px 16px;
+    display:grid; grid-template-columns:auto 1fr; gap:8px 14px;
+    font-size:13px;
+  }
+  .summary dt{color:var(--ink-soft); font-weight:600;}
+  .summary dd{color:var(--ink); font-weight:700; word-break:break-all;}
+  .done .pickup{
+    margin-top:12px; text-align:left;
+    font-size:12.5px; line-height:1.6; color:var(--ink);
+    background:var(--blue-soft); border-radius:12px; padding:12px 14px;
+  }
+  .done a.home{display:inline-block; margin-top:22px; color:var(--blue); font-size:13px; font-weight:700; text-decoration:none;}
+
+  .credit{
+    padding:22px 18px 34px;
+    text-align:center;
+    font-size:11.5px; color:var(--ink-soft); line-height:1.7;
+    background:var(--panel);
+  }
+  .credit .logos{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .credit .logos img{
+    height:42px; width:auto; max-width:140px; object-fit:contain;
+    background:#fff; border:1px solid var(--gray); border-radius:8px; padding:8px 12px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage">
+
+    <div class="topbar">
+      <a class="back" href="../" data-i18n="back">‹ Back</a>
+      <div class="right">
+        <div class="lang-switch" id="langSwitch">
+          <button class="lang-globe" type="button" onclick="toggleLangMenu(event)" aria-label="Language">🌐 <span id="langLabel">English</span></button>
+          <div class="lang-menu" id="langMenu">
+            <button class="lang-opt" type="button" data-lang="en">English</button>
+            <button class="lang-opt" type="button" data-lang="ja">日本語</button>
+            <button class="lang-opt" type="button" data-lang="zh-Hans">简体中文</button>
+            <button class="lang-opt" type="button" data-lang="zh-Hant">繁體中文</button>
+          </div>
+        </div>
+        <a class="cta-mini" href="#book" data-i18n="ctaMini">Book</a>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <header class="hero">
+      <img class="art" src="assets/poster.webp" alt="잃어버린 소포 · Busan Station">      <div class="copy">
+        <div class="kicker">BUSAN STATION · OUTDOOR ESCAPE GAME</div>
+        <h1 data-i18n="heroTitle">The Lost Parcel</h1>
+        <p class="tagline" data-i18n="heroDesc">Find the clues hidden around Busan Station and uncover the secret of a parcel no one has claimed.</p>
+        <div class="period" data-i18n="heroPeriod">2026.10.08 — 12.04</div>
+        <div class="chips">
+          <span class="chip free" data-i18n="free">FREE</span>
+          <span class="chip" data-i18n="chipTime">About 60 min</span>
+          <span class="chip" data-i18n="chipGift">Souvenir on completion</span>
+        </div>
+        <a class="cta" href="#book" data-i18n="cta">Book now</a>
+      </div>
+    </header>
+
+    <!-- 01 STORY -->
+    <section class="sec story">
+      <div class="sec-head"><span class="num">01</span><h2 data-i18n="s1">The Story</h2></div>
+      <div class="from">
+        <div class="ic">✉️</div>
+        <div><b data-i18n="sender">Myeongnan Brand Laboratory</b><span data-i18n="fromAddr">from. Director Kim Cho-ryang</span></div>
+      </div>
+      <p data-i18n="story1">During renovation work at our lab, the workers found an old parcel. It seemed too meaningful to simply throw away — but no one knows who it belongs to, or what it even is.</p>
+      <p data-i18n="story2">Detective, the clues are hidden all around Busan Station. Crack the codes, follow the trail, and reveal the true identity of the lost parcel.</p>
+    </section>
+
+    <!-- 02 PROGRAM INFO -->
+    <section class="sec">
+      <div class="sec-head"><span class="num">02</span><h2 data-i18n="s2">Program Info</h2></div>
+      <dl class="info">
+        <div class="info-row"><div class="ic">📅</div><div><dt data-i18n="iPeriodT">Period</dt><dd><span data-i18n="iPeriod">Oct 8 – Dec 4, 2026</span><small data-i18n="iClosed">Closed every Monday and on Korean public holidays (incl. Oct 9, Hangeul Day)</small></dd></div></div>
+        <div class="info-row"><div class="ic">🕙</div><div><dt data-i18n="iHoursT">Hours</dt><dd>10:00 — 17:00</dd></div></div>
+        <div class="info-row"><div class="ic">⏱️</div><div><dt data-i18n="iDurT">Duration</dt><dd data-i18n="iDur">About 60 minutes</dd></div></div>
+        <div class="info-row"><div class="ic">🗺️</div><div><dt data-i18n="iAreaT">Play area</dt><dd data-i18n="iArea">Around Busan Station</dd></div></div>
+        <div class="info-row"><div class="ic">🧳</div><div><dt data-i18n="iStartT">Start point &amp; kit pick-up</dt><dd><span data-i18n="iStart">ZIMCARRY Busan Station</span><small><a id="mapLink" href="https://www.google.com/maps/search/?api=1&query=%EC%A7%90%EC%BA%90%EB%A6%AC%20%EB%B6%80%EC%82%B0%EC%97%AD%EC%A0%90" target="_blank" rel="noopener" data-i18n="map">View map ›</a></small></dd></div></div>
+        <div class="info-row"><div class="ic">🎁</div><div><dt data-i18n="iPriceT">Price &amp; reward</dt><dd><span data-i18n="iPrice">Free</span><small data-i18n="iReward">A special souvenir is given when you complete the game.</small></dd></div></div>
+      </dl>
+    </section>
+
+    <!-- 03 HOW IT WORKS -->
+    <section class="sec">
+      <div class="sec-head"><span class="num">03</span><h2 data-i18n="s3">How It Works</h2></div>
+      <ol class="steps">
+        <li><b data-i18n="st1">Book online</b><span data-i18n="st1d">Pick a date and leave your details on this page.</span></li>
+        <li><b data-i18n="st2">Pick up your kit</b><span data-i18n="st2d">Come to ZIMCARRY Busan Station and collect your game kit.</span></li>
+        <li><b data-i18n="st3">Solve the mystery</b><span data-i18n="st3d">Follow the clues around Busan Station with your kit and phone.</span></li>
+        <li><b data-i18n="st4">Get your souvenir</b><span data-i18n="st4d">Finish the game and receive a special souvenir.</span></li>
+      </ol>
+    </section>
+
+    <!-- 04 NOTES -->
+    <section class="sec">
+      <div class="sec-head"><span class="num">04</span><h2 data-i18n="s4">Please Note</h2></div>
+      <ul class="notes">
+        <li class="warn"><span class="ic">⏳</span><span data-i18n="n1">ZIMCARRY is busy with luggage customers in the morning, so you may have to wait. Please plan your visit accordingly.</span></li>
+        <li><span class="ic">👟</span><span data-i18n="n2">Comfortable clothes and shoes are recommended.</span></li>
+        <li><span class="ic">🚸</span><span data-i18n="n3">Parts of the course run next to roads. Please watch out for traffic and stay safe.</span></li>
+      </ul>
+    </section>
+
+    <!-- 05 BOOK -->
+    <section class="sec" id="book">
+      <div class="sec-head"><span class="num">05</span><h2 data-i18n="s5">Book</h2></div>
+
+      <form id="reserveForm" novalidate>
+        <div class="field" id="f-name">
+          <label for="name"><span data-i18n="nameLabel">Full name (as in passport)</span><span class="req">*</span></label>
+          <input type="text" id="name" autocomplete="name" autocapitalize="characters" spellcheck="false" data-i18n-ph="namePh" placeholder="e.g. HONG GILDONG">
+          <div class="help" data-i18n="nameHelp">Enter your name in English letters exactly as it appears on your passport.</div>
+          <div class="err" data-i18n="nameErr">Please enter your name in English letters.</div>
+        </div>
+
+        <div class="field" id="f-country">
+          <label for="country"><span data-i18n="countryLabel">Country</span><span class="req">*</span></label>
+          <select id="country"></select>
+          <div class="err" data-i18n="countryErr">Please select your country.</div>
+        </div>
+
+        <div class="field" id="f-date">
+          <div class="label"><span data-i18n="dateLabel">Reservation date</span><span class="req">*</span></div>
+          <div class="cal">
+            <div class="cal-head">
+              <button class="cal-nav" type="button" id="calPrev" aria-label="Previous month">‹</button>
+              <div class="month" id="calMonth"></div>
+              <button class="cal-nav" type="button" id="calNext" aria-label="Next month">›</button>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-legend">
+              <span><i style="background:var(--blue-soft)"></i><span data-i18n="legendOpen">Available</span></span>
+              <span><i style="background:#E7E9ED"></i><span data-i18n="legendClosed">Closed</span></span>
+            </div>
+          </div>
+          <div class="cal-picked" id="calPicked"></div>
+          <div class="err" data-i18n="dateErr">Please choose an available date.</div>
+        </div>
+
+        <div class="field" id="f-people">
+          <div class="label"><span data-i18n="peopleLabel">Number of people</span><span class="req">*</span></div>
+          <div class="stepper">
+            <button type="button" id="pplMinus" aria-label="−">−</button>
+            <output id="people" aria-live="polite">1</output>
+            <button type="button" id="pplPlus" aria-label="+">+</button>
+          </div>
+          <div class="help" id="peopleHelp"></div>
+        </div>
+
+        <div class="field" id="f-contact">
+          <div class="label"><span data-i18n="contactLabel">Contact</span><span class="req">*</span></div>
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="ctype" value="email" checked><span data-i18n="email">Email</span></label>
+            <label><input type="radio" name="ctype" value="phone"><span data-i18n="phone">Phone</span></label>
+          </div>
+          <input type="email" id="contact" autocomplete="email" inputmode="email">
+          <div class="help" id="contactHelp"></div>
+          <div class="err" id="contactErr"></div>
+        </div>
+
+        <div class="field" id="f-consent">
+          <div class="consent">
+            <div class="consent-title" data-i18n="cTitle">※ Collection and use of personal information</div>
+            <dl>
+              <dt data-i18n="cItemsT">Collected</dt><dd data-i18n="cItems">Name, place of residence, contact (email or phone number)</dd>
+              <dt data-i18n="cPurposeT">Purpose</dt><dd data-i18n="cPurpose">Result report (KPI) statistics, reservation confirmation, game kit distribution</dd>
+              <dt data-i18n="cKeepT">Retention</dt><dd data-i18n="cKeep">Destroyed within 1 month after the program ends</dd>
+            </dl>
+            <p class="consent-refuse" data-i18n="cRefuse">You may refuse to consent, but your participation may be restricted.</p>
+            <label class="check"><input type="checkbox" id="consent"><span data-i18n="cAgree">I agree to the collection and use of my personal information.</span></label>
+          </div>
+          <div class="err" data-i18n="consentErr">Please agree to continue.</div>
+        </div>
+
+        <button class="submit" type="submit" id="submitBtn" data-i18n="submit">Reserve</button>
+        <div class="form-msg" id="formMsg" role="alert"></div>
+      </form>
+
+      <div class="done" id="done">
+        <img src="assets/miyo.png" alt="">
+        <h2 data-i18n="doneTitle">Your reservation is in!</h2>
+        <p data-i18n="doneDesc">We'll contact you using the details below. See you at Busan Station, Detective!</p>
+        <dl class="summary" id="summary"></dl>
+        <div class="pickup" data-i18n="donePickup">On your reservation date, come to ZIMCARRY Busan Station between 10:00 and 17:00 to pick up your game kit.</div>
+        <a class="home" href="../" data-i18n="home">‹ Back to the start</a>
+      </div>
+    </section>
+
+    <footer class="credit">
+      <div data-i18n="credit">Presented by the Korea Tourism Organization Busan·Ulsan·Gyeongnam Office and Busan Dong-gu Office.</div>
+      <div class="logos">
+        <img src="assets/kto.png" alt="Korea Tourism Organization">
+        <img src="assets/donggu.png" alt="Busan Dong-gu">
+        <img src="assets/zimcarry.svg" alt="ZIMCARRY">
+        <img src="assets/dawoom.png" alt="Communication Dawoom">
+      </div>
+    </footer>
+
+  </div>
+
+<script>
+  /* ==================== settings ==================== */
+  // Where reservations are sent (Google Apps Script web-app URL — see apps-script.gs).
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbybMfPNwL1ihVGB7U0FPPzcXRUDAmJk2y5UCPS4fIR66plRkfSvtnhC8-0SGpai2UGSPw/exec';
+  // Bookable period (YYYY-MM-DD, inclusive).
+  const DATE_MIN = '2026-10-08';
+  const DATE_MAX = '2026-12-04';
+  // Closed weekdays (0 = Sun, 1 = Mon …).
+  const CLOSED_WEEKDAYS = [1];
+  // Korean public holidays — closed. (10/3 개천절, 10/5 개천절 대체공휴일, 10/9 한글날)
+  const HOLIDAYS = ['2026-10-03', '2026-10-05', '2026-10-09'];
+  // Countries shown at the top of the list.
+  const TOP_COUNTRIES = ['CN','JP','TW','HK','US','VN','TH','PH','SG','MY','ID','MO'];
+  // Party size per booking.
+  const MAX_PEOPLE = 10;
+
+  /* ==================== i18n ==================== */
+  const I18N = {
+    en: {
+      title:'The Lost Parcel — Busan Station Outdoor Escape Game',
+      langName:'English',
+      back:'‹ Back',
+      ctaMini:'Book',
+      heroTitle:'The Lost Parcel',
+      heroDesc:'Find the clues hidden around Busan Station and uncover the secret of a parcel no one has claimed.',
+      heroPeriod:'2026.10.08 — 12.04',
+      free:'FREE',
+      chipTime:'About 60 min',
+      chipGift:'Souvenir on completion',
+      cta:'Book now',
+      s1:'The Story',
+      sender:'Myeongnan Brand Laboratory',
+      fromAddr:'from. Director Kim Cho-ryang',
+      story1:'During renovation work at our lab, the workers found an old parcel. It seemed too meaningful to simply throw away — but no one knows who it belongs to, or what it even is.',
+      story2:'Detective, the clues are hidden all around Busan Station. Crack the codes, follow the trail, and reveal the true identity of the lost parcel.',
+      s2:'Program Info',
+      iPeriodT:'Period',
+      iPeriod:'Oct 8 – Dec 4, 2026',
+      iClosed:'Closed every Monday and on Korean public holidays (incl. Oct 9, Hangeul Day)',
+      iHoursT:'Hours',
+      iDurT:'Duration',
+      iDur:'About 60 minutes',
+      iAreaT:'Play area',
+      iArea:'Around Busan Station',
+      iStartT:'Start point & kit pick-up',
+      iStart:'ZIMCARRY Busan Station',
+      map:'View map ›',
+      iPriceT:'Price & reward',
+      iPrice:'Free',
+      iReward:'A special souvenir is given when you complete the game.',
+      s3:'How It Works',
+      st1:'Book online',
+      st1d:'Pick a date and leave your details on this page.',
+      st2:'Pick up your kit',
+      st2d:'Come to ZIMCARRY Busan Station and collect your game kit.',
+      st3:'Solve the mystery',
+      st3d:'Follow the clues around Busan Station with your kit and phone.',
+      st4:'Get your souvenir',
+      st4d:'Finish the game and receive a special souvenir.',
+      s4:'Please Note',
+      n1:'ZIMCARRY is busy with luggage customers in the morning, so you may have to wait. Please plan your visit accordingly.',
+      n2:'Comfortable clothes and shoes are recommended.',
+      n3:'Parts of the course run next to roads. Please watch out for traffic and stay safe.',
+      s5:'Book',
+      nameLabel:'Full name (as in passport)',
+      namePh:'e.g. HONG GILDONG',
+      nameHelp:'Enter your name in English letters exactly as it appears on your passport.',
+      nameErr:'Please enter your name in English letters.',
+      countryLabel:'Country of residence',
+      countryPh:'Select your country',
+      countryErr:'Please select your country.',
+      dateLabel:'Reservation date',
+      legendOpen:'Available',
+      legendClosed:'Closed',
+      picked:'Selected: ',
+      dateErr:'Please choose an available date.',
+      peopleLabel:'Number of people',
+      peopleHelp:'Up to {n} people per booking.',
+      peopleUnit:'{n} people',
+      peopleUnit1:'1 person',
+      contactLabel:'Contact',
+      email:'Email',
+      phone:'Phone',
+      emailPh:'name@example.com',
+      phonePh:'+1 555 123 4567',
+      emailHelp:'We’ll send your confirmation to this address.',
+      phoneHelp:'Include the country code (e.g. +86, +81). Messenger-reachable numbers are best.',
+      emailErr:'Please enter a valid email address.',
+      phoneErr:'Please enter a phone number with country code.',
+      cItemsT:'Collected',
+      cTitle:'※ Collection and use of personal information',
+      cItems:'Name, place of residence, contact (email or phone number)',
+      cPurposeT:'Purpose',
+      cPurpose:'Result report (KPI) statistics, reservation confirmation, game kit distribution',
+      cKeepT:'Retention',
+      cKeep:'Destroyed within 1 month after the program ends',
+      cRefuse:'You may refuse to consent, but your participation may be restricted.',
+      cAgree:'I agree to the collection and use of my personal information.',
+      consentErr:'Please agree to continue.',
+      submit:'Reserve',
+      sending:'Sending…',
+      sendErr:'Something went wrong. Please try again in a moment.',
+      doneTitle:'Your reservation is in!',
+      doneDesc:'We’ll contact you using the details below. See you at Busan Station, Detective!',
+      donePickup:'On your reservation date, come to ZIMCARRY Busan Station between 10:00 and 17:00 to pick up your game kit.',
+      home:'‹ Back to the start',
+      credit:'Presented by the Korea Tourism Organization Busan·Ulsan·Gyeongnam Office and Busan Dong-gu Office. Sponsored by ZIMCARRY. Produced by Communication Dawoom.'
+    },
+    ja: {
+      title:'なくした小包 — 釜山駅 屋外脱出ゲーム',
+      langName:'日本語',
+      back:'‹ 戻る',
+      ctaMini:'予約',
+      heroTitle:'なくした小包',
+      heroDesc:'釜山駅のあちこちに隠された手がかりを探し、持ち主のわからない小包の秘密を解き明かそう。',
+      heroPeriod:'2026.10.08 — 12.04',
+      free:'無料',
+      chipTime:'約60分',
+      chipGift:'クリアで記念品',
+      cta:'今すぐ予約',
+      s1:'ストーリー',
+      sender:'明卵ブランド研究所',
+      fromAddr:'from. 金草梁 所長',
+      story1:'当研究所のリフォーム工事中に、作業員が古い小包を一つ見つけました。そのまま捨てるには事情の深い品のようですが、持ち主が誰なのか、何なのか、いまだに分かりません。',
+      story2:'探偵さん、手がかりは釜山駅のあちこちに隠されています。暗号を解き、足取りをたどって、なくした小包の正体を明らかにしてください。',
+      s2:'プログラム情報',
+      iPeriodT:'期間',
+      iPeriod:'2026年10月8日〜12月4日',
+      iClosed:'毎週月曜日・韓国の祝日は休み（10月9日 ハングルの日を含む）',
+      iHoursT:'運営時間',
+      iDurT:'所要時間',
+      iDur:'約60分',
+      iAreaT:'プレイエリア',
+      iArea:'釜山駅周辺',
+      iStartT:'スタート地点・キット受け取り',
+      iStart:'ZIMCARRY 釜山駅店',
+      map:'地図を見る ›',
+      iPriceT:'料金・特典',
+      iPrice:'無料',
+      iReward:'ゲームをクリアすると特別な記念品をプレゼント。',
+      s3:'参加方法',
+      st1:'オンライン予約',
+      st1d:'このページで日付を選び、情報を入力します。',
+      st2:'キットを受け取る',
+      st2d:'ZIMCARRY 釜山駅店でゲームキットを受け取ります。',
+      st3:'謎を解く',
+      st3d:'キットとスマートフォンを手に、釜山駅周辺の手がかりを追いかけます。',
+      st4:'記念品をもらう',
+      st4d:'ゲームをクリアしたら、特別な記念品をお受け取りください。',
+      s4:'ご注意',
+      n1:'午前中は ZIMCARRY の荷物預かり利用客が多く、お待ちいただく場合があります。ご来店の際はご参考ください。',
+      n2:'動きやすい服装・靴をおすすめします。',
+      n3:'車道に近いコースがあります。安全に十分ご注意ください。',
+      s5:'予約',
+      nameLabel:'氏名（パスポート表記）',
+      namePh:'例：YAMADA TARO',
+      nameHelp:'パスポートに記載されているとおり、ローマ字で入力してください。',
+      nameErr:'氏名をローマ字で入力してください。',
+      countryLabel:'居住国・地域',
+      countryPh:'国・地域を選択',
+      countryErr:'国・地域を選択してください。',
+      dateLabel:'予約日',
+      legendOpen:'予約可',
+      legendClosed:'休み',
+      picked:'選択した日：',
+      dateErr:'予約可能な日付を選んでください。',
+      peopleLabel:'人数',
+      peopleHelp:'1回の予約で最大{n}名まで。',
+      peopleUnit:'{n}名',
+      contactLabel:'連絡先',
+      email:'メール',
+      phone:'電話番号',
+      emailPh:'name@example.com',
+      phonePh:'+81 90 1234 5678',
+      emailHelp:'予約確認をこのアドレスにお送りします。',
+      phoneHelp:'国番号（例：+81）から入力してください。',
+      emailErr:'正しいメールアドレスを入力してください。',
+      phoneErr:'国番号付きの電話番号を入力してください。',
+      cItemsT:'収集項目',
+      cTitle:'※ 個人情報の収集・利用について',
+      cItems:'氏名、居住地、連絡先（メールアドレスまたは電話番号）',
+      cPurposeT:'利用目的',
+      cPurpose:'成果報告（KPI）の統計作成、予約の確認、ゲームキットの配布',
+      cKeepT:'保管期間',
+      cKeep:'プログラム終了後1か月以内に破棄',
+      cRefuse:'同意を拒否することもできますが、その場合は参加が制限されることがあります。',
+      cAgree:'個人情報の収集・利用に同意します。',
+      consentErr:'同意が必要です。',
+      submit:'予約する',
+      sending:'送信中…',
+      sendErr:'送信できませんでした。しばらくしてからもう一度お試しください。',
+      doneTitle:'予約を受け付けました！',
+      doneDesc:'以下の連絡先にご連絡します。釜山駅でお会いしましょう、探偵さん！',
+      donePickup:'予約日の 10:00〜17:00 に ZIMCARRY 釜山駅店へお越しいただき、ゲームキットをお受け取りください。',
+      home:'‹ 最初に戻る',
+      credit:'主催：韓国観光公社 釜山蔚山慶南支社・釜山東区庁　後援：ZIMCARRY　制作：Communication Dawoom'
+    },
+    'zh-Hans': {
+      title:'遗失的包裹 — 釜山站户外密室逃脱',
+      langName:'简体中文',
+      back:'‹ 返回',
+      ctaMini:'预约',
+      heroTitle:'遗失的包裹',
+      heroDesc:'寻找藏在釜山站各处的线索，揭开一件无人认领的包裹的秘密。',
+      heroPeriod:'2026.10.08 — 12.04',
+      free:'免费',
+      chipTime:'约60分钟',
+      chipGift:'通关赠纪念品',
+      cta:'立即预约',
+      s1:'故事',
+      sender:'明卵品牌研究所',
+      fromAddr:'from. 金草梁 所长',
+      story1:'我们研究所在装修施工时，工人发现了一个旧包裹。直接扔掉又觉得它似乎大有来头，可至今没人知道它的主人是谁，也不知道它究竟是什么。',
+      story2:'侦探，线索就藏在釜山站的各个角落。破解密码，顺藤摸瓜，揭开遗失包裹的真实身份吧。',
+      s2:'活动信息',
+      iPeriodT:'活动期间',
+      iPeriod:'2026年10月8日—12月4日',
+      iClosed:'每周一及韩国公共假日休息（含10月9日韩文日）',
+      iHoursT:'运营时间',
+      iDurT:'所需时间',
+      iDur:'约60分钟',
+      iAreaT:'游戏范围',
+      iArea:'釜山站一带',
+      iStartT:'出发地点及领取道具包',
+      iStart:'ZIMCARRY 釜山站店',
+      map:'查看地图 ›',
+      iPriceT:'费用及奖励',
+      iPrice:'免费',
+      iReward:'完成游戏即可获得特别纪念品。',
+      s3:'参与方式',
+      st1:'在线预约',
+      st1d:'在本页面选择日期并填写信息。',
+      st2:'领取道具包',
+      st2d:'前往 ZIMCARRY 釜山站店领取游戏道具包。',
+      st3:'解开谜题',
+      st3d:'带上道具包和手机，追踪釜山站周边的线索。',
+      st4:'领取纪念品',
+      st4d:'完成游戏后领取特别纪念品。',
+      s4:'注意事项',
+      n1:'上午 ZIMCARRY 行李寄存的客人较多，可能需要等候，请合理安排到访时间。',
+      n2:'建议穿着舒适的衣服和鞋子。',
+      n3:'部分路线紧邻车道，请注意交通安全。',
+      s5:'预约',
+      nameLabel:'姓名（与护照一致）',
+      namePh:'例：ZHANG SAN',
+      nameHelp:'请按护照上的英文（拼音）姓名填写。',
+      nameErr:'请用英文字母填写姓名。',
+      countryLabel:'居住国家/地区',
+      countryPh:'请选择国家/地区',
+      countryErr:'请选择国家/地区。',
+      dateLabel:'预约日期',
+      legendOpen:'可预约',
+      legendClosed:'休息',
+      picked:'已选择：',
+      dateErr:'请选择可预约的日期。',
+      peopleLabel:'人数',
+      peopleHelp:'每次预约最多{n}人。',
+      peopleUnit:'{n}人',
+      contactLabel:'联系方式',
+      email:'邮箱',
+      phone:'电话',
+      emailPh:'name@example.com',
+      phonePh:'+86 138 0000 0000',
+      emailHelp:'预约确认将发送到此邮箱。',
+      phoneHelp:'请包含国家代码（如 +86）。',
+      emailErr:'请输入有效的邮箱地址。',
+      phoneErr:'请输入带国家代码的电话号码。',
+      cItemsT:'收集项目',
+      cTitle:'※ 个人信息收集及使用说明',
+      cItems:'姓名、居住地、联系方式（邮箱或电话号码）',
+      cPurposeT:'使用目的',
+      cPurpose:'编制成果报告（KPI）统计、确认预约、发放游戏道具包',
+      cKeepT:'保存期限',
+      cKeep:'活动结束后1个月内销毁',
+      cRefuse:'您可以拒绝同意，但参与可能会因此受到限制。',
+      cAgree:'我同意收集和使用个人信息。',
+      consentErr:'请先同意后再继续。',
+      submit:'立即预约',
+      sending:'提交中…',
+      sendErr:'提交失败，请稍后再试。',
+      doneTitle:'预约已提交！',
+      doneDesc:'我们会通过以下联系方式与您联系。侦探，釜山站见！',
+      donePickup:'请于预约当天 10:00—17:00 前往 ZIMCARRY 釜山站店领取游戏道具包。',
+      home:'‹ 返回首页',
+      credit:'主办：韩国观光公社釜山蔚山庆南支社・釜山东区厅　赞助：ZIMCARRY　制作：Communication Dawoom'
+    },
+    'zh-Hant': {
+      title:'遺失的包裹 — 釜山站戶外密室逃脫',
+      langName:'繁體中文',
+      back:'‹ 返回',
+      ctaMini:'預約',
+      heroTitle:'遺失的包裹',
+      heroDesc:'尋找藏在釜山站各處的線索，揭開一件無人認領的包裹的祕密。',
+      heroPeriod:'2026.10.08 — 12.04',
+      free:'免費',
+      chipTime:'約60分鐘',
+      chipGift:'通關贈紀念品',
+      cta:'立即預約',
+      s1:'故事',
+      sender:'明卵品牌研究所',
+      fromAddr:'from. 金草梁 所長',
+      story1:'我們研究所在裝修施工時，工人發現了一個舊包裹。直接丟掉又覺得它似乎大有來頭，可至今沒人知道它的主人是誰，也不知道它究竟是什麼。',
+      story2:'偵探，線索就藏在釜山站的各個角落。破解密碼，循線追查，揭開遺失包裹的真實身分吧。',
+      s2:'活動資訊',
+      iPeriodT:'活動期間',
+      iPeriod:'2026年10月8日—12月4日',
+      iClosed:'每週一及韓國國定假日公休（含10月9日韓文日）',
+      iHoursT:'營運時間',
+      iDurT:'所需時間',
+      iDur:'約60分鐘',
+      iAreaT:'遊戲範圍',
+      iArea:'釜山站一帶',
+      iStartT:'出發地點及領取道具包',
+      iStart:'ZIMCARRY 釜山站店',
+      map:'查看地圖 ›',
+      iPriceT:'費用及獎勵',
+      iPrice:'免費',
+      iReward:'完成遊戲即可獲得特別紀念品。',
+      s3:'參加方式',
+      st1:'線上預約',
+      st1d:'在本頁面選擇日期並填寫資料。',
+      st2:'領取道具包',
+      st2d:'前往 ZIMCARRY 釜山站店領取遊戲道具包。',
+      st3:'解開謎題',
+      st3d:'帶上道具包和手機，追蹤釜山站周邊的線索。',
+      st4:'領取紀念品',
+      st4d:'完成遊戲後領取特別紀念品。',
+      s4:'注意事項',
+      n1:'上午 ZIMCARRY 行李寄放的客人較多，可能需要等候，請斟酌安排到訪時間。',
+      n2:'建議穿著舒適的衣服和鞋子。',
+      n3:'部分路線緊鄰車道，請注意交通安全。',
+      s5:'預約',
+      nameLabel:'姓名（與護照一致）',
+      namePh:'例：CHEN DA WEN',
+      nameHelp:'請依護照上的英文姓名填寫。',
+      nameErr:'請用英文字母填寫姓名。',
+      countryLabel:'居住國家/地區',
+      countryPh:'請選擇國家/地區',
+      countryErr:'請選擇國家/地區。',
+      dateLabel:'預約日期',
+      legendOpen:'可預約',
+      legendClosed:'公休',
+      picked:'已選擇：',
+      dateErr:'請選擇可預約的日期。',
+      peopleLabel:'人數',
+      peopleHelp:'每次預約最多{n}人。',
+      peopleUnit:'{n}人',
+      contactLabel:'聯絡方式',
+      email:'電子郵件',
+      phone:'電話',
+      emailPh:'name@example.com',
+      phonePh:'+886 912 345 678',
+      emailHelp:'預約確認將寄送至此信箱。',
+      phoneHelp:'請包含國碼（如 +886、+852）。',
+      emailErr:'請輸入有效的電子郵件地址。',
+      phoneErr:'請輸入含國碼的電話號碼。',
+      cItemsT:'蒐集項目',
+      cTitle:'※ 個人資料蒐集及使用說明',
+      cItems:'姓名、居住地、聯絡方式（電子郵件或電話號碼）',
+      cPurposeT:'使用目的',
+      cPurpose:'編製成果報告（KPI）統計、確認預約、發放遊戲道具包',
+      cKeepT:'保存期限',
+      cKeep:'活動結束後1個月內銷毀',
+      cRefuse:'您可以拒絕同意，但參加可能會因此受到限制。',
+      cAgree:'我同意蒐集及使用個人資料。',
+      consentErr:'請先同意後再繼續。',
+      submit:'立即預約',
+      sending:'送出中…',
+      sendErr:'送出失敗，請稍後再試。',
+      doneTitle:'預約已送出！',
+      doneDesc:'我們會透過以下聯絡方式與您聯繫。偵探，釜山站見！',
+      donePickup:'請於預約當天 10:00—17:00 前往 ZIMCARRY 釜山站店領取遊戲道具包。',
+      home:'‹ 返回首頁',
+      credit:'主辦：韓國觀光公社釜山蔚山慶南支社・釜山東區廳　贊助：ZIMCARRY　製作：Communication Dawoom'
+    }
+  };
+
+  // ISO 3166-1 alpha-2 (KR left out — Korean visitors book via Smart Place)
+  const COUNTRY_CODES = ('AD AE AF AG AI AL AM AO AR AS AT AU AW AZ BA BB BD BE BF BG BH BI BJ BM BN BO BR BS BT BW BY BZ CA CD CF CG CH CI CK CL CM CN CO CR CU CV CW CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FM FO FR GA GB GD GE GH GI GL GM GN GQ GR GT GU GW GY HK HN HR HT HU ID IE IL IN IQ IR IS IT JM JO JP KE KG KH KI KM KN KP KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MG MH MK ML MM MN MO MR MT MU MV MW MX MY MZ NA NC NE NG NI NL NO NP NR NZ OM PA PE PF PG PH PK PL PR PS PT PW PY QA RO RS RU RW SA SB SC SD SE SG SI SK SL SM SN SO SR SS ST SV SY SZ TD TG TH TJ TL TM TN TO TR TT TV TW TZ UA UG US UY UZ VA VC VE VN VU WS YE ZA ZM ZW').split(' ');
+
+  let curLang = 'en';
+  function t(key){
+    return (I18N[curLang] && I18N[curLang][key] != null) ? I18N[curLang][key] : (I18N.en[key] || '');
+  }
+  function regionName(code, lang){
+    try{ return new Intl.DisplayNames([lang], {type:'region'}).of(code) || code; }
+    catch(e){ return code; }
+  }
+
+  function buildCountries(){
+    const sel = document.getElementById('country');
+    const prev = sel.value;
+    const collator = new Intl.Collator(curLang);
+    const top = TOP_COUNTRIES.map(c=>({c, n:regionName(c, curLang)}));
+    const rest = COUNTRY_CODES.filter(c=>!TOP_COUNTRIES.includes(c))
+      .map(c=>({c, n:regionName(c, curLang)}))
+      .sort((a,b)=>collator.compare(a.n, b.n));
+    sel.innerHTML = '';
+    const ph = new Option(t('countryPh'), '');
+    ph.disabled = true;
+    sel.add(ph);
+    top.forEach(o=>sel.add(new Option(o.n, o.c)));
+    const sep = new Option('──────────', '');
+    sep.disabled = true;
+    sel.add(sep);
+    rest.forEach(o=>sel.add(new Option(o.n, o.c)));
+    sel.value = prev || '';
+    if(!sel.value) ph.selected = true;
+  }
+
+  /* ==================== calendar ==================== */
+  // "Today" in Korea, so a visitor abroad can't book a day that's already over in Busan.
+  const TODAY_KST = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Seoul'}).format(new Date());
+  const pad = n => String(n).padStart(2, '0');
+  const iso = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+  const parseISO = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+
+  function isClosed(s){
+    return CLOSED_WEEKDAYS.includes(parseISO(s).getDay()) || HOLIDAYS.includes(s);
+  }
+  function isBookable(s){
+    return s >= DATE_MIN && s <= DATE_MAX && s >= TODAY_KST && !isClosed(s);
+  }
+
+  const firstMonth = parseISO(DATE_MIN > TODAY_KST ? DATE_MIN : TODAY_KST);
+  const lastMonth = parseISO(DATE_MAX);
+  let calY = firstMonth.getFullYear(), calM = firstMonth.getMonth();
+  let selectedDate = '';
+
+  function fmtDate(s, withWeekday){
+    return new Intl.DateTimeFormat(curLang, {year:'numeric', month:'long', day:'numeric', weekday: withWeekday ? 'short' : undefined}).format(parseISO(s));
+  }
+
+  function renderCalendar(){
+    document.getElementById('calMonth').textContent =
+      new Intl.DateTimeFormat(curLang, {year:'numeric', month:'long'}).format(new Date(calY, calM, 1));
+    const ym = calY * 12 + calM;
+    document.getElementById('calPrev').disabled = ym <= firstMonth.getFullYear() * 12 + firstMonth.getMonth();
+    document.getElementById('calNext').disabled = ym >= lastMonth.getFullYear() * 12 + lastMonth.getMonth();
+
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+    const dowFmt = new Intl.DateTimeFormat(curLang, {weekday:'narrow'});
+    for(let i = 0; i < 7; i++){
+      const el = document.createElement('div');
+      el.className = 'dow' + (i === 0 ? ' sun' : '');
+      el.textContent = dowFmt.format(new Date(2026, 1, i + 1));   // 2026-02-01 is a Sunday
+      grid.appendChild(el);
+    }
+    const lead = new Date(calY, calM, 1).getDay();
+    for(let i = 0; i < lead; i++) grid.appendChild(document.createElement('div'));
+
+    const days = new Date(calY, calM + 1, 0).getDate();
+    for(let d = 1; d <= days; d++){
+      const s = iso(calY, calM, d);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'day';
+      b.textContent = d;
+      b.setAttribute('aria-label', fmtDate(s, true));
+      if(isBookable(s)){
+        b.classList.add('open');
+        if(s === selectedDate){ b.classList.add('sel'); b.setAttribute('aria-pressed', 'true'); }
+        b.addEventListener('click', ()=>{
+          selectedDate = s;
+          document.getElementById('f-date').classList.remove('invalid');
+          renderCalendar();
+        });
+      } else {
+        b.disabled = true;
+        if(s >= DATE_MIN && s <= DATE_MAX && isClosed(s)) b.classList.add('closed');
+      }
+      grid.appendChild(b);
+    }
+    document.getElementById('calPicked').textContent = selectedDate ? t('picked') + fmtDate(selectedDate, true) : '';
+  }
+  document.getElementById('calPrev').addEventListener('click', ()=>{ calM--; if(calM < 0){ calM = 11; calY--; } renderCalendar(); });
+  document.getElementById('calNext').addEventListener('click', ()=>{ calM++; if(calM > 11){ calM = 0; calY++; } renderCalendar(); });
+
+  /* ==================== language ==================== */
+  function contactType(){
+    return document.querySelector('input[name=ctype]:checked').value;
+  }
+  function applyContactType(){
+    const input = document.getElementById('contact');
+    const isEmail = contactType() === 'email';
+    input.type = isEmail ? 'email' : 'tel';
+    input.autocomplete = isEmail ? 'email' : 'tel';
+    input.inputMode = isEmail ? 'email' : 'tel';
+    input.placeholder = t(isEmail ? 'emailPh' : 'phonePh');
+    document.getElementById('contactHelp').textContent = t(isEmail ? 'emailHelp' : 'phoneHelp');
+    document.getElementById('contactErr').textContent = t(isEmail ? 'emailErr' : 'phoneErr');
+  }
+
+  function applyLang(lang){
+    if(!I18N[lang]) lang = 'en';
+    curLang = lang;
+    document.documentElement.lang = lang;
+    document.title = t('title');
+    document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.setAttribute('placeholder', t(el.dataset.i18nPh)); });
+    document.getElementById('langLabel').textContent = t('langName');
+    document.querySelectorAll('.lang-opt').forEach(o=>o.classList.toggle('active', o.dataset.lang === lang));
+    buildCountries();
+    applyContactType();
+    renderCalendar();
+    document.getElementById('peopleHelp').textContent = t('peopleHelp').replace('{n}', MAX_PEOPLE);
+    if(document.getElementById('done').classList.contains('show')) renderSummary();
+    try{ localStorage.setItem('demoLang', lang); }catch(e){}
+  }
+  function toggleLangMenu(e){
+    if(e) e.stopPropagation();
+    document.getElementById('langMenu').classList.toggle('open');
+  }
+  document.querySelectorAll('.lang-opt').forEach(o=>{
+    o.addEventListener('click', ()=>{
+      applyLang(o.dataset.lang);
+      document.getElementById('langMenu').classList.remove('open');
+    });
+  });
+  document.addEventListener('click', (e)=>{
+    if(!document.getElementById('langSwitch').contains(e.target)) document.getElementById('langMenu').classList.remove('open');
+  });
+
+  /* ==================== form ==================== */
+  document.querySelectorAll('input[name=ctype]').forEach(r=>r.addEventListener('change', ()=>{
+    document.getElementById('contact').value = '';
+    document.getElementById('f-contact').classList.remove('invalid');
+    applyContactType();
+  }));
+
+  let people = 1;
+  function setPeople(n){
+    people = Math.min(MAX_PEOPLE, Math.max(1, n));
+    document.getElementById('people').textContent = people;
+    document.getElementById('pplMinus').disabled = people <= 1;
+    document.getElementById('pplPlus').disabled = people >= MAX_PEOPLE;
+  }
+  function peopleText(n){
+    const one = I18N[curLang].peopleUnit1;   // only languages with a singular form define this
+    return (n === 1 && one) ? one : t('peopleUnit').replace('{n}', n);
+  }
+  document.getElementById('pplMinus').addEventListener('click', ()=>setPeople(people - 1));
+  document.getElementById('pplPlus').addEventListener('click', ()=>setPeople(people + 1));
+  setPeople(1);
+
+  const nameInput = document.getElementById('name');
+  nameInput.addEventListener('blur', ()=>{ nameInput.value = nameInput.value.trim().replace(/\s+/g,' ').toUpperCase(); });
+
+  function validate(){
+    const contact = document.getElementById('contact').value.trim();
+    const checks = {
+      'f-name': /^[A-Za-z][A-Za-z .'\-]*$/.test(nameInput.value.trim()),
+      'f-country': !!document.getElementById('country').value,
+      'f-date': !!selectedDate && isBookable(selectedDate),
+      'f-contact': contactType() === 'email'
+        ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)
+        : /^\+?[0-9][0-9\s\-()]{6,19}$/.test(contact),
+      'f-consent': document.getElementById('consent').checked
+    };
+    let first = null;
+    Object.entries(checks).forEach(([id, ok])=>{
+      document.getElementById(id).classList.toggle('invalid', !ok);
+      if(!ok && !first) first = id;
+    });
+    if(first) document.getElementById(first).scrollIntoView({behavior:'smooth', block:'center'});
+    return !first;
+  }
+  // clear a field's error as soon as it's edited
+  document.querySelectorAll('.field').forEach(f=>{
+    f.addEventListener('input', ()=>f.classList.remove('invalid'));
+    f.addEventListener('change', ()=>f.classList.remove('invalid'));
+  });
+
+  let lastBooking = null;
+  function renderSummary(){
+    const b = lastBooking;
+    const rows = [
+      [t('nameLabel'), b.name],
+      [t('countryLabel'), regionName(b.country, curLang)],
+      [t('dateLabel'), fmtDate(b.date, true)],
+      [t('peopleLabel'), peopleText(b.people)],
+      [t(b.contactType === 'email' ? 'email' : 'phone'), b.contact]
+    ];
+    const dl = document.getElementById('summary');
+    dl.innerHTML = '';
+    rows.forEach(([k, v])=>{
+      const dt = document.createElement('dt'); dt.textContent = k;
+      const dd = document.createElement('dd'); dd.textContent = v;
+      dl.append(dt, dd);
+    });
+  }
+
+  document.getElementById('reserveForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    nameInput.value = nameInput.value.trim().replace(/\s+/g,' ').toUpperCase();
+    if(!validate()) return;
+
+    const country = document.getElementById('country').value;
+    const booking = {
+      name: nameInput.value,
+      country,
+      countryName: regionName(country, 'en'),
+      date: selectedDate,
+      people,
+      contactType: contactType(),
+      contact: document.getElementById('contact').value.trim(),
+      lang: curLang,
+      submittedAt: new Date().toISOString()
+    };
+
+    const btn = document.getElementById('submitBtn');
+    const msg = document.getElementById('formMsg');
+    btn.disabled = true;
+    btn.textContent = t('sending');
+    msg.textContent = '';
+    try{
+      if(ENDPOINT){
+        // Apps Script web apps don't send CORS headers, so post "no-cors" as a simple form.
+        await fetch(ENDPOINT, { method:'POST', mode:'no-cors', body:new URLSearchParams(booking) });
+      } else {
+        console.warn('[reserve] ENDPOINT is empty — booking was NOT sent anywhere:', booking);
+      }
+      lastBooking = booking;
+      renderSummary();
+      document.getElementById('reserveForm').style.display = 'none';
+      document.getElementById('done').classList.add('show');
+      document.getElementById('book').scrollIntoView({behavior:'smooth', block:'start'});
+    } catch(err){
+      console.error(err);
+      msg.textContent = t('sendErr');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = t('submit');
+    }
+  });
+
+  /* ---- init language: ?lang= wins, then the choice saved on the main page (../) ---- */
+  let _lang = new URLSearchParams(location.search).get('lang');
+  if(!_lang){ try{ _lang = localStorage.getItem('demoLang'); }catch(e){} }
+  applyLang(_lang);
+</script>
+
+</body>
+</html>
