@@ -37,6 +37,10 @@
 
   *{box-sizing:border-box; margin:0; padding:0;}
 
+  /* scrollbars : invisible, scrolling still works */
+  *{scrollbar-width:none; -ms-overflow-style:none;}
+  *::-webkit-scrollbar{width:0; height:0; display:none;}
+
   html, body{
     height:100%;
   }
@@ -486,6 +490,11 @@
   .hint-body .hint-answer{ color:var(--ink); font-weight:600; }
   .hint-body .hint-answer b{ color:var(--red); }
 
+  /* sponsor banner : full-bleed strip at the very bottom, shown once the case is solved */
+  #view-attach .promo{display:none; margin:28px -18px -40px;}
+  #view-attach .result-block.show ~ .promo{display:block;}
+  #view-attach .promo img{display:block; width:100%; height:auto;}
+
   #view-attach .back-btn{
     display:block;
     text-align:center;
@@ -581,6 +590,8 @@
     line-height:1.7;
   }
   .credit-block .lead{margin-bottom:14px;}
+  .credit-block .inquiry{margin-top:16px; font-size:12px;}
+  .credit-block .inquiry a{color:var(--blue); font-weight:700; text-decoration:none;}
   .credit-group{margin-top:14px;}
   .credit-group > b{
     display:block;
@@ -780,10 +791,16 @@
               </div>
             </div>
           </div>
+          <div class="inquiry"><span data-i18n="inquiry">문의</span> · <a href="mailto:dawoom@dawoom.io">dawoom@dawoom.io</a></div>
         </div>
       </div>
 
       <div class="back-btn" onclick="backToEmail()" data-i18n="backToMail">‹ 메일로 돌아가기</div>
+
+      <!-- sponsor banner : only after the answer is solved, flush at the very bottom; image swaps per language -->
+      <a class="promo" href="https://www.zimcarry.net" target="_blank" rel="noopener">
+        <img id="promoImg" src="assets/banner-ko.webp" alt="짐캐리 — 부산역 짐배송" width="2000" height="741" loading="lazy" />
+      </a>
     </div>
 
     <div class="hojong" id="hojong">
@@ -841,6 +858,7 @@
       creditHost:'주최 · 주관',
       creditSponsor:'후원',
       creditProducer:'제작',
+      inquiry:'문의',
       backToMail:'‹ 메일로 돌아가기',
       miyo1:'안녕하세요!<br>명란 삼남매의 귀염둥이 <b>미요</b>예요!<br>탐정님을 위한 몸풀기 문제가 있네요?',
       miyo2:'첨부된 붙임 파일을 확인해봐요!',
@@ -881,6 +899,7 @@
       creditHost:'HOST · ORGANIZER',
       creditSponsor:'SPONSOR',
       creditProducer:'PRODUCED BY',
+      inquiry:'INQUIRIES',
       backToMail:'‹ Back to mail',
       miyo1:'Hello!<br>I\'m <b>Miyo</b>, the little darling of The Myeongnan Siblings!<br>There\'s a warm-up puzzle for you, Detective.',
       miyo2:'Let\'s check the attached file!',
@@ -921,6 +940,7 @@
       creditHost:'主催・主管',
       creditSponsor:'後援',
       creditProducer:'制作',
+      inquiry:'お問い合わせ',
       backToMail:'‹ メールに戻る',
       miyo1:'こんにちは！<br>明卵三兄妹の愛されん坊、<b>ミヨ</b>だよ！<br>探偵さんへのウォームアップ問題があるみたい？',
       miyo2:'添付ファイルを確認してみよう！',
@@ -961,6 +981,7 @@
       creditHost:'主办 · 承办',
       creditSponsor:'赞助',
       creditProducer:'制作',
+      inquiry:'咨询',
       backToMail:'‹ 返回邮件',
       miyo1:'你好！<br>我是明卵三兄妹里的小可爱<b>咪哟</b>！<br>有一道给侦探的热身谜题哦？',
       miyo2:'一起来看看附件吧！',
@@ -1001,6 +1022,7 @@
       creditHost:'主辦 · 承辦',
       creditSponsor:'贊助',
       creditProducer:'製作',
+      inquiry:'洽詢',
       backToMail:'‹ 返回郵件',
       miyo1:'你好！<br>我是明卵三兄妹裡的小可愛<b>咪喲</b>！<br>有一道給偵探的暖身謎題喔？',
       miyo2:'一起來看看附件吧！',
@@ -1049,6 +1071,7 @@
     if(ht) ht.innerHTML = hojongLines[Math.min(hojongStep, hojongLines.length - 1)];
     document.querySelectorAll('.lang-opt').forEach(o=>o.classList.toggle('active', o.dataset.lang === lang));
     updateBookLink();
+    document.getElementById('promoImg').src = 'assets/banner-' + lang + '.webp';
     try{ localStorage.setItem('demoLang', lang); }catch(e){}
   }
   function toggleLangMenu(e){

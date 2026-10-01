@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Lost Parcel — Reservation</title>
+<title>The Lost Parcel</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8E%3C/text%3E%3C/svg%3E">
 <style>
   @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');font-weight:normal;font-display:swap;}
@@ -27,6 +27,10 @@
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
+
+  /* scrollbars : invisible, scrolling still works */
+  *{scrollbar-width:none; -ms-overflow-style:none;}
+  *::-webkit-scrollbar{width:0; height:0; display:none;}
   html{scroll-behavior:smooth;}
   html, body{min-height:100%;}
   body{
@@ -187,6 +191,32 @@
   .steps b{display:block; font-size:14px; font-weight:800;}
   .steps span{display:block; font-size:12.5px; color:var(--ink-soft); line-height:1.6; margin-top:3px;}
 
+  /* coupon ticket */
+  .coupon{
+    position:relative;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:#FFD600; color:#1A1A1A;
+    border-radius:14px;
+    padding:16px 18px;
+  }
+  /* ticket notches */
+  .coupon::before, .coupon::after{
+    content:''; position:absolute; top:50%;
+    width:16px; height:16px; margin-top:-8px;
+    border-radius:50%; background:#fff;
+  }
+  .coupon::before{left:-8px;}
+  .coupon::after{right:-8px;}
+  .coupon-brand{font-size:11px; font-weight:900; letter-spacing:.08em;}
+  .coupon-title{font-size:16px; font-weight:800; margin-top:2px; line-height:1.35;}
+  .coupon-amt{font-size:26px; font-weight:900; white-space:nowrap; text-align:right; line-height:1.1;}
+  .coupon-amt small{display:block; font-size:12px; font-weight:800; letter-spacing:.04em;}
+  .coupon-lead{font-size:13.5px; line-height:1.7; color:var(--ink); margin:12px 2px 12px;}
+  .coupon-terms{display:grid; gap:8px;}
+  .coupon-terms > div{background:var(--panel); border-radius:12px; padding:11px 12px;}
+  .coupon-terms dt{font-size:11.5px; font-weight:700; color:var(--ink-soft);}
+  .coupon-terms dd{font-size:13px; font-weight:600; color:var(--ink); line-height:1.6; margin-top:2px;}
+
   .notes{list-style:none; display:grid; gap:8px;}
   .notes li{
     display:grid; grid-template-columns:22px 1fr; gap:8px;
@@ -199,7 +229,17 @@
   .notes li .ic{text-align:center;}
 
   /* ---- Booking form ---- */
-  #book{scroll-margin-top:52px;}
+  .book-cta{padding:26px 18px 34px;}
+  .cta-big{
+    display:block; text-align:center;
+    background:var(--blue); color:#fff;
+    font-weight:800; font-size:16px;
+    padding:16px 0; border-radius:12px;
+    text-decoration:none;
+  }
+  .cta-big:hover{background:var(--blue-deep);}
+  .book-sub{font-size:13px; color:var(--ink-soft); line-height:1.6; margin:-6px 0 18px;}
+  .book-sub b{color:var(--ink);}
   form{padding-bottom:40px;}
   .field{margin-bottom:18px;}
   .field > label, .field > .label{
@@ -331,6 +371,9 @@
   }
   .done a.home{display:inline-block; margin-top:22px; color:var(--blue); font-size:13px; font-weight:700; text-decoration:none;}
 
+  .promo{display:block;}
+  .promo img{display:block; width:100%; height:auto;}
+
   .credit{
     padding:22px 18px 34px;
     text-align:center;
@@ -338,7 +381,12 @@
     background:var(--panel);
   }
   .credit .logos{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .credit .inquiry{margin-top:14px; font-size:12px;}
+  .credit .inquiry a{color:var(--blue); font-weight:700; text-decoration:none;}
+  .credit .logos a{display:block; border-radius:8px; transition:transform .15s ease, box-shadow .15s ease;}
+  .credit .logos a:hover{transform:translateY(-1px); box-shadow:0 4px 12px rgba(20,30,60,0.12);}
   .credit .logos img{
+    display:block;
     height:42px; width:auto; max-width:140px; object-fit:contain;
     background:#fff; border:1px solid var(--gray); border-radius:8px; padding:8px 12px;
   }
@@ -349,7 +397,7 @@
   <div class="stage">
 
     <div class="topbar">
-      <a class="back" href="../" data-i18n="back">‹ Back</a>
+      <a class="back" id="backLink" href="../" data-i18n="back">‹ Back</a>
       <div class="right">
         <div class="lang-switch" id="langSwitch">
           <button class="lang-globe" type="button" onclick="toggleLangMenu(event)" aria-label="Language">🌐 <span id="langLabel">English</span></button>
@@ -363,6 +411,9 @@
         <a class="cta-mini" href="#book" data-i18n="ctaMini">Book</a>
       </div>
     </div>
+
+    <!-- ============ PAGE 1 : program info ============ -->
+    <div id="pageInfo">
 
     <!-- HERO -->
     <header class="hero">
@@ -415,9 +466,29 @@
       </ol>
     </section>
 
-    <!-- 04 NOTES -->
+    <!-- 04 BONUS COUPON (ZIMCARRY luggage delivery) -->
     <section class="sec">
-      <div class="sec-head"><span class="num">04</span><h2 data-i18n="s4">Please Note</h2></div>
+      <div class="sec-head"><span class="num">04</span><h2 data-i18n="sCp">Bonus Coupon</h2></div>
+      <div class="coupon">
+        <div class="coupon-main">
+          <div class="coupon-brand">ZIMCARRY</div>
+          <div class="coupon-title" data-i18n="cpTitle">Luggage delivery coupon</div>
+        </div>
+        <div class="coupon-amt">₩4,000<small data-i18n="cpOff">OFF</small></div>
+      </div>
+      <p class="coupon-lead" data-i18n="cpLead">Travel hands-free after the game. Ask the staff for a coupon when you pick up your kit — only if you want one.</p>
+      <dl class="coupon-terms">
+        <div><dt data-i18n="cpPayT">How to use</dt><dd data-i18n="cpPay">On-site payment only. It cannot be used for online bookings.</dd></div>
+        <div><dt data-i18n="cpTimeT">Same-day delivery</dt><dd data-i18n="cpTime">Request by 15:00 and your luggage is delivered between 16:00 and 19:00 the same day.</dd></div>
+        <div><dt data-i18n="cpAreaT">Area</dt><dd data-i18n="cpArea">Busan only: Busan Station ↔ accommodation, or accommodation ↔ accommodation. Gimhae Airport delivery is not included.</dd></div>
+        <div><dt data-i18n="cpValidT">Valid until</dt><dd data-i18n="cpValid">December 31, 2026</dd></div>
+        <div><dt data-i18n="cpLimitT">Limit</dt><dd data-i18n="cpLimit">Once per team</dd></div>
+      </dl>
+    </section>
+
+    <!-- 05 NOTES -->
+    <section class="sec">
+      <div class="sec-head"><span class="num">05</span><h2 data-i18n="s4">Please Note</h2></div>
       <ul class="notes">
         <li class="warn"><span class="ic">⏳</span><span data-i18n="n1">ZIMCARRY is busy with luggage customers in the morning, so you may have to wait. Please plan your visit accordingly.</span></li>
         <li><span class="ic">👟</span><span data-i18n="n2">Comfortable clothes and shoes are recommended.</span></li>
@@ -425,9 +496,17 @@
       </ul>
     </section>
 
-    <!-- 05 BOOK -->
-    <section class="sec" id="book">
-      <div class="sec-head"><span class="num">05</span><h2 data-i18n="s5">Book</h2></div>
+    <div class="book-cta">
+      <a class="cta-big" href="#book" data-i18n="cta">Book now</a>
+    </div>
+
+    </div><!-- /pageInfo -->
+
+    <!-- ============ PAGE 2 : booking form (shown at #book) ============ -->
+    <div id="pageBook" hidden>
+    <section class="sec" id="bookSec">
+      <div class="sec-head"><h2 data-i18n="s5">Book</h2></div>
+      <p class="book-sub"><b data-i18n="heroTitle">The Lost Parcel</b> · <span data-i18n="iPeriod">Oct 8 – Dec 4, 2026</span> · 10:00 — 17:00</p>
 
       <form id="reserveForm" novalidate>
         <div class="field" id="f-name">
@@ -509,16 +588,23 @@
         <a class="home" href="../" data-i18n="home">‹ Back to the start</a>
       </div>
     </section>
+    </div><!-- /pageBook -->
 
     <footer class="credit">
       <div data-i18n="credit">Presented by the Korea Tourism Organization Busan·Ulsan·Gyeongnam Office and Busan Dong-gu Office.</div>
       <div class="logos">
-        <img src="assets/kto.png" alt="Korea Tourism Organization">
-        <img src="assets/donggu.png" alt="Busan Dong-gu">
-        <img src="assets/zimcarry.svg" alt="ZIMCARRY">
-        <img src="assets/dawoom.png" alt="Communication Dawoom">
+        <a href="https://knto.or.kr" target="_blank" rel="noopener"><img src="assets/kto.png" alt="Korea Tourism Organization"></a>
+        <a href="https://www.bsdonggu.go.kr" target="_blank" rel="noopener"><img src="assets/donggu.png" alt="Busan Dong-gu"></a>
+        <a href="https://www.zimcarry.net" target="_blank" rel="noopener"><img src="assets/zimcarry.svg" alt="ZIMCARRY"></a>
+        <a href="http://dawoom.io" target="_blank" rel="noopener"><img src="assets/dawoom.png" alt="Communication Dawoom"></a>
       </div>
+      <div class="inquiry"><span data-i18n="inquiry">Inquiries</span> · <a href="mailto:dawoom@dawoom.io">dawoom@dawoom.io</a></div>
     </footer>
+
+    <!-- sponsor banner : full-width strip at the very bottom; image swaps per language (applyLang) -->
+    <a class="promo" id="promo" href="https://www.zimcarry.net" target="_blank" rel="noopener">
+      <img id="promoImg" src="assets/banner-en.webp" alt="ZIMCARRY — Busan Station luggage delivery" width="2000" height="741" loading="lazy">
+    </a>
 
   </div>
 
@@ -541,7 +627,7 @@
   /* ==================== i18n ==================== */
   const I18N = {
     en: {
-      title:'The Lost Parcel — Busan Station Outdoor Escape Game',
+      title:'The Lost Parcel',
       langName:'English',
       back:'‹ Back',
       ctaMini:'Book',
@@ -581,6 +667,20 @@
       st3d:'Follow the clues around Busan Station with your kit and phone.',
       st4:'Get your souvenir',
       st4d:'Finish the game and receive a special souvenir.',
+      sCp:'Bonus Coupon',
+      cpTitle:'Luggage delivery coupon',
+      cpOff:'OFF',
+      cpLead:'Travel hands-free after the game. Ask the staff for a coupon when you pick up your kit — only if you want one.',
+      cpPayT:'How to use',
+      cpPay:'On-site payment only. It cannot be used for online bookings.',
+      cpTimeT:'Same-day delivery',
+      cpTime:'Request by 15:00 and your luggage is delivered between 16:00 and 19:00 the same day.',
+      cpAreaT:'Area',
+      cpArea:'Busan only: Busan Station ↔ accommodation, or accommodation ↔ accommodation. Gimhae Airport delivery is not included.',
+      cpValidT:'Valid until',
+      cpValid:'December 31, 2026',
+      cpLimitT:'Limit',
+      cpLimit:'Once per team',
       s4:'Please Note',
       n1:'ZIMCARRY is busy with luggage customers in the morning, so you may have to wait. Please plan your visit accordingly.',
       n2:'Comfortable clothes and shoes are recommended.',
@@ -626,12 +726,13 @@
       sendErr:'Something went wrong. Please try again in a moment.',
       doneTitle:'Your reservation is in!',
       doneDesc:'We’ll contact you using the details below. See you at Busan Station, Detective!',
-      donePickup:'On your reservation date, come to ZIMCARRY Busan Station between 10:00 and 17:00 to pick up your game kit.',
+      donePickup:'On your reservation date, come to ZIMCARRY Busan Station between 10:00 and 17:00 to pick up your game kit. You can also ask for a ₩4,000 ZIMCARRY luggage delivery coupon there.',
       home:'‹ Back to the start',
-      credit:'Presented by the Korea Tourism Organization Busan·Ulsan·Gyeongnam Office and Busan Dong-gu Office. Sponsored by ZIMCARRY. Produced by Communication Dawoom.'
+      credit:'Presented by the Korea Tourism Organization Busan·Ulsan·Gyeongnam Office and Busan Dong-gu Office. Sponsored by ZIMCARRY. Produced by Communication Dawoom.',
+      inquiry:'Inquiries'
     },
     ja: {
-      title:'なくした小包 — 釜山駅 屋外脱出ゲーム',
+      title:'The Lost Parcel',
       langName:'日本語',
       back:'‹ 戻る',
       ctaMini:'予約',
@@ -671,6 +772,20 @@
       st3d:'キットとスマートフォンを手に、釜山駅周辺の手がかりを追いかけます。',
       st4:'記念品をもらう',
       st4d:'ゲームをクリアしたら、特別な記念品をお受け取りください。',
+      sCp:'特典クーポン',
+      cpTitle:'手荷物配送クーポン',
+      cpOff:'OFF',
+      cpLead:'ゲームのあとは手ぶらで観光へ。キット受け取りの際、ご希望の方にスタッフがクーポンをお渡しします。',
+      cpPayT:'ご利用方法',
+      cpPay:'現地でのお支払いのみ対象です。オンライン予約ではご利用いただけません。',
+      cpTimeT:'当日配送',
+      cpTime:'15時までのお申し込みで、当日16時〜19時にお届けします。',
+      cpAreaT:'対象エリア',
+      cpArea:'釜山エリア限定：釜山駅 ↔ 宿泊先、宿泊先 ↔ 宿泊先。金海空港への配送は対象外です。',
+      cpValidT:'有効期限',
+      cpValid:'2026年12月31日まで',
+      cpLimitT:'利用回数',
+      cpLimit:'1チームにつき1回',
       s4:'ご注意',
       n1:'午前中は ZIMCARRY の荷物預かり利用客が多く、お待ちいただく場合があります。ご来店の際はご参考ください。',
       n2:'動きやすい服装・靴をおすすめします。',
@@ -715,12 +830,13 @@
       sendErr:'送信できませんでした。しばらくしてからもう一度お試しください。',
       doneTitle:'予約を受け付けました！',
       doneDesc:'以下の連絡先にご連絡します。釜山駅でお会いしましょう、探偵さん！',
-      donePickup:'予約日の 10:00〜17:00 に ZIMCARRY 釜山駅店へお越しいただき、ゲームキットをお受け取りください。',
+      donePickup:'予約日の 10:00〜17:00 に ZIMCARRY 釜山駅店へお越しいただき、ゲームキットをお受け取りください。ご希望の方には ZIMCARRY 手荷物配送の4,000ウォン割引クーポンもお渡しします。',
       home:'‹ 最初に戻る',
-      credit:'主催：韓国観光公社 釜山蔚山慶南支社・釜山東区庁　後援：ZIMCARRY　制作：Communication Dawoom'
+      credit:'主催：韓国観光公社 釜山蔚山慶南支社・釜山東区庁　後援：ZIMCARRY　制作：Communication Dawoom',
+      inquiry:'お問い合わせ'
     },
     'zh-Hans': {
-      title:'遗失的包裹 — 釜山站户外密室逃脱',
+      title:'The Lost Parcel',
       langName:'简体中文',
       back:'‹ 返回',
       ctaMini:'预约',
@@ -755,11 +871,25 @@
       st1:'在线预约',
       st1d:'在本页面选择日期并填写信息。',
       st2:'领取道具包',
-      st2d:'前往 ZIMCARRY 釜山站店领取游戏道具包。',
+      st2d:'前往 ZIMCARRY 釜山站店领取游戏道具包。如有需要，还可领取 ZIMCARRY 行李配送 4,000 韩元优惠券。',
       st3:'解开谜题',
       st3d:'带上道具包和手机，追踪釜山站周边的线索。',
       st4:'领取纪念品',
       st4d:'完成游戏后领取特别纪念品。',
+      sCp:'专属优惠券',
+      cpTitle:'行李配送优惠券',
+      cpOff:'优惠',
+      cpLead:'游戏结束后轻装出行。领取道具包时，如有需要可向工作人员索取优惠券。',
+      cpPayT:'使用方式',
+      cpPay:'仅限现场付款时使用，线上预约不适用。',
+      cpTimeT:'当日配送',
+      cpTime:'15:00前申请，当天16:00—19:00送达。',
+      cpAreaT:'适用区域',
+      cpArea:'仅限釜山地区：釜山站 ↔ 住宿地点、住宿地点 ↔ 住宿地点。不含金海机场配送。',
+      cpValidT:'有效期',
+      cpValid:'至2026年12月31日',
+      cpLimitT:'使用次数',
+      cpLimit:'每组限用1次',
       s4:'注意事项',
       n1:'上午 ZIMCARRY 行李寄存的客人较多，可能需要等候，请合理安排到访时间。',
       n2:'建议穿着舒适的衣服和鞋子。',
@@ -804,12 +934,13 @@
       sendErr:'提交失败，请稍后再试。',
       doneTitle:'预约已提交！',
       doneDesc:'我们会通过以下联系方式与您联系。侦探，釜山站见！',
-      donePickup:'请于预约当天 10:00—17:00 前往 ZIMCARRY 釜山站店领取游戏道具包。',
+      donePickup:'请于预约当天 10:00—17:00 前往 ZIMCARRY 釜山站店领取游戏道具包。如有需要，还可领取 ZIMCARRY 行李配送 4,000 韩元优惠券。',
       home:'‹ 返回首页',
-      credit:'主办：韩国观光公社釜山蔚山庆南支社・釜山东区厅　赞助：ZIMCARRY　制作：Communication Dawoom'
+      credit:'主办：韩国观光公社釜山蔚山庆南支社・釜山东区厅　赞助：ZIMCARRY　制作：Communication Dawoom',
+      inquiry:'咨询'
     },
     'zh-Hant': {
-      title:'遺失的包裹 — 釜山站戶外密室逃脫',
+      title:'The Lost Parcel',
       langName:'繁體中文',
       back:'‹ 返回',
       ctaMini:'預約',
@@ -844,11 +975,25 @@
       st1:'線上預約',
       st1d:'在本頁面選擇日期並填寫資料。',
       st2:'領取道具包',
-      st2d:'前往 ZIMCARRY 釜山站店領取遊戲道具包。',
+      st2d:'前往 ZIMCARRY 釜山站店領取遊戲道具包。如有需要，還可領取 ZIMCARRY 行李配送 4,000 韓元優惠券。',
       st3:'解開謎題',
       st3d:'帶上道具包和手機，追蹤釜山站周邊的線索。',
       st4:'領取紀念品',
       st4d:'完成遊戲後領取特別紀念品。',
+      sCp:'專屬優惠券',
+      cpTitle:'行李配送優惠券',
+      cpOff:'優惠',
+      cpLead:'遊戲結束後輕裝出遊。領取道具包時，如有需要可向工作人員索取優惠券。',
+      cpPayT:'使用方式',
+      cpPay:'僅限現場付款時使用，線上預約不適用。',
+      cpTimeT:'當日配送',
+      cpTime:'15:00前申請，當天16:00—19:00送達。',
+      cpAreaT:'適用區域',
+      cpArea:'僅限釜山地區：釜山站 ↔ 住宿地點、住宿地點 ↔ 住宿地點。不含金海機場配送。',
+      cpValidT:'有效期限',
+      cpValid:'至2026年12月31日',
+      cpLimitT:'使用次數',
+      cpLimit:'每組限用1次',
       s4:'注意事項',
       n1:'上午 ZIMCARRY 行李寄放的客人較多，可能需要等候，請斟酌安排到訪時間。',
       n2:'建議穿著舒適的衣服和鞋子。',
@@ -893,9 +1038,10 @@
       sendErr:'送出失敗，請稍後再試。',
       doneTitle:'預約已送出！',
       doneDesc:'我們會透過以下聯絡方式與您聯繫。偵探，釜山站見！',
-      donePickup:'請於預約當天 10:00—17:00 前往 ZIMCARRY 釜山站店領取遊戲道具包。',
+      donePickup:'請於預約當天 10:00—17:00 前往 ZIMCARRY 釜山站店領取遊戲道具包。如有需要，還可領取 ZIMCARRY 行李配送 4,000 韓元優惠券。',
       home:'‹ 返回首頁',
-      credit:'主辦：韓國觀光公社釜山蔚山慶南支社・釜山東區廳　贊助：ZIMCARRY　製作：Communication Dawoom'
+      credit:'主辦：韓國觀光公社釜山蔚山慶南支社・釜山東區廳　贊助：ZIMCARRY　製作：Communication Dawoom',
+      inquiry:'洽詢'
     }
   };
 
@@ -1028,6 +1174,7 @@
     buildCountries();
     applyContactType();
     renderCalendar();
+    document.getElementById('promoImg').src = 'assets/banner-' + lang + '.webp';
     document.getElementById('peopleHelp').textContent = t('peopleHelp').replace('{n}', MAX_PEOPLE);
     if(document.getElementById('done').classList.contains('show')) renderSummary();
     try{ localStorage.setItem('demoLang', lang); }catch(e){}
@@ -1149,7 +1296,7 @@
       renderSummary();
       document.getElementById('reserveForm').style.display = 'none';
       document.getElementById('done').classList.add('show');
-      document.getElementById('book').scrollIntoView({behavior:'smooth', block:'start'});
+      window.scrollTo({top:0, behavior:'smooth'});
     } catch(err){
       console.error(err);
       msg.textContent = t('sendErr');
@@ -1158,6 +1305,19 @@
       btn.textContent = t('submit');
     }
   });
+
+  /* ==================== pages : info  <->  booking form (#book) ==================== */
+  function showPage(){
+    const book = location.hash === '#book';
+    document.getElementById('pageInfo').hidden = book;
+    document.getElementById('pageBook').hidden = !book;
+    document.querySelector('.cta-mini').hidden = book;
+    // "Back" : from the form -> info page, from the info page -> prologue
+    document.getElementById('backLink').setAttribute('href', book ? '#info' : '../');
+    window.scrollTo({top:0, behavior:'instant'});   // jump (html has smooth scrolling)
+  }
+  window.addEventListener('hashchange', showPage);
+  showPage();
 
   /* ---- init language: ?lang= wins, then the choice saved on the main page (../) ---- */
   let _lang = new URLSearchParams(location.search).get('lang');
