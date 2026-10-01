@@ -412,6 +412,19 @@
 
   .map-btn:hover { background: var(--accent-glow); border-color: var(--accent); }
 
+  /* ── SPONSOR BANNER ── */
+  .sponsor-banner {
+    display: block;
+    margin-top: 28px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .sponsor-banner img { display: block; width: 100%; height: auto; }
+  .sponsor-banner:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--accent-glow); }
+
   /* ── TO TOP ── */
   .to-top {
     position: fixed;
@@ -508,6 +521,10 @@
     <div class="spot-list" id="spotList"></div>
   </div>
 
+  <a class="sponsor-banner" href="https://www.zimcarry.net" target="_blank" rel="noopener sponsored">
+    <img id="sponsorImg" src="assets/busan.spots/zimcarry-ko.webp" alt="짐캐리 — 짐 없는 여행의 시작" width="2000" height="741">
+  </a>
+
   <footer class="footer">
     <p id="footerNote"></p>
   </footer>
@@ -531,6 +548,7 @@
         station: { title: '부산역 인근 관광지', sub: '부산역에서 가까운 순으로 소개하는 16곳' }
       },
       promo: { title: '디지털 관광주민증', sub: '부산 동구의 관광주민이 되어 제휴 관광지·가게 할인 혜택을 받아보세요.', badge: '내국인 전용', more: '발급하러 가기' },
+      sponsorAlt: '짐캐리 — 짐 없는 여행의 시작, 부산역에서 숙소까지 한번에 짐배송',
       dist: km => `부산역에서 직선거리 약 ${km}km`,
       spots: {
         wartime: [
@@ -579,6 +597,7 @@
         station: { title: 'Near Busan Station', sub: '16 spots, listed from nearest to farthest' }
       },
       promo: { title: 'Digital Tourist Resident Card', sub: 'Become a tourist resident of Dong-gu, Busan and enjoy discounts at partner sights and shops.', badge: 'Korean nationals only', more: 'Go to sign-up page (Korean)' },
+      sponsorAlt: 'Zimcarry — Travel light: luggage delivery from Busan Station to your hotel',
       dist: km => `≈ ${km} km from Busan Station (straight line)`,
       spots: {
         wartime: [
@@ -627,6 +646,7 @@
         station: { title: '釜山站周边景点', sub: '按距釜山站由近到远介绍16处景点' }
       },
       promo: { title: '数字观光居民证', sub: '成为釜山东区的观光居民，即可享受合作景点与商家的优惠。', badge: '仅限韩国国民', more: '前往申请页面（韩文）' },
+      sponsorAlt: 'Zimcarry — 轻装旅行，从这里开始：从釜山站到住宿地点行李直送',
       dist: km => `距釜山站直线约${km}公里`,
       spots: {
         wartime: [
@@ -675,6 +695,7 @@
         station: { title: '釜山站周邊景點', sub: '依距釜山站由近到遠介紹16處景點' }
       },
       promo: { title: '數位觀光居民證', sub: '成為釜山東區的觀光居民，即可享有合作景點與店家的優惠。', badge: '僅限韓國國民', more: '前往申請頁面（韓文）' },
+      sponsorAlt: 'Zimcarry — 輕裝旅行，從這裡開始：從釜山站到住宿地點行李直送',
       dist: km => `距釜山站直線約${km}公里`,
       spots: {
         wartime: [
@@ -723,6 +744,7 @@
         station: { title: '釜山駅周辺の観光地', sub: '釜山駅から近い順に紹介する16か所' }
       },
       promo: { title: 'デジタル観光住民証', sub: '釜山・東区の観光住民になると、提携観光地やお店で割引特典が受けられます。', badge: '韓国国民限定', more: '申請ページへ（韓国語）' },
+      sponsorAlt: 'Zimcarry — 手ぶら旅のはじまり：釜山駅から宿泊先まで荷物をそのまま配送',
       dist: km => `釜山駅から直線で約${km}km`,
       spots: {
         wartime: [
@@ -828,6 +850,10 @@
     document.getElementById('moreLabel3').textContent = c.promo.more;
     document.getElementById('backLabel').textContent = c.back;
     document.getElementById('footerNote').textContent = c.footer;
+
+    const sponsorImg = document.getElementById('sponsorImg');
+    sponsorImg.src = `assets/busan.spots/zimcarry-${state.lang}.webp`;
+    sponsorImg.alt = c.sponsorAlt;
 
     const catList = document.getElementById('catList');
     const detailView = document.getElementById('detailView');
