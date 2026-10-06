@@ -827,6 +827,14 @@
 
   let state = { lang: 'ko', view: 'home', cat: null };
 
+  // ?lang=en 처럼 링크로 언어를 미리 지정 (설문 감사 화면 등에서 사용). zh-Hans/zh-Hant 표기도 허용
+  (function () {
+    const alias = { 'zh-hans': 'zh-cn', 'zh-hant': 'zh-tw' };
+    const p = (new URLSearchParams(location.search).get('lang') || '').toLowerCase();
+    const l = alias[p] || p;
+    if (document.querySelector('.lang-btn[data-lang="' + l + '"]')) state.lang = l;
+  })();
+
   function naverUrl(q) {
     return 'https://map.naver.com/p/search/' + encodeURIComponent(q);
   }
