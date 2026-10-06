@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lost Parcel · 만족도 조사</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8E%3C/text%3E%3C/svg%3E">
+<style>
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');font-weight:normal;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Medium.woff2') format('woff2');font-weight:500;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Bold.woff2') format('woff2');font-weight:700;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraBold.woff2') format('woff2');font-weight:800;font-display:swap;}
+  @font-face{font-family:'Suit';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Heavy.woff2') format('woff2');font-weight:900;font-display:swap;}
+
+  :root{
+    --blue:#4169E1;        /* accent 1 */
+    --blue-deep:#2F4FC4;
+    --blue-soft:#EEF1FF;
+    --red:#E1332E;         /* accent 2 : stamp only */
+    --navy:#16225A;
+    --line:#E0E0E0;
+    --paper:#FAFAF8;
+    --panel:#F5F6F8;
+    --ink:#141414;
+    --ink-soft:#5B6B82;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  *{scrollbar-width:none; -ms-overflow-style:none;}
+  *::-webkit-scrollbar{width:0; height:0; display:none;}
+  html, body{min-height:100%;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Suit', -apple-system, 'Apple SD Gothic Neo', 'Hiragino Sans', 'PingFang SC', 'Microsoft JhengHei', sans-serif;
+    font-size:16px; line-height:1.6;
+    display:flex; justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  button, input, textarea{font-family:inherit;}
+  :focus-visible{outline:3px solid rgba(65,105,225,.45); outline-offset:2px;}
+
+  .stage{
+    width:min(100vw, 480px);
+    min-height:100dvh;
+    background:#fff;
+    display:flex; flex-direction:column;
+  }
+  @media (min-width:520px){
+    .stage{ border-left:1px solid var(--line); border-right:1px solid var(--line); }
+  }
+
+  /* ---- Header ---- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:14px 20px 0;
+  }
+  .brand{display:flex; align-items:center; gap:8px; font-size:16px; font-weight:800; letter-spacing:-.01em;}
+  .brand svg{width:20px; height:20px; display:block;}
+  .lang-switch{position:relative;}
+  .lang-globe{
+    height:36px; padding:0 12px; border-radius:10px;
+    border:1px solid var(--line); background:#fff; color:var(--ink);
+    font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .lang-globe:hover{background:var(--panel);}
+  .lang-menu{
+    display:none; position:absolute; top:42px; right:0; z-index:30;
+    flex-direction:column; gap:2px; min-width:140px;
+    background:#fff; border:1px solid var(--line); border-radius:12px; padding:6px;
+    box-shadow:0 8px 24px rgba(20,20,20,.12);
+  }
+  .lang-menu.open{display:flex;}
+  .lang-opt{
+    border:none; background:transparent; color:var(--ink);
+    font-size:15px; font-weight:600; text-align:left;
+    padding:10px 12px; border-radius:8px; cursor:pointer; white-space:nowrap; min-height:44px;
+  }
+  .lang-opt:hover{background:var(--panel);}
+  .lang-opt.active{background:var(--blue); color:#fff;}
+
+  /* ---- Progress : "01 / 08" + stepped bar ---- */
+  .progress{display:none; padding:22px 20px 0;}
+  .progress.on{display:block;}
+  .progress .row{display:flex; justify-content:space-between; align-items:baseline; font-size:14px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums;}
+  .progress .row b{font-size:16px; color:var(--ink); font-weight:800;}
+  .track{margin-top:8px; height:6px; background:var(--line);}
+  .track i{display:block; height:100%; width:0; background:var(--blue); transition:width .4s steps(8, end);}
+
+  /* ---- Screens ---- */
+  main{flex:1; display:flex; flex-direction:column;}
+  .screen{flex:1; display:flex; flex-direction:column; padding:28px 20px 0; animation:slideIn .38s cubic-bezier(.2,.7,.2,1) both;}
+  .screen.back{animation-name:slideBack;}
+  @keyframes slideIn{from{opacity:0; transform:translateX(18px);} to{opacity:1; transform:none;}}
+  @keyframes slideBack{from{opacity:0; transform:translateX(-18px);} to{opacity:1; transform:none;}}
+
+  .kicker{font-size:13px; font-weight:800; color:var(--blue); letter-spacing:.14em; text-transform:uppercase;}
+  h1{font-size:32px; font-weight:900; line-height:1.25; letter-spacing:-.02em; margin-top:10px;}
+  h2.q{font-size:26px; font-weight:800; line-height:1.4; letter-spacing:-.015em; margin-top:10px; outline:none;}
+  .hint{font-size:16px; color:var(--ink-soft); margin-top:10px;}
+  .lead{margin-top:18px; font-size:16px; line-height:1.75; color:#2A3342;}
+  .lead p + p{margin-top:14px;}
+
+  /* ---- Option cards ---- */
+  .opts{display:flex; flex-direction:column; gap:10px; margin-top:24px;}
+  .opts.langs{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .opts.langs .opt:last-child:nth-child(odd){grid-column:1 / -1;}
+  .opt{
+    position:relative; width:100%; min-height:56px;
+    display:flex; align-items:center; gap:14px; text-align:left;
+    padding:12px 16px; border-radius:14px;
+    background:#fff; border:1.5px solid var(--line);
+    font-size:16px; font-weight:600; line-height:1.5; color:var(--ink);
+    cursor:pointer; transition:background .15s, border-color .15s;
+  }
+  .opt:hover{background:var(--panel);}
+  .opt .txt{flex:1; min-width:0;}
+  .opt small{display:block; font-size:14px; font-weight:500; color:var(--ink-soft); margin-top:2px; line-height:1.5;}
+
+  /* custom check (native radio is not used) */
+  .chk{
+    flex:none; width:24px; height:24px; border-radius:7px;
+    border:1.5px solid #C4CAD6; background:#fff;
+    display:grid; place-items:center; transition:background .15s, border-color .15s;
+  }
+  .chk svg{width:14px; height:14px; opacity:0; transform:scale(.6); transition:opacity .12s, transform .12s;}
+  .opt[aria-checked=true]{border-color:var(--blue); background:var(--blue-soft); color:var(--navy); box-shadow:inset 0 0 0 1px var(--blue);}
+  .opt[aria-checked=true] .chk{background:var(--blue); border-color:var(--blue);}
+  .opt[aria-checked=true] .chk svg{opacity:1; transform:none;}
+
+  /* pixel meter : 5 small squares, filled = level */
+  .meter{flex:none; display:flex; gap:3px;}
+  .meter i{width:8px; height:8px; background:var(--line);}
+  .meter i.on{background:#9DB0F0;}
+  .opt[aria-checked=true] .meter i{background:#CBD5F7;}
+  .opt[aria-checked=true] .meter i.on{background:var(--blue);}
+
+  .opt.lang{font-size:18px; font-weight:700; min-height:64px;}
+
+  /* difficulty direction cue */
+  .axis{display:flex; align-items:center; gap:10px; margin-top:22px; font-size:14px; font-weight:700; color:var(--ink-soft);}
+  .axis .line{flex:1; height:2px; background:repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 10px);}
+  .axis + .opts{margin-top:12px;}
+
+  .other-input, textarea{
+    width:100%; margin-top:10px; font-size:16px; line-height:1.6; color:var(--ink);
+    padding:14px 16px; border-radius:14px; border:1.5px solid var(--line); background:var(--panel);
+    outline:none; transition:border-color .15s, background .15s;
+  }
+  .other-input:focus, textarea:focus{border-color:var(--blue); background:#fff;}
+  textarea{min-height:128px; resize:vertical; margin-top:24px; display:block;}
+  textarea::placeholder, .other-input::placeholder{color:#8A94A6;}
+  .count{text-align:right; font-size:14px; color:var(--ink-soft); margin-top:6px; font-variant-numeric:tabular-nums;}
+
+  /* ---- Bottom nav ---- */
+  .nav{
+    position:sticky; bottom:0; z-index:10;
+    display:flex; gap:10px; margin:auto -20px 0; padding:16px 20px calc(16px + env(safe-area-inset-bottom));
+    background:linear-gradient(to bottom, rgba(255,255,255,0), #fff 18px);
+  }
+  .spacer{height:28px; flex:none;}
+  .btn{
+    min-height:56px; font-size:17px; font-weight:800; border-radius:14px; border:1.5px solid transparent; cursor:pointer;
+    transition:background .15s, border-color .15s;
+  }
+  .btn.primary{flex:1; background:var(--blue); color:#fff;}
+  .btn.primary:hover{background:var(--blue-deep);}
+  .btn.primary:disabled{background:#E3E6EE; color:#8A94A6; cursor:not-allowed;}
+  .btn.ghost{flex:none; width:104px; background:#fff; color:var(--ink); border-color:var(--line);}
+  .btn.ghost:hover{background:var(--panel);}
+
+  .err{margin-top:12px; font-size:15px; color:var(--red); display:none;}
+  .err.on{display:block;}
+
+  /* ---- Done : mission-complete tone ---- */
+  .done{align-items:center; text-align:center; justify-content:center; padding-bottom:40px;}
+  .done .npcs{width:min(100%, 380px); height:auto; display:block; margin:-14px auto 10px; image-rendering:pixelated;}
+  .done .kicker{color:var(--red);}
+  .done h1{font-size:30px; margin-top:8px;}
+  html:lang(ja) .done h1, html:lang(zh-Hans) .done h1, html:lang(zh-Hant) .done h1{font-size:25px;}
+  .done .thanks{font-size:20px; font-weight:800; margin-top:14px;}
+  .done .lead{max-width:340px; margin-top:10px;}
+  .done{justify-content:flex-start; padding-top:56px;}
+  .more{align-self:stretch; margin-top:40px; border-top:1.5px dashed var(--line); text-align:left;}
+  .more-row{display:flex; align-items:center; justify-content:space-between; gap:14px; min-height:68px; padding:14px 4px; border-bottom:1px solid var(--line); color:var(--ink); text-decoration:none;}
+  .more-row:hover{background:var(--panel);}
+  .more-row .mt b{display:block; font-size:16px; font-weight:800; line-height:1.45;}
+  .more-row .mt small{display:block; font-size:14px; color:var(--ink-soft); font-weight:500; line-height:1.5; margin-top:2px;}
+  .more-row svg{flex:none; color:var(--blue);}
+  .more-row:focus-visible{outline:3px solid rgba(65,105,225,.4); outline-offset:-3px;}
+
+  .screen.still{animation:none;}
+  .prompt{font-size:20px; font-weight:700; line-height:1.5; margin-top:10px;}
+  h2.q.sm{font-size:21px; line-height:1.45;}
+  .hint.sm{font-size:16px; margin-top:6px;}
+  .lead.plain{white-space:pre-line;}
+  .lead, .hint, .cnote, .consent dd{word-break:keep-all; overflow-wrap:break-word;}
+  .lead .entry{font-weight:700; color:var(--navy);}
+
+  /* ---- Inputs ---- */
+  .field{
+    display:block; width:100%; min-height:52px; margin-top:8px;
+    font-size:16px; line-height:1.5; color:var(--ink);
+    padding:12px 16px; border-radius:14px; border:1.5px solid var(--line); background:#fff;
+    outline:none; transition:border-color .15s, background .15s;
+  }
+  .field:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(65,105,225,.16);}
+  .field::placeholder{color:#8A94A6;}
+  .field:disabled{background:var(--panel); color:#8A94A6;}
+  .field.bad{border-color:var(--red);}
+  .other-input{margin-top:10px;}
+  .label{display:flex; align-items:center; gap:8px; margin-top:20px; font-size:16px; font-weight:700;}
+  .req{font-style:normal; font-size:13px; font-weight:800; color:var(--blue);}
+  .ferr{min-height:0; font-size:14px; color:var(--red); margin-top:6px; display:none;}
+  .ferr.on{display:block;}
+  .fields.off{opacity:.55;}
+
+  /* ---- Country (foreign only) ---- */
+  .country{margin-top:32px; padding-top:28px; border-top:1.5px dashed var(--line);}
+  .country.reveal{animation:reveal .4s cubic-bezier(.2,.7,.2,1) both;}
+  @keyframes reveal{from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:none;}}
+  .combo{position:relative; margin-top:14px;}
+  .combo .field{margin-top:0;}
+  .combo-list{
+    position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:15;
+    max-height:min(260px, 38dvh); overflow-y:auto; list-style:none;
+    background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:6px;
+    box-shadow:0 8px 24px rgba(20,20,20,.12);
+  }
+  .combo-list[hidden]{display:none;}
+  .combo-list li{
+    display:flex; justify-content:space-between; gap:10px; align-items:center;
+    min-height:48px; padding:10px 12px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer;
+  }
+  .combo-list li span{font-size:14px; font-weight:500; color:var(--ink-soft);}
+  .combo-list li.act{background:var(--panel);}
+  .combo-list li[aria-selected=true]{background:var(--blue-soft); color:var(--navy);}
+  .combo-list li.none{cursor:default; color:var(--ink-soft); font-weight:500;}
+
+  /* ---- Event (Korean only) ---- */
+  .gift{ /* Naver Pay coupon */
+    position:relative; margin-top:22px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:20px 18px 20px 22px; background:#00DE5A; color:var(--ink); border-radius:14px; overflow:hidden;
+  }
+  .gift::before, .gift::after{ /* ticket notches */
+    content:''; position:absolute; top:50%; width:18px; height:18px; margin-top:-9px; border-radius:50%; background:#fff;
+  }
+  .gift::before{left:-9px;} .gift::after{right:-9px;}
+  .gift-txt{min-width:0;}
+  .gift-k{font-size:16px; font-weight:800; letter-spacing:-.01em;}
+  .gift-amt{font-size:44px; font-weight:900; line-height:1.15; letter-spacing:-.03em; font-variant-numeric:tabular-nums;}
+  .gift-amt small{font-size:24px; font-weight:800; margin-left:2px;}
+  .gift-sub{font-size:15px; font-weight:700; margin-top:2px;}
+  .gift-logo{flex:none; width:112px; height:auto; display:block; padding-left:10px;}
+
+  /* ---- Face slider : one face glides left/right along a soft rail ---- */
+  .sl-wrap{margin-top:26px;}
+  .sl-cur{min-height:40px; text-align:center; font-size:24px; font-weight:800; letter-spacing:-.02em; color:var(--navy);}
+  .sl-cur.idle{color:var(--ink-soft); font-size:16px; font-weight:600;}
+  .slider{
+    --f:.5;
+    position:relative; height:96px; margin-top:6px; border-radius:20px;
+    cursor:pointer; touch-action:pan-y; user-select:none; -webkit-user-select:none;
+  }
+  .slider:focus, .slider:focus-visible{outline:none;}
+  .kbd .slider:focus{outline:3px solid rgba(65,105,225,.4); outline-offset:2px;}   /* 키보드 사용 시에만 */
+  .rail{position:absolute; left:40px; right:40px; top:44px; height:8px; border-radius:99px; background:#E6EBF8;}
+  .rail .fill{position:absolute; left:0; top:0; bottom:0; width:calc(var(--f) * 100%); border-radius:99px; background:var(--blue); opacity:0; transition:width .4s cubic-bezier(.22,.9,.3,1), opacity .2s;}
+  .slider.has .rail .fill{opacity:.9;}
+  .thumb{
+    position:absolute; top:12px; width:72px; height:72px; margin-left:-36px; pointer-events:none;
+    left:calc(40px + (100% - 80px) * var(--f));
+    transition:left .45s cubic-bezier(.22,.9,.3,1), opacity .25s, filter .25s;
+    filter:drop-shadow(0 6px 8px rgba(22,34,90,.16));
+  }
+  .thumb img{width:100%; height:100%; display:block; image-rendering:pixelated;}
+  .slider.idle .thumb{opacity:.5; filter:grayscale(1);}
+  .slider.dragging .thumb, .slider.dragging .rail .fill{transition:none;}
+  .sl-ends{display:flex; justify-content:space-between; gap:12px; margin-top:2px; padding:0 8px; font-size:14px; font-weight:700; color:var(--ink-soft);}
+  .sl-ends span:last-child{text-align:right;}
+
+  /* ---- Line breaks ---- */
+  html:lang(ko) body{word-break:keep-all;}
+  html:lang(ja) body, html:lang(zh-Hans) body, html:lang(zh-Hant) body{line-break:strict; word-break:keep-all;}
+  body{overflow-wrap:break-word;}
+  h1, h2, h3, .prompt, .hint, .sl-cur, .kicker{text-wrap:balance;}
+  p, .lead, .txt, small, dd, .cnote{text-wrap:pretty;}
+  #confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:60;}
+  .fields{margin-top:6px; transition:opacity .2s;}
+
+  .consent{margin-top:34px; padding-top:26px; border-top:1.5px dashed var(--line);}
+  .consent h3{font-size:18px; font-weight:800;}
+  .consent dl{margin-top:12px; display:grid; gap:8px;}
+  .consent dl div{display:grid; grid-template-columns:76px 1fr; gap:10px; font-size:14px; line-height:1.6;}
+  .consent dt{font-weight:800; color:var(--ink-soft);}
+  .consent dd{color:#2A3342;}
+  .cnote{margin-top:12px; font-size:14px; line-height:1.65; color:var(--ink-soft);}
+  .cnote.soft{color:var(--blue-deep); font-weight:600;}
+  .opts.row{margin-top:16px;}
+  .opt .txt{word-break:keep-all; overflow-wrap:break-word;}
+
+  @media (prefers-reduced-motion:reduce){
+    .country.reveal{animation:none;}
+    .screen, .screen.back{animation:none;}
+    .track i, .opt, .chk, .chk svg{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <header class="topbar">
+    <div class="brand" id="brandName">잃어버린 소포</div>
+    <div class="lang-switch">
+      <button class="lang-globe" type="button" id="langBtn" aria-label="Language" aria-haspopup="true" aria-expanded="false"><span id="langLabel">한국어</span> ▾</button>
+      <div class="lang-menu" id="langMenu">
+        <button class="lang-opt" type="button" data-lang="ko">한국어</button>
+        <button class="lang-opt" type="button" data-lang="en">English</button>
+        <button class="lang-opt" type="button" data-lang="ja">日本語</button>
+        <button class="lang-opt" type="button" data-lang="zh-Hans">简体中文</button>
+        <button class="lang-opt" type="button" data-lang="zh-Hant">繁體中文</button>
+      </div>
+    </div>
+  </header>
+  <div class="progress" id="progress"><div class="row"><span id="pLeft"><b>01</b> / 08</span><span id="pLabel">QUESTION</span></div><div class="track"><i id="bar"></i></div></div>
+  <main id="app"></main>
+</div>
+
+<script>
+/* ============================================================
+   설정 : 응답 수집 주소 (Google Apps Script 웹앱 URL)
+   비워두면 이 기기(localStorage)에만 저장됩니다. → survey/README.md 참고
+   ============================================================ */
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyxG4uMVJOXEZYK5YRYioxWeQk2PqfsINoUvWuADmLbHpOjWvxhNRODQRzmSPL_0EbL/exec';
+const MAX_TEXT = 1000;
+
+const LANGS = {
+  'ko':{label:'한국어', html:'ko'},
+  'en':{label:'English', html:'en'},
+  'ja':{label:'日本語', html:'ja'},
+  'zh-Hans':{label:'简体中文', html:'zh-Hans'},
+  'zh-Hant':{label:'繁體中文', html:'zh-Hant'},
+};
+
+/* ---------- 선택지 (값은 언어와 무관하게 저장) ---------- */
+const SCALES = {
+  sat : {ko:['매우 만족','만족','보통','불만족','매우 불만족'],
+         en:['Very satisfied','Satisfied','Neutral','Dissatisfied','Very dissatisfied'],
+         ja:['とても満足','満足','普通','不満','とても不満'],
+         'zh-Hans':['非常满意','满意','一般','不满意','非常不满意'],
+         'zh-Hant':['非常滿意','滿意','普通','不滿意','非常不滿意']},
+  ease: {ko:['매우 쉬웠다','쉬웠다','보통이다','어려웠다','매우 어려웠다'],
+         en:['Very easy','Easy','Average','Difficult','Very difficult'],
+         ja:['とても分かりやすかった','分かりやすかった','普通','分かりにくかった','とても分かりにくかった'],
+         'zh-Hans':['非常容易','容易','一般','困难','非常困难'],
+         'zh-Hant':['非常容易','容易','普通','困難','非常困難']},
+  diff: {ko:['매우 쉬웠다','쉬웠다','적당했다','어려웠다','매우 어려웠다'],
+         en:['Very easy','Easy','Just right','Hard','Very hard'],
+         ja:['とても簡単だった','簡単だった','ちょうどよかった','難しかった','とても難しかった'],
+         'zh-Hans':['非常简单','简单','难度适中','困难','非常困难'],
+         'zh-Hant':['非常簡單','簡單','難度適中','困難','非常困難']},
+  rec : {ko:['매우 그렇다','그렇다','보통이다','그렇지 않다','전혀 그렇지 않다'],
+         en:['Definitely','Probably','Not sure','Probably not','Definitely not'],
+         ja:['ぜひ勧めたい','勧めたい','どちらでもない','あまり勧めたくない','まったく勧めたくない'],
+         'zh-Hans':['非常愿意','愿意','一般','不太愿意','完全不愿意'],
+         'zh-Hant':['非常願意','願意','普通','不太願意','完全不願意']},
+};
+/* 저장값: 위에서부터 5,4,3,2,1 (만족·긍정일수록 높음). 난이도(diff)만 1=매우 쉬움 … 5=매우 어려움 */
+const SCALE_VALUES = {sat:[5,4,3,2,1], ease:[1,2,3,4,5], rec:[5,4,3,2,1], diff:[1,2,3,4,5]};
+
+const SOURCES_KO = [
+  {id:'prev_program', t:'기존 야외 방탈출 프로그램 참여 경험', s:'소막마을 탐험대, 부산대 자율상권 골목탐정단 등'},
+  {id:'portal',    t:'네이버 등 포털 검색'},
+  {id:'instagram', t:'인스타그램'},
+  {id:'blog_cafe', t:'블로그·카페'},
+  {id:'press',     t:'기사·보도자료'},
+  {id:'referral',  t:'지인 추천'},
+  {id:'offline',   t:'포스터·전단 등 오프라인 홍보물'},
+  {id:'other',     t:'기타'},
+];
+const SOURCES_INTL = {
+  ids:['sns','search','travel','creator','referral','offline','hotel','other'],
+  'en':['SNS (Instagram, etc.)','Search engine (Google, etc.)','Travel site / blog','Influencer / creator content','Friends / family','Poster / flyer / tourist information center','Hotel / accommodation','Other'],
+  'ja':['SNS（Instagramなど）','Googleなどの検索エンジン','旅行サイト・ブログ','インフルエンサー・クリエイターの投稿','友人・家族の紹介','ポスター・チラシ・観光案内所','ホテル・宿泊施設','その他'],
+  'zh-Hans':['社交媒体（Instagram 等）','Google 等搜索引擎','旅游网站・博客','网红・创作者内容','亲友推荐','海报・传单・旅游咨询中心','酒店・住宿','其他'],
+  'zh-Hant':['社群媒體（Instagram 等）','Google 等搜尋引擎','旅遊網站・部落格','網紅・創作者內容','親友推薦','海報・傳單・旅遊諮詢中心','飯店・住宿','其他'],
+};
+
+/* ---------- 문구 ---------- */
+const UI = {
+  ko:{
+    langKicker:'LANGUAGE', langTitle:'당신의 언어를\n선택해 주세요.',
+    introKicker:'SURVEY', introTitle:'〈잃어버린 소포〉\n만족도 조사',
+    intro:['〈잃어버린 소포〉를 마지막까지 함께해주셔서 감사합니다 💙','본 프로그램은 「피란수도 부산」의 역사와 장소적 가치를 재미있게 경험할 수 있도록 기획된 야외 방탈출 프로그램입니다.','여러분의 의견은 더 나은 프로그램을 만드는 데 큰 도움이 됩니다.','잠시 시간을 내어 만족도 조사에 참여해 주세요.'],
+    start:'시작하기', next:'다음', prev:'이전', submit:'제출하기', sending:'보내는 중…',
+    single:'하나만 선택해 주세요.', optional:'선택 응답', otherPh:'직접 입력 (선택)',
+    q:{
+      source:'〈잃어버린 소포〉를 어떻게 알게 되셨나요?',
+      difficulty:'게임 난이도는 어떠셨나요?',
+      story:'프로그램의 스토리와 내용에 얼마나 만족하셨나요?',
+      course:'코스와 이동 동선에 얼마나 만족하셨나요?',
+      usage:'게임 이용 방법은 이해하기 쉬웠나요?',
+      overall:'전체적으로 〈잃어버린 소포〉에 얼마나 만족하셨나요?',
+      recommend:'친구나 가족에게 〈잃어버린 소포〉를 추천하고 싶으신가요?',
+      comment:'〈잃어버린 소포〉에 대한 의견을 자유롭게 남겨주세요.',
+    },
+    commentPh:'한마디 남겨주시면, 더 재미있고 알찬 야외 방탈출 게임을 만드는 데 큰 도움이 됩니다! ♥️',
+    doneTitle:'소중한 의견 감사합니다 💙', doneText:'보내주신 의견을 바탕으로 더욱 재미있고 완성도 높은 프로그램을 만들어가겠습니다.',
+    error:'전송에 실패했어요. 응답은 이 기기에 저장되었으니, 네트워크를 확인하고 다시 시도해 주세요.',
+  },
+  en:{
+    langKicker:'LANGUAGE', langTitle:'Please select\nyour language.',
+    introKicker:'SURVEY', introTitle:'The Lost Parcel\nSatisfaction Survey',
+    intro:['Thank you for playing The Lost Parcel all the way to the end 💙','This outdoor escape game was designed to let you enjoy the history and the places of “Busan, the Wartime Capital” in a fun way.','Your feedback helps us make the program even better.','Please take a moment to answer a few questions.'],
+    start:'Start', next:'Next', prev:'Back', submit:'Submit', sending:'Sending…',
+    single:'Select one.', optional:'Optional', otherPh:'Type here (optional)',
+    q:{
+      source:'How did you hear about The Lost Parcel?',
+      difficulty:'How was the difficulty of the game?',
+      story:'How satisfied were you with the story and content of the program?',
+      course:'How satisfied were you with the course and the route?',
+      usage:'Was it easy to understand how to play the game?',
+      overall:'Overall, how satisfied were you with The Lost Parcel?',
+      recommend:'Would you like to recommend The Lost Parcel to friends or family?',
+      comment:'Please share any thoughts about The Lost Parcel.',
+    },
+    commentPh:'Even a short note helps us build a more fun and fulfilling outdoor escape game! ♥️',
+    doneTitle:'Thank you for your feedback 💙', doneText:'We will use your feedback to make the program even more fun and polished.',
+    error:'Failed to send. Your answers are saved on this device — please check your connection and try again.',
+  },
+  ja:{
+    langKicker:'LANGUAGE', langTitle:'言語を選択\nしてください。',
+    introKicker:'SURVEY', introTitle:'〈失われた小包〉\n満足度アンケート',
+    intro:['〈失われた小包〉を最後まで楽しんでいただき、ありがとうございます 💙','本プログラムは「避難首都・釜山」の歴史と場所の価値を楽しく体験できるよう企画された、屋外型の脱出ゲームです。','皆さまのご意見は、より良いプログラムづくりに大きな力となります。','少しお時間をいただき、アンケートにご協力ください。'],
+    start:'はじめる', next:'次へ', prev:'戻る', submit:'送信する', sending:'送信中…',
+    single:'1つ選んでください。', optional:'任意', otherPh:'自由入力（任意）',
+    q:{
+      source:'〈失われた小包〉をどこで知りましたか？',
+      difficulty:'ゲームの難易度はいかがでしたか？',
+      story:'プログラムのストーリーと内容にどのくらい満足しましたか？',
+      course:'コースと移動ルートにどのくらい満足しましたか？',
+      usage:'ゲームの遊び方は分かりやすかったですか？',
+      overall:'全体的に〈失われた小包〉にどのくらい満足しましたか？',
+      recommend:'友人や家族に〈失われた小包〉をおすすめしたいですか？',
+      comment:'〈失われた小包〉についてご意見を自由にお書きください。',
+    },
+    commentPh:'ひとことでもいただけると、より楽しく充実した屋外脱出ゲームづくりの大きな助けになります！♥️',
+    doneTitle:'貴重なご意見をありがとうございました 💙', doneText:'いただいたご意見をもとに、さらに楽しく完成度の高いプログラムを作っていきます。',
+    error:'送信に失敗しました。回答はこの端末に保存されています。通信環境を確認して、もう一度お試しください。',
+  },
+  'zh-Hans':{
+    langKicker:'LANGUAGE', langTitle:'请选择\n您的语言。',
+    introKicker:'SURVEY', introTitle:'〈遗失的包裹〉\n满意度调查',
+    intro:['感谢您一路陪伴〈遗失的包裹〉走到最后 💙','本项目是为了让大家有趣地体验“战时首都釜山”的历史与场所价值而策划的户外密室逃脱活动。','您的意见对我们打造更好的项目有很大帮助。','请花一点时间参与满意度调查。'],
+    start:'开始', next:'下一步', prev:'上一步', submit:'提交', sending:'提交中…',
+    single:'请选择一项。', optional:'选填', otherPh:'请输入（选填）',
+    q:{
+      source:'您是如何得知〈遗失的包裹〉的？',
+      difficulty:'您觉得游戏难度如何？',
+      story:'您对项目的故事和内容有多满意？',
+      course:'您对路线和移动动线有多满意？',
+      usage:'游戏的玩法容易理解吗？',
+      overall:'总体来说，您对〈遗失的包裹〉有多满意？',
+      recommend:'您愿意向朋友或家人推荐〈遗失的包裹〉吗？',
+      comment:'请随意留下您对〈遗失的包裹〉的意见。',
+    },
+    commentPh:'只言片语也能帮助我们打造更有趣、更充实的户外密室逃脱游戏！♥️',
+    doneTitle:'感谢您宝贵的意见 💙', doneText:'我们将根据您的意见，把项目打磨得更有趣、更完善。',
+    error:'提交失败。您的回答已保存在此设备上，请检查网络后重试。',
+  },
+  'zh-Hant':{
+    langKicker:'LANGUAGE', langTitle:'請選擇\n您的語言。',
+    introKicker:'SURVEY', introTitle:'〈遺失的包裹〉\n滿意度調查',
+    intro:['感謝您一路陪伴〈遺失的包裹〉走到最後 💙','本計畫是為了讓大家有趣地體驗「戰時首都釜山」的歷史與場所價值而企劃的戶外密室逃脫活動。','您的意見對我們打造更好的計畫有很大幫助。','請花一點時間參與滿意度調查。'],
+    start:'開始', next:'下一步', prev:'上一步', submit:'提交', sending:'提交中…',
+    single:'請選擇一項。', optional:'選填', otherPh:'請輸入（選填）',
+    q:{
+      source:'您是如何得知〈遺失的包裹〉的？',
+      difficulty:'您覺得遊戲難度如何？',
+      story:'您對計畫的故事與內容有多滿意？',
+      course:'您對路線與移動動線有多滿意？',
+      usage:'遊戲的玩法容易理解嗎？',
+      overall:'整體來說，您對〈遺失的包裹〉有多滿意？',
+      recommend:'您願意向朋友或家人推薦〈遺失的包裹〉嗎？',
+      comment:'請隨意留下您對〈遺失的包裹〉的意見。',
+    },
+    commentPh:'隻字片語也能幫助我們打造更有趣、更充實的戶外密室逃脫遊戲！♥️',
+    doneTitle:'感謝您寶貴的意見 💙', doneText:'我們將根據您的意見，把計畫打磨得更有趣、更完善。',
+    error:'提交失敗。您的回答已儲存在此裝置上，請檢查網路後重試。',
+  },
+};
+
+/* ---------- 시작·마지막 화면용 문구 ---------- */
+const UI2 = {
+  ko:{prompt:'당신의 언어를 선택해 주세요.', cQ:'어느 국가에서 방문하셨나요?', cDesc:'응답해 주신 정보는 향후 다국어 지원 및 해외 관광객 대상 콘텐츠 기획을 위한 참고자료로 활용됩니다.', cPh:'국가를 검색하거나 선택하세요', other:'기타 (Other)', none:'검색 결과가 없어요'},
+  en:{prompt:'Please select your language.', cQ:'Which country are you visiting from?', cDesc:'Your answer will be used as a reference for planning multilingual support and content for international visitors.', cPh:'Search or select a country', other:'Other', none:'No results'},
+  ja:{prompt:'言語を選択してください。', cQ:'どちらの国からお越しですか？', cDesc:'ご回答いただいた情報は、今後の多言語対応や海外からの観光客向けコンテンツ企画の参考として活用します。', cPh:'国を検索または選択してください', other:'その他（Other）', none:'該当する国がありません'},
+  'zh-Hans':{prompt:'请选择您的语言。', cQ:'您来自哪个国家/地区？', cDesc:'您提供的信息将作为今后多语言支持及海外游客内容策划的参考资料。', cPh:'搜索或选择国家/地区', other:'其他（Other）', none:'没有找到结果'},
+  'zh-Hant':{prompt:'請選擇您的語言。', cQ:'您來自哪個國家/地區？', cDesc:'您提供的資訊將作為日後多語言支援及海外旅客內容企劃的參考資料。', cPh:'搜尋或選擇國家/地區', other:'其他（Other）', none:'找不到結果'},
+};
+/* 이벤트(한국어 응답자 전용) */
+const EV = {
+  kicker:'EVENT', title:'설문 참여 이벤트 🎁',
+  giftK:'네이버페이', giftAmt:'5,000', giftUnit:'원', giftSub:'쿠폰 · 추첨 100분',
+  desc:['만족도 조사에 참여해 주신 분 중 추첨을 통해 100분께 네이버페이 5,000원 쿠폰을 드립니다.','경품 추첨 및 발송을 위해 아래 정보를 입력해 주세요.'],
+  name:'이름', namePh:'홍길동', phone:'연락처', phonePh:'010-0000-0000',
+  phoneErr:'올바른 휴대전화 번호를 입력해 주세요. (예: 010-1234-5678)',
+  req:'필수',
+  cTitle:'개인정보 수집·이용 동의',
+  cItems:[['수집 항목','이름, 연락처'],['이용 목적','만족도 조사 이벤트 당첨자 확인 및 경품 발송'],['보유 기간','경품 발송 완료 후 1개월 이내 파기']],
+  cNote:'동의를 거부할 권리가 있으며, 동의하지 않을 경우 설문 참여에는 제한이 없으나 이벤트 추첨 대상에서는 제외됩니다.',
+  agree:'동의합니다', disagree:'동의하지 않습니다',
+  declineNote:'동의하지 않아도 설문은 제출할 수 있어요. 다만 이벤트 추첨에서는 제외됩니다.',
+  doneEntry:'이벤트 응모가 접수되었습니다. 당첨 시 입력하신 연락처로 안내드릴게요.',
+};
+
+/* 국가 : ISO 3166-1 alpha-2 코드로 저장, 표시 이름은 브라우저(Intl)가 언어별로 제공 */
+const COUNTRIES = ['US','CA','MX','BR','AR','CL','GB','FR','DE','IT','ES','PT','NL','BE','CH','AT','SE','NO','DK','FI','PL','CZ','RU','TR','AE','SA','IL','IN','PK','BD','LK','NP','TH','VN','PH','MY','ID','SG','KH','LA','MM','MN','KZ','UZ','JP','CN','TW','HK','MO','AU','NZ','ZA','EG','KR'];
+const _countryCache = {};
+function countryItems(){
+  const loc = LANGS[state.lang].html;
+  if(_countryCache[state.lang]) return _countryCache[state.lang];
+  let dn, en; try{ dn=new Intl.DisplayNames([loc],{type:'region'}); en=new Intl.DisplayNames(['en'],{type:'region'}); }catch(e){}
+  const items = COUNTRIES.map(c=>({code:c, name:(dn&&dn.of(c))||c, en:(en&&en.of(c))||c}));
+  items.sort((a,b)=>a.name.localeCompare(b.name, loc));
+  items.push({code:'OTHER', name:UI2[state.lang].other, en:'Other'});
+  return (_countryCache[state.lang] = items);
+}
+const countryName = code => { const c = countryItems().find(x=>x.code===code); return c ? c.name : ''; };
+
+/* ---------- 문항 순서 (1~8번) ---------- */
+const QUESTIONS = [
+  {id:'source',     type:'source'},
+  {id:'difficulty', type:'scale', scale:'diff'},
+  {id:'story',      type:'scale', scale:'sat'},
+  {id:'course',     type:'scale', scale:'sat'},
+  {id:'usage',      type:'scale', scale:'ease'},
+  {id:'overall',    type:'scale', scale:'sat'},
+  {id:'recommend',  type:'scale', scale:'rec'},
+  {id:'comment',    type:'text', optional:true},
+];
+const EVENT = QUESTIONS.length;   // 한국어 응답자만 거치는 마지막 단계
+const DONE = 99;
+
+/* ---------- 상태 ---------- */
+const state = {lang:'ko', langChosen:false, step:-2, answers:{}, sourceOther:'', comment:'',
+  country:null, countryQuery:'', comboOpen:false, comboIdx:0, reveal:false,
+  evName:'', evPhone:'', phoneTouched:false, consent:null,
+  sending:false, error:false, dir:1, focus:false};
+// step: -2 언어(+국가), -1 안내, 0..7 문항, 8 이벤트(한국어만), 99 완료
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ui = () => UI[state.lang];
+const isKo = () => state.lang==='ko';
+
+function sourceList(){
+  if(isKo()) return SOURCES_KO.map(o=>({id:o.id, t:o.t, s:o.s}));
+  return SOURCES_INTL.ids.map((id,i)=>({id, t:SOURCES_INTL[state.lang][i]}));
+}
+
+/* 휴대전화 : 숫자만 받아 010-0000-0000 형태로 정리 */
+function fmtPhone(v){
+  const d = v.replace(/\D/g,'').slice(0,11);
+  if(d.length<=3) return d;
+  if(d.length<=7) return d.slice(0,3)+'-'+d.slice(3);
+  return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);
+}
+const phoneOk = v => /^01[016789]\d{7,8}$/.test(v.replace(/\D/g,''));
+
+function canProceed(){
+  if(state.step===-2) return state.langChosen && (isKo() || !!state.country);
+  if(state.step===EVENT) return state.consent!==null && (state.consent===false || (state.evName.trim().length>=2 && phoneOk(state.evPhone)));
+  if(state.step>=0 && state.step<EVENT){ const q=QUESTIONS[state.step]; return !!q.optional || state.answers[q.id]!==undefined; }
+  return true;
+}
+function refreshNext(){
+  const b = $('#nextBtn'); if(b) b.disabled = state.sending || !canProceed();
+}
+
+/* 감사 화면 하단 링크 : 관광명소는 모두에게, 다른 야외 방탈출은 국내(한국어) 응답자에게만 */
+const MORE = {
+  spots:{ url:'https://escape.dawoom.io/busan.spots.html', langParam:true,
+    ko:['부산역에서 만나는 부산 관광명소','역 근처 가볼 만한 곳 보기'], en:['Busan sights near Busan Station','Explore places worth visiting nearby'],
+    ja:['釜山駅から行ける釜山の観光名所','駅周辺のおすすめスポットを見る'], 'zh-Hans':['釜山站周边的釜山景点','查看附近值得一去的地方'], 'zh-Hant':['釜山站周邊的釜山景點','查看附近值得一去的地方'] },
+  escape:{ url:'https://escape.dawoom.io', only:'ko', ko:['다른 야외 방탈출 하러 가기','또 다른 도시 속 미션에 도전해 보세요'] },
+};
+
+/* ---------- 렌더 ---------- */
+const AXIS = {ko:['쉬움','어려움'], en:['Easy','Hard'], ja:['簡単','難しい'], 'zh-Hans':['简单','困难'], 'zh-Hant':['簡單','困難']};
+const CHECK = '<span class="chk" aria-hidden="true"><svg viewBox="0 0 14 14" shape-rendering="crispEdges"><path fill="#fff" d="M2 7h2v2H2zM4 9h2v2H4zM6 7h2v2H6zM8 5h2v2H8zM10 3h2v2h-2z"/></svg></span>';
+const PARCEL = '<svg class="icon" viewBox="0 0 20 16" role="img" aria-hidden="true"><path fill="#16225A" d="M1 3h18v12H1z"/><path fill="#E0E0E0" d="M2 4h16v10H2z"/><path fill="#4169E1" d="M9 3h2v12H9z"/><path fill="#E1332E" d="M12 6h6v6h-6z"/><path fill="#fff" d="M13 9h1v1h-1zM14 10h1v1h-1zM15 9h1v1h-1zM16 8h1v1h-1z"/></svg>';
+const pad2 = n => String(n).padStart(2,'0');
+
+function meter(level){
+  return `<span class="meter" aria-hidden="true">${[1,2,3,4,5].map(i=>`<i class="${i<=level?'on':''}"></i>`).join('')}</span>`;
+}
+function optBtn(val, cur, inner, extra=''){
+  return `<button type="button" role="radio" aria-checked="${cur===val}" class="opt ${extra}" data-ans="${val}">${inner}</button>`;
+}
+
+function countryBlock(){
+  const t = UI2[state.lang];
+  const shown = state.country ? countryName(state.country) : state.countryQuery;
+  return `<div class="country${state.reveal?' reveal':''}">
+    <h2 class="q sm" id="countryQ">${esc(t.cQ)}</h2>
+    <p class="hint sm">${esc(t.cDesc)}</p>
+    <div class="combo">
+      <input id="countryIn" class="field" type="text" role="combobox" aria-expanded="false" aria-controls="countryList" aria-autocomplete="list" aria-labelledby="countryQ" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${esc(t.cPh)}" value="${esc(shown)}">
+      <ul id="countryList" class="combo-list" role="listbox" aria-labelledby="countryQ" hidden></ul>
+    </div>
+  </div>`;
+}
+function filteredCountries(){
+  const q = (state.country ? '' : state.countryQuery).trim().toLowerCase();
+  const items = countryItems();
+  if(!q) return items;
+  return items.filter(c=>c.name.toLowerCase().includes(q) || c.en.toLowerCase().includes(q) || c.code.toLowerCase()===q);
+}
+function drawCombo(){
+  const list = $('#countryList'), inp = $('#countryIn'); if(!list||!inp) return;
+  const items = filteredCountries();
+  if(state.comboIdx>=items.length) state.comboIdx = Math.max(0, items.length-1);
+  list.innerHTML = items.length
+    ? items.map((c,i)=>`<li role="option" id="co-${c.code}" data-code="${c.code}" class="${i===state.comboIdx?'act':''}" aria-selected="${c.code===state.country}">${esc(c.name)}${c.code!=='OTHER'&&c.en!==c.name?`<span>${esc(c.en)}</span>`:''}</li>`).join('')
+    : `<li class="none" role="presentation">${esc(UI2[state.lang].none)}</li>`;
+  list.hidden = !state.comboOpen;
+  inp.setAttribute('aria-expanded', String(state.comboOpen));
+  const a = items[state.comboIdx];
+  if(state.comboOpen && a) inp.setAttribute('aria-activedescendant','co-'+a.code); else inp.removeAttribute('aria-activedescendant');
+  const el = list.querySelector('.act'); if(el && state.comboOpen) el.scrollIntoView({block:'nearest'});
+}
+function chooseCountry(code){
+  state.country = code; state.countryQuery = ''; state.comboOpen = false;
+  const inp = $('#countryIn'); if(inp) inp.value = countryName(code);
+  drawCombo(); refreshNext();
+}
+
+function eventScreen(cls){
+  const e = EV, c = state.consent;
+  const agree = c===true;
+  const phoneBad = state.phoneTouched && agree && state.evPhone && !phoneOk(state.evPhone);
+  return `<section class="${cls}">
+    <div class="kicker">${e.kicker}</div>
+    <h2 class="q" tabindex="-1" id="focusMe">${esc(e.title)}</h2>
+    <div class="gift" role="img" aria-label="${e.giftK} ${e.giftAmt}${e.giftUnit} · ${e.giftSub}">
+      <div class="gift-txt" aria-hidden="true">
+        <div class="gift-k">${e.giftK}</div>
+        <div class="gift-amt">${e.giftAmt}<small>${e.giftUnit}</small></div>
+        <div class="gift-sub">${e.giftSub}</div>
+      </div>
+      <img class="gift-logo" src="assets/npay.png" alt="" width="400" height="150">
+    </div>
+    <div class="lead">${e.desc.map(p=>`<p>${esc(p)}</p>`).join('')}</div>
+
+    <div class="fields${c===false?' off':''}">
+      <label class="label" for="evName">${e.name}${agree?`<em class="req">${e.req}</em>`:''}</label>
+      <input id="evName" class="field" type="text" autocomplete="name" maxlength="30" placeholder="${esc(e.namePh)}" value="${esc(state.evName)}" ${c===false?'disabled':''}>
+      <label class="label" for="evPhone">${e.phone}${agree?`<em class="req">${e.req}</em>`:''}</label>
+      <input id="evPhone" class="field${phoneBad?' bad':''}" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="13" placeholder="${esc(e.phonePh)}" value="${esc(state.evPhone)}" aria-describedby="phoneErr" ${c===false?'disabled':''}>
+      <div class="ferr${phoneBad?' on':''}" id="phoneErr" role="alert">${phoneBad?esc(e.phoneErr):''}</div>
+    </div>
+
+    <div class="consent" role="group" aria-labelledby="consentT">
+      <h3 id="consentT">${e.cTitle}</h3>
+      <dl>${e.cItems.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+      <p class="cnote">${esc(e.cNote)}</p>
+      <div class="opts row" role="radiogroup" aria-labelledby="consentT">
+        <button type="button" role="radio" aria-checked="${c===true}" class="opt" data-consent="1"><span class="txt">${e.agree}</span>${CHECK}</button>
+        <button type="button" role="radio" aria-checked="${c===false}" class="opt" data-consent="0"><span class="txt">${e.disagree}</span>${CHECK}</button>
+      </div>
+      ${c===false?`<p class="cnote soft">${esc(e.declineNote)}</p>`:''}
+    </div>
+    <div class="err ${state.error?'on':''}" role="alert">${esc(ui().error)}</div>
+    <div class="spacer"></div>
+    <div class="nav">
+      <button type="button" class="btn ghost" data-act="prev">${ui().prev}</button>
+      <button type="button" class="btn primary" id="nextBtn" data-act="submit" ${canProceed()&&!state.sending?'':'disabled'}>${state.sending?ui().sending:ui().submit}</button>
+    </div>
+  </section>`;
+}
+
+/* ---------- 얼굴 슬라이더 (5단계) + 컨페티 ---------- */
+const BRAND = {ko:'잃어버린 소포', en:'The Lost Parcel', ja:'失われた小包', 'zh-Hans':'遗失的包裹', 'zh-Hant':'遺失的包裹'};
+const SLIDE_HINT = {ko:'밀거나 눌러서 선택해 주세요.', en:'Drag or tap to choose.', ja:'スライドまたはタップして選んでください。', 'zh-Hans':'拖动或点按来选择。', 'zh-Hant':'拖曳或點按來選擇。'};
+/* 값 1~5 → 표정 이미지. 난이도: 1 매우 쉬움=emotion-05 … 5 매우 어려움=emotion-01 / 그 외(만족·이해·추천): 1=emotion-06(불만) … 5=emotion-10(만족) */
+const faceFor = (scale, v) => 'assets/emotion-' + String(ltr(scale) ? 6-v : v+5).padStart(2,'0') + '.png';
+/* 값 v에 해당하는 라벨 (SCALES 배열은 diff만 값 오름차순, 나머지는 긍정→부정 순) */
+const ltr = scale => scale==='diff' || scale==='ease';   // 왼쪽=쉬움 → 오른쪽=어려움 (질문2·5 통일)
+const scaleLabel = (scale, v) => SCALES[scale][state.lang][ltr(scale) ? v-1 : 5-v];
+['01','02','03','04','05','06','07','08','09','10'].forEach(n=>{ new Image().src = 'assets/emotion-'+n+'.png'; });
+
+function sliderHTML(q){
+  const v = state.answers[q.id], on = v!==undefined, cv = on ? v : 3;
+  const txt = on ? scaleLabel(q.scale,v) : SLIDE_HINT[state.lang];
+  return `<div class="sl-wrap">
+    <div class="sl-cur ${on?'':'idle'}" id="slCur" aria-live="polite">${esc(txt)}</div>
+    <div class="slider ${on?'has':'idle'}" id="slider" role="slider" tabindex="0" aria-labelledby="focusMe" aria-valuemin="1" aria-valuemax="5" aria-valuenow="${cv}" aria-valuetext="${esc(txt)}" data-scale="${q.scale}" data-q="${q.id}" style="--f:${(cv-1)/4}">
+      <div class="rail"><div class="fill"></div></div>
+      <div class="thumb"><img id="slFace" src="${faceFor(q.scale,cv)}" alt="" width="72" height="72"></div>
+    </div>
+    <div class="sl-ends" aria-hidden="true"><span>${esc(scaleLabel(q.scale,1))}</span><span>${esc(scaleLabel(q.scale,5))}</span></div>
+  </div>`;
+}
+function setScale(el, v){
+  const scale = el.dataset.scale, qid = el.dataset.q;
+  if(state.answers[qid]===v) return;
+  state.answers[qid] = v;
+  el.classList.remove('idle'); el.classList.add('has');
+  el.setAttribute('aria-valuenow', v);
+  el.setAttribute('aria-valuetext', scaleLabel(scale,v));
+  $('#slFace').src = faceFor(scale,v);
+  const cur = $('#slCur'); cur.textContent = scaleLabel(scale,v); cur.classList.remove('idle');
+  refreshNext();
+  if((scale==='sat'||scale==='rec') && v===5) confetti(el);   // emotion-10 → 컨페티
+}
+/* 0~1 위치 (손가락을 따라 연속으로 움직이고, 놓으면 가장 가까운 단계로 부드럽게 안착) */
+function fracFromX(el, x){
+  const r = el.getBoundingClientRect();
+  return Math.min(1, Math.max(0, (x - r.left - 40) / (r.width - 80)));
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Tab'||e.key.startsWith('Arrow')) document.body.classList.add('kbd'); });
+document.addEventListener('pointerdown', ()=>document.body.classList.remove('kbd'));
+let _drag = null, _x0 = 0;
+function snap(el, v){ el.style.setProperty('--f', (v-1)/4); setScale(el, v); }
+app.addEventListener('pointerdown', e=>{
+  const el = e.target.closest('#slider'); if(!el) return;
+  e.preventDefault();
+  _drag = el; _x0 = e.clientX;
+  try{ el.setPointerCapture(e.pointerId); }catch(_){}
+  snap(el, Math.round(fracFromX(el, e.clientX)*4)+1);   // 누르면 그 위치로 스르륵 이동
+});
+app.addEventListener('pointermove', e=>{
+  if(!_drag) return;
+  if(Math.abs(e.clientX-_x0) > 4) _drag.classList.add('dragging');
+  if(!_drag.classList.contains('dragging')) return;
+  const f = fracFromX(_drag, e.clientX);
+  _drag.style.setProperty('--f', f);
+  setScale(_drag, Math.round(f*4)+1);
+});
+const endDrag = () => {
+  if(!_drag) return;
+  const el = _drag; _drag = null;
+  const v = state.answers[el.dataset.q];
+  el.classList.remove('dragging');
+  if(v!==undefined) el.style.setProperty('--f', (v-1)/4);
+};
+app.addEventListener('pointerup', endDrag); app.addEventListener('pointercancel', endDrag);
+
+function confetti(from){
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const old = $('#confetti'); if(old) old.remove();
+  const cv = document.createElement('canvas'); cv.id = 'confetti'; cv.setAttribute('aria-hidden','true');
+  document.body.appendChild(cv);
+  const dpr = window.devicePixelRatio || 1, W = innerWidth, H = innerHeight;
+  cv.width = W*dpr; cv.height = H*dpr;
+  const c = cv.getContext('2d'); c.scale(dpr,dpr);
+  const r = from.getBoundingClientRect();
+  const ox = r.right - 40, oy = r.top + r.height/2;   // 오른쪽 끝(만족) 얼굴 위치
+  const colors = ['#4169E1','#E1332E','#FFC93C','#00DE5A','#FFFFFF','#16225A','#8FA6F0'];
+  const P = Array.from({length:140}, ()=>{
+    const a = -Math.PI/2 + (Math.random()-.5)*Math.PI*1.1, s = 7 + Math.random()*11;
+    return {x:ox, y:oy, vx:Math.cos(a)*s, vy:Math.sin(a)*s, w:5+Math.random()*6, h:5+Math.random()*6,
+      rot:Math.random()*6, vr:(Math.random()-.5)*.35, col:colors[(Math.random()*colors.length)|0]};
+  });
+  const t0 = performance.now();
+  (function tick(t){
+    const dt = t - t0; c.clearRect(0,0,W,H);
+    P.forEach(p=>{
+      p.vy += .38; p.vx *= .99; p.vy *= .992; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      c.save(); c.globalAlpha = Math.max(0, 1 - Math.max(0, dt-1700)/700);
+      c.translate(p.x,p.y); c.rotate(p.rot); c.fillStyle = p.col; c.fillRect(-p.w/2,-p.h/2,p.w,p.h); c.restore();
+    });
+    if(dt < 2400) requestAnimationFrame(tick); else cv.remove();
+  })(t0);
+}
+
+/* 줄바꿈 다듬기 : 〈작품명〉·「고유명」은 통째로 한 줄에 두고, 일본어·중국어는 단어(구) 경계에서만 줄바꿈 (<wbr> 삽입) */
+const _seg = {};
+const CLOSE = /^[。、，．,.!?！？；：:）)〉》」』”’]/, OPEN = /[（(〈《「『“‘]$/;
+const NAME = /((?:〈[^〉]+〉|「[^」]+」)[를을에의가은는와과도로をにのはがとで的]?)/g;
+function phraseWrap(root){
+  const l = state.lang; if(l==='en') return;
+  const seg = (l!=='ko' && l!=='ja' && typeof Intl!=='undefined' && Intl.Segmenter) ? (_seg[l] || (_seg[l] = new Intl.Segmenter(l==='ja'?'ja':l, {granularity:'word'}))) : null;
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode:n=>/^(INPUT|TEXTAREA|SCRIPT|STYLE)$/.test(n.parentNode.nodeName)||n.textContent.trim().length<3?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  const nodes=[]; let n; while(n=tw.nextNode()) nodes.push(n);
+  const wbr = () => document.createElement('wbr');
+  nodes.forEach(t=>{
+    const text = t.textContent;
+    if(!seg && l!=='ja' && !NAME.test(text)) { NAME.lastIndex=0; return; }
+    NAME.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    const pieces = text.split(NAME);
+    pieces.forEach((piece,i)=>{
+      if(!piece) return;
+      if(i%2===1){ const s=document.createElement('span'); s.style.whiteSpace='nowrap'; s.textContent=piece; frag.append(s); if(pieces[i+1] && !CLOSE.test(pieces[i+1]) && !/^\s/.test(pieces[i+1])) frag.append(wbr()); return; }
+      if(l==='ja'){   // 일본어 : 히라가나(조사·어미) 뒤에서 한자/가타카나가 시작될 때만 줄바꿈 허용
+        const MARK = '@@';
+        piece
+          .replace(/([\u3041-\u309F、。])(?=[\u30A0-\u30FF\u4E00-\u9FFF〈「（(“])/g, (m,c)=> (c==='ご'||c==='お') ? c : c+MARK)   // 히라가나 뒤에서 한자·가타카나 시작 (ご・お 접두어는 제외)
+          .replace(/を(?=[\u3041-\u309F])/g, 'を'+MARK)                                                                  // 「…を|ありがとう」
+          .split(MARK).forEach((c,k)=>{ if(k) frag.append(wbr()); frag.append(c); });
+        return;
+      }
+      if(!seg){ frag.append(piece); return; }
+      let buf='';
+      [...seg.segment(piece)].forEach((s,k)=>{
+        const p = s.segment;
+        if(k>0 && !/\s$/.test(buf) && !/^\s/.test(p) && !CLOSE.test(p) && !OPEN.test(buf)){ frag.append(buf, wbr()); buf=''; }
+        buf += p;
+      });
+      frag.append(buf);
+    });
+    t.replaceWith(frag);
+  });
+}
+
+function moreLinks(){
+  return Object.values(MORE).filter(m=>!m.only || m.only===state.lang).map(m=>{
+    const [t,d] = m[state.lang] || m.ko;
+    const href = m.langParam ? m.url + '?lang=' + state.lang : m.url;
+    return `<a class="more-row" href="${href}" target="_blank" rel="noopener"><span class="mt"><b>${esc(t)}</b><small>${esc(d)}</small></span><svg viewBox="0 0 8 12" width="9" height="13" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M2 0h2v2H2zM4 2h2v2H4zM6 4h2v4H6zM4 8h2v2H4zM2 10h2v2H2z"/></svg></a>`;
+  }).join('');
+}
+function render(){
+  const u = ui();
+  document.documentElement.lang = LANGS[state.lang].html;
+  $('#langLabel').textContent = LANGS[state.lang].label;
+  $('#brandName').textContent = BRAND[state.lang]; document.title = BRAND[state.lang];
+  document.querySelectorAll('.lang-opt').forEach(o=>o.classList.toggle('active', o.dataset.lang===state.lang));
+
+  const total = QUESTIONS.length;
+  const inQ = state.step>=0 && state.step<total;
+  const showProg = inQ || state.step===EVENT;
+  $('#progress').classList.toggle('on', showProg);
+  if(showProg){
+    $('#pLeft').innerHTML = inQ ? `<b>${pad2(state.step+1)}</b> / ${pad2(total)}` : `<b>${pad2(total)}</b> / ${pad2(total)}`;
+    $('#pLabel').textContent = inQ ? 'QUESTION' : 'EVENT';
+    $('#bar').style.width = (inQ ? (state.step+1)/total*100 : 100) + '%';
+  }
+
+  const cls = 'screen' + (state.dir<0 ? ' back' : state.dir===0 ? ' still' : '');
+  let html = '';
+  if(state.step===-2){
+    html = `<section class="${cls}">
+      <div class="kicker">${u.langKicker}</div>
+      <h1 tabindex="-1" id="focusMe">${esc(BRAND[state.lang])}</h1>
+      <p class="prompt" id="langQ">${esc(UI2[state.lang].prompt)}</p>
+      <div class="opts langs" role="radiogroup" aria-labelledby="langQ">${Object.keys(LANGS).map(k=>`<button type="button" role="radio" aria-checked="${state.langChosen&&k===state.lang}" class="opt lang" data-pick-lang="${k}" lang="${k}"><span class="txt">${LANGS[k].label}</span>${CHECK}</button>`).join('')}</div>
+      ${state.langChosen && !isKo() ? countryBlock() : ''}
+      <div class="spacer"></div>
+      <div class="nav"><button type="button" class="btn primary" id="nextBtn" data-act="next" ${canProceed()?'':'disabled'}>${u.next}</button></div>
+    </section>`;
+  } else if(state.step===-1){
+    html = `<section class="${cls}">
+      <div class="kicker">${u.introKicker}</div>
+      <h1 tabindex="-1" id="focusMe">${esc(u.introTitle).replace(/\n/g,' ')}</h1>
+      <div class="lead">${u.intro.map(p=>`<p>${esc(p)}</p>`).join('')}</div>
+      <div class="spacer"></div>
+      <div class="nav"><button type="button" class="btn ghost" data-act="prev">${u.prev}</button><button type="button" class="btn primary" data-act="start">${u.start}</button></div>
+    </section>`;
+  } else if(inQ){
+    const q = QUESTIONS[state.step];
+    let body = '';
+    if(q.type==='source'){
+      const cur = state.answers.source;
+      body = `<div class="opts" role="radiogroup" aria-labelledby="focusMe">${sourceList().map(o=>optBtn(o.id, cur, `<span class="txt">${esc(o.t)}${o.s?`<small>${esc(o.s)}</small>`:''}</span>${CHECK}`)).join('')}</div>
+        ${cur==='other'?`<input class="field other-input" id="otherIn" maxlength="100" aria-label="${esc(u.otherPh)}" placeholder="${esc(u.otherPh)}" value="${esc(state.sourceOther)}">`:''}`;
+    } else if(q.type==='scale'){
+      body = sliderHTML(q);
+    } else {
+      body = `<textarea id="commentIn" rows="4" maxlength="${MAX_TEXT}" aria-labelledby="focusMe" placeholder="${esc(u.commentPh)}">${esc(state.comment)}</textarea>
+        <div class="count"><span id="cnt">${state.comment.length}</span> / ${MAX_TEXT}</div>
+        <div class="err ${state.error?'on':''}" role="alert">${esc(u.error)}</div>`;
+    }
+    const last = state.step===total-1 && !isKo();   // 한국어 응답자는 이벤트 화면에서 제출
+    html = `<section class="${cls}">
+      <div class="kicker">QUESTION ${pad2(state.step+1)}${q.optional?` · ${u.optional}`:''}</div>
+      <h2 class="q" tabindex="-1" id="focusMe">${esc(u.q[q.id])}</h2>
+      ${body}
+      <div class="spacer"></div>
+      <div class="nav">
+        <button type="button" class="btn ghost" data-act="prev">${u.prev}</button>
+        <button type="button" class="btn primary" id="nextBtn" data-act="${last?'submit':'next'}" ${canProceed()&&!state.sending?'':'disabled'}>${state.sending?u.sending:(last?u.submit:u.next)}</button>
+      </div>
+    </section>`;
+  } else if(state.step===EVENT){
+    html = eventScreen(cls);
+  } else {
+    const entered = isKo() && state.consent===true;
+    html = `<section class="${cls} done">
+      <img class="npcs" src="assets/npcs.png" alt="" width="1983" height="793">
+      <div class="kicker">THANK YOU, DETECTIVE!</div>
+      <h1 tabindex="-1" id="focusMe">${esc(u.doneTitle)}</h1>
+      <div class="lead"><p>${esc(u.doneText)}</p>${entered?`<p class="entry">${esc(EV.doneEntry)}</p>`:''}</div>
+      <nav class="more" aria-label="links">${moreLinks()}</nav>
+    </section>`;
+  }
+  app.innerHTML = html;
+  phraseWrap(app);
+  if(state.dir!==0) window.scrollTo(0,0);
+  state.reveal = false;
+  if(state.step===-2) drawCombo();
+  const f = $('#focusMe'); if(f && state.focus) f.focus({preventScroll:true});
+}
+
+/* ---------- 이벤트 ---------- */
+function setLang(l){
+  if(isKo()!==(l==='ko')){ delete state.answers.source; state.sourceOther=''; } // 유입경로 선택지가 달라짐
+  state.lang = l;
+  if(l==='ko'){ state.country=null; state.countryQuery=''; }
+  else { state.consent=null; state.evName=''; state.evPhone=''; }                // 외국어 응답자에게는 이벤트 없음
+  if(state.step===EVENT && l!=='ko') state.step = EVENT-1;
+  try{ localStorage.setItem('lp_survey_lang', l); }catch(e){}
+  render();
+}
+function pickLang(k){
+  const wasForeign = state.langChosen && !isKo();
+  state.reveal = !wasForeign && k!=='ko';      // 외국어를 처음 고를 때만 국가 영역이 부드럽게 나타남
+  state.langChosen = true; state.dir = 0; state.focus = false; state.comboOpen = false;
+  setLang(k);
+}
+
+app.addEventListener('click', e=>{
+  const pl = e.target.closest('[data-pick-lang]');
+  if(pl){ pickLang(pl.dataset.pickLang); const b=app.querySelector(`[data-pick-lang="${pl.dataset.pickLang}"]`); b&&b.focus({preventScroll:true}); return; }
+  const co = e.target.closest('#countryList [data-code]');
+  if(co){ chooseCountry(co.dataset.code); return; }
+  const cs = e.target.closest('[data-consent]');
+  if(cs){
+    state.consent = cs.dataset.consent==='1'; state.dir=0; state.focus=false;
+    render(); const sel=app.querySelector('[data-consent][aria-checked=true]'); sel&&sel.focus({preventScroll:true});
+    return;
+  }
+  const ans = e.target.closest('[data-ans]');
+  if(ans){
+    const q = QUESTIONS[state.step];
+    const v = ans.dataset.ans;
+    state.answers[q.id] = q.type==='scale' ? Number(v) : v;
+    if(q.type==='source' && v!=='other') state.sourceOther='';
+    state.dir = 0; state.focus = false;
+    render();                                   // 자동 이동 없음 : 선택만 반영
+    const sel = app.querySelector('[aria-checked=true]'); if(sel) sel.focus({preventScroll:true});
+    if(q.type==='source' && v==='other'){ const i=$('#otherIn'); i&&i.focus(); }
+    return;
+  }
+  const act = e.target.closest('[data-act]');
+  if(!act || act.disabled) return;
+  const a = act.dataset.act;
+  if(a==='start' || a==='next') go(1);
+  else if(a==='prev') go(-1);
+  else if(a==='submit') submit();
+});
+app.addEventListener('input', e=>{
+  const id = e.target.id;
+  if(id==='otherIn') state.sourceOther = e.target.value;
+  else if(id==='commentIn'){ state.comment = e.target.value; $('#cnt').textContent = state.comment.length; }
+  else if(id==='evName'){ state.evName = e.target.value; refreshNext(); }
+  else if(id==='evPhone'){
+    state.evPhone = fmtPhone(e.target.value); e.target.value = state.evPhone;
+    if(state.phoneTouched) updatePhoneErr();
+    refreshNext();
+  }
+  else if(id==='countryIn'){
+    state.country = null; state.countryQuery = e.target.value; state.comboOpen = true; state.comboIdx = 0;
+    drawCombo(); refreshNext();
+  }
+});
+function updatePhoneErr(){
+  const bad = state.consent===true && state.evPhone && !phoneOk(state.evPhone);
+  const el = $('#phoneErr'), inp = $('#evPhone'); if(!el||!inp) return;
+  el.textContent = bad ? EV.phoneErr : ''; el.classList.toggle('on', !!bad); inp.classList.toggle('bad', !!bad);
+}
+app.addEventListener('focusout', e=>{
+  if(e.target.id==='evPhone'){ state.phoneTouched = true; updatePhoneErr(); }
+  if(e.target.id==='countryIn'){
+    setTimeout(()=>{ state.comboOpen=false; const inp=$('#countryIn'); if(inp && state.country) inp.value=countryName(state.country); drawCombo(); }, 120);
+  }
+});
+app.addEventListener('focusin', e=>{
+  if(e.target.id==='countryIn' && !state.comboOpen){ state.comboOpen=true; state.comboIdx=0; if(state.country) e.target.select(); drawCombo(); }
+});
+app.addEventListener('click', e=>{
+  if(e.target.id==='countryIn' && !state.comboOpen){ state.comboOpen=true; drawCombo(); }
+});
+app.addEventListener('keydown', e=>{
+  if(e.target.id==='countryIn'){
+    const items = filteredCountries();
+    if(e.key==='ArrowDown'){ e.preventDefault(); state.comboOpen=true; state.comboIdx=Math.min(items.length-1, state.comboIdx+1); drawCombo(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); state.comboIdx=Math.max(0, state.comboIdx-1); drawCombo(); }
+    else if(e.key==='Enter'){ if(state.comboOpen && items[state.comboIdx]){ e.preventDefault(); chooseCountry(items[state.comboIdx].code); } }
+    else if(e.key==='Escape'){ state.comboOpen=false; drawCombo(); }
+    return;
+  }
+  if(e.target.id==='slider'){
+    const el = e.target, cur = state.answers[el.dataset.q];
+    let v = cur===undefined ? 3 : cur;
+    if(e.key==='ArrowRight'||e.key==='ArrowUp') v = Math.min(5, v+1);
+    else if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = Math.max(1, v-1);
+    else if(e.key==='Home') v = 1; else if(e.key==='End') v = 5; else return;
+    e.preventDefault();
+    snap(el, v);
+    return;
+  }
+  // 라디오 그룹처럼 방향키로 이동
+  if(!['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)) return;
+  const b = e.target.closest('[role=radio]'); if(!b) return;
+  const list = [...b.parentElement.querySelectorAll('[role=radio]')];
+  const i = list.indexOf(b), n = (e.key==='ArrowDown'||e.key==='ArrowRight') ? i+1 : i-1;
+  if(list[n]){ e.preventDefault(); list[n].focus(); }
+});
+// 목록을 눌러도 입력창 포커스가 빠지지 않게
+app.addEventListener('mousedown', e=>{ if(e.target.closest('#countryList')) e.preventDefault(); });
+
+function go(d){
+  if(d>0 && !canProceed()) return;
+  state.dir = d; state.focus = true;
+  let n = state.step + d;
+  if(n>=EVENT && !isKo()) n = EVENT-1;          // 외국어 응답자는 이벤트 단계 없음
+  state.step = Math.max(-2, Math.min(EVENT, n));
+  state.error=false;
+  render();
+}
+
+/* 언어 메뉴 */
+const menu = $('#langMenu');
+$('#langBtn').addEventListener('click', e=>{
+  e.stopPropagation(); menu.classList.toggle('open');
+  $('#langBtn').setAttribute('aria-expanded', menu.classList.contains('open'));
+});
+menu.addEventListener('click', e=>{
+  const o = e.target.closest('.lang-opt'); if(!o) return;
+  menu.classList.remove('open'); $('#langBtn').setAttribute('aria-expanded','false');
+  if(state.step===-2) pickLang(o.dataset.lang);
+  else { state.dir=0; state.focus=false; setLang(o.dataset.lang); }
+});
+document.addEventListener('click', ()=>{ menu.classList.remove('open'); $('#langBtn').setAttribute('aria-expanded','false'); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') menu.classList.remove('open'); });
+
+/* ---------- 제출 ---------- */
+function buildPayload(){
+  const a = state.answers;
+  const ko = isKo();
+  const agreed = ko && state.consent===true;
+  return {
+    submittedAt: new Date().toISOString(),
+    lang: state.lang,
+    country: ko ? null : (state.country || null),   // ISO 3166-1 alpha-2, 기타 = OTHER
+    source: a.source || '',
+    sourceOther: a.source==='other' ? state.sourceOther.trim() : '',
+    difficulty: a.difficulty,      // 1 매우 쉬움 … 5 매우 어려움
+    story: a.story,                // 5 매우 만족 … 1 매우 불만족
+    course: a.course,
+    usage: a.usage,                // 1 매우 쉬웠다 … 5 매우 어려웠다 (난이도와 같은 방향)
+    overall: a.overall,            // KPI
+    recommend: a.recommend,        // 5 매우 그렇다 … 1 전혀 그렇지 않다
+    comment: state.comment.trim(),
+    privacyConsent: agreed,        // 개인정보 수집·이용 동의 (한국어 응답자만 true 가능)
+    eventEntry: agreed,            // 동의한 경우에만 이벤트 추첨 대상
+    name: agreed ? state.evName.trim() : '',
+    phone: agreed ? state.evPhone : '',
+  };
+}
+async function submit(){
+  if(state.sending || !canProceed()) return;
+  state.sending = true; state.error = false; state.dir = 0; render();
+  const payload = buildPayload();
+  // 항상 이 기기에도 백업 (전송 성공 시 삭제)
+  try{
+    const q = JSON.parse(localStorage.getItem('lp_survey_queue')||'[]');
+    q.push(payload); localStorage.setItem('lp_survey_queue', JSON.stringify(q));
+  }catch(e){}
+  let ok = true;
+  if(ENDPOINT){
+    try{
+      await fetch(ENDPOINT, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
+    }catch(e){ ok = false; }
+  }
+  state.sending = false;
+  if(ok){
+    try{ localStorage.removeItem('lp_survey_queue'); if(!ENDPOINT) localStorage.setItem('lp_survey_queue', JSON.stringify([payload])); }catch(e){}
+    state.dir = 1; state.focus = true; state.step = DONE;
+  } else state.error = true;
+  render();
+}
+
+/* ---------- 시작 ---------- */
+(function init(){
+  // ?lang=ko 처럼 링크로 언어를 미리 정할 수 있음 (QR 코드 언어별 배포용). 외국어는 국가 선택이 필요해 첫 화면에 머뭅니다.
+  const p = new URLSearchParams(location.search).get('lang');
+  if(p && LANGS[p]){
+    state.lang=p; state.langChosen=true;
+    if(p==='ko') state.step=-1;
+  }
+  render();
+})();
+</script>
+</body>
+</html>
