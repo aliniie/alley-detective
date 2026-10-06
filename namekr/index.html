@@ -37,6 +37,7 @@ h1{font-size:28px;line-height:1.25;margin:28px 0 6px}
 .mode{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .mode .grp{display:flex;flex-wrap:wrap;gap:6px;transition:opacity .15s}
 .mode .grp.dim{opacity:.38}
+.mode [hidden],.mode[hidden]{display:none}
 .tag.jpn{color:var(--blue);border-color:var(--blue)}
 .mode button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 14px;font:inherit;font-size:13px;cursor:pointer}
 .mode button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
@@ -125,10 +126,10 @@ const HZ_DATA="一yi|일;丁ding|정;七qi|칠;万wan|만;丈zhang|장;三san|�
 /* ---------- UI strings ---------- */
 const T={
   en:{hzm:"Chinese sound",hzh:"Korean hanja reading",hzNote:"Chinese names are usually written by Mandarin sound (王小明 → 왕샤오밍); hanja reading is the traditional Korean way. For Japanese names, type kana (やまだ たろう) or choose the romaji option. Kanji names need their reading.",lEn:"English name",lJa:"Japanese name (romaji)",jpn:"Japanese reading",hzMissing:"Some characters aren't in our data: ",kana:"Japanese names aren't supported yet. Please type Chinese characters or English letters.",title:"What is your name in Korean?",lead:"Type your name in English letters. We'll write it the way Koreans would say it.",inputLabel:"Your name (e.g. Emma Smith)",placeholder:"Type your name…",try:"Try:",resultLabel:"Your name in Korean",speak:"🔊 Hear it",copy:"Copy",copied:"Copied!",save:"Save as image",dict:"common name",rule:"by sound rules",unsupported:"For now this works with English letters (A–Z). Please type your name in the Latin alphabet.",already:"That's already Korean! Try typing a name in English letters.",cantConvert:"Couldn't convert this one. Please check the spelling.",note:"Names are converted by how they sound, following Korean loanword rules. Common names come from a built-in list; others use sound rules and may differ from how you'd spell it yourself. It's a fun guide, not an official record.",cardTitle:"MY KOREAN NAME"},
- tw:{hzm:"依中文發音",hzh:"韓國漢字音",hzNote:"現代の中国人の名前は通常、中国語の発音で表記します（王小明 → 왕샤오밍）。日本人の名前は、かなで入力するか、ローマ字オプションを選んでください。漢字の名前は読み方が必要です。",lEn:"英語の名前",lJa:"日本人の名前（ローマ字）",jpn:"日本語の読み",hzMissing:"資料中沒有這些字：",kana:"暫不支援日文姓名，請輸入漢字（中文）或英文字母。",title:"你的名字用韓文怎麼寫？",lead:"請用英文字母輸入名字，我們會依韓國人的讀音寫出來。",inputLabel:"名字（例如 Emma Smith）",placeholder:"輸入你的名字…",try:"試試：",resultLabel:"你的韓文名字",speak:"🔊 聽發音",copy:"複製",copied:"已複製！",save:"儲存為圖片",dict:"常見名字",rule:"發音規則",unsupported:"目前只支援英文字母（A–Z）的名字。",already:"這已經是韓文了！請用英文字母輸入。",cantConvert:"無法轉換，請檢查拼寫。",note:"依外來語標記規則，根據發音轉換。常見名字來自內建名單，其他名字依發音規則轉換，可能與實際寫法不同。僅供娛樂參考。",cardTitle:"MY KOREAN NAME"},
- ar:{hzm:"النطق الصيني",hzh:"القراءة الكورية للهانجا",hzNote:"现代中国人名通常按普通话读音标记（王小明 → 왕샤오밍）。日本人名请输入假名，或选择罗马字选项；汉字姓名需要读音。",lEn:"英文名",lJa:"日本人名（罗马字）",jpn:"日语读音",hzMissing:"بعض الأحرف غير موجودة في البيانات: ",kana:"الأسماء اليابانية غير مدعومة بعد. اكتب بالأحرف الصينية أو اللاتينية.",title:"كيف يُكتب اسمك بالكورية؟",lead:"اكتب اسمك بالأحرف العربية أو اللاتينية، وسنكتبه كما ينطقه الكوريون.",inputLabel:"اسمك (مثال: محمد أحمد أو Emma Smith)",placeholder:"اكتب اسمك…",try:"جرّب:",resultLabel:"اسمك بالكورية",speak:"🔊 استمع",copy:"نسخ",copied:"تم النسخ!",save:"حفظ كصورة",dict:"اسم شائع",rule:"بقواعد النطق",unsupported:"يدعم الموقع حاليًا الأحرف اللاتينية (A–Z) والعربية فقط.",already:"هذا مكتوب بالكورية بالفعل! اكتب اسمك بحروف عربية أو لاتينية.",cantConvert:"تعذّر التحويل. تحقق من الإملاء.",note:"يُحوَّل الاسم حسب نطقه وفق قواعد الكتابة الكورية للأسماء الأجنبية. الأسماء الشائعة من قائمة مدمجة، وغيرها بقواعد النطق وقد يختلف عن الكتابة الفعلية. للتسلية والاسترشاد فقط.",cardTitle:"MY KOREAN NAME"},
- ja:{hzm:"中国語の発音",hzh:"韓国の漢字音",hzNote:"現代中國人名通常依普通話讀音標記（王小明 → 왕샤오밍）。日本人名請輸入假名，或選擇羅馬字選項；漢字姓名需要讀音。",lEn:"英文名",lJa:"日本人名（羅馬字）",jpn:"日語讀音",hzMissing:"データにない文字があります：",kana:"日本語の名前にはまだ対応していません。漢字（中国語）かアルファベットで入力してください。",title:"あなたの名前を韓国語（ハングル）で",lead:"アルファベットで名前を入力してください。韓国の人が読む音に合わせて表記します。",inputLabel:"名前（例：Emma Smith）",placeholder:"名前を入力…",try:"例：",resultLabel:"ハングルの名前",speak:"🔊 発音を聞く",copy:"コピー",copied:"コピーしました",save:"画像で保存",dict:"よくある名前",rule:"発音ルール",unsupported:"現在はアルファベット（A–Z）の名前のみ対応しています。",already:"すでにハングルです。アルファベットで入力してください。",cantConvert:"変換できませんでした。綴りを確認してください。",note:"外来語表記のルールに沿って音で変換します。一般的な名前は内蔵リスト、その他は発音ルールを使うため、実際の表記と異なる場合があります。参考としてお楽しみください。",cardTitle:"MY KOREAN NAME"},
- zh:{hzm:"按中文读音",hzh:"韩国汉字音",hzNote:"تُكتب أسماء الصينيين المعاصرين عادةً حسب النطق الصيني (王小明 ← 왕샤오밍). للأسماء اليابانية اكتبها بالكانا أو اختر خيار الحروف اللاتينية؛ أسماء الكانجي تحتاج إلى قراءتها.",lEn:"اسم إنجليزي",lJa:"اسم ياباني (بالحروف اللاتينية)",jpn:"النطق الياباني",hzMissing:"数据中没有这些字：",kana:"暂不支持日文姓名，请输入汉字（中文）或英文字母。",title:"你的名字用韩文怎么写？",lead:"请用英文字母输入名字，我们会按韩国人的读音写出来。",inputLabel:"名字（例如 Emma Smith）",placeholder:"输入你的名字…",try:"试试：",resultLabel:"你的韩文名字",speak:"🔊 听发音",copy:"复制",copied:"已复制！",save:"保存为图片",dict:"常见名字",rule:"发音规则",unsupported:"目前只支持英文字母（A–Z）的名字。",already:"这已经是韩文了！请用英文字母输入。",cantConvert:"无法转换，请检查拼写。",note:"按外来语标记规则根据发音转换。常见名字来自内置名单，其他名字按发音规则转换，可能与实际写法不同。仅供娱乐参考。",cardTitle:"MY KOREAN NAME"}
+ tw:{hzm:"依中文發音",hzh:"韓國漢字音",hzNote:"現代中國人名通常依普通話讀音標記（王小明 → 왕샤오밍）。日本人名請輸入假名，或選擇羅馬字選項；漢字姓名需要讀音。",lEn:"英文名",lJa:"日本人名（羅馬字）",jpn:"日語讀音",hzMissing:"資料中沒有這些字：",kana:"暫不支援日文姓名，請輸入漢字（中文）或英文字母。",title:"你的名字用韓文怎麼寫？",lead:"請用英文字母輸入名字，我們會依韓國人的讀音寫出來。",inputLabel:"名字（例如 Emma Smith）",placeholder:"輸入你的名字…",try:"試試：",resultLabel:"你的韓文名字",speak:"🔊 聽發音",copy:"複製",copied:"已複製！",save:"儲存為圖片",dict:"常見名字",rule:"發音規則",unsupported:"目前只支援英文字母（A–Z）的名字。",already:"這已經是韓文了！請用英文字母輸入。",cantConvert:"無法轉換，請檢查拼寫。",note:"依外來語標記規則，根據發音轉換。常見名字來自內建名單，其他名字依發音規則轉換，可能與實際寫法不同。僅供娛樂參考。",cardTitle:"MY KOREAN NAME"},
+ ar:{hzm:"النطق الصيني",hzh:"القراءة الكورية للهانجا",hzNote:"تُكتب أسماء الصينيين المعاصرين عادةً حسب النطق الصيني (王小明 ← 왕샤오밍). للأسماء اليابانية اكتبها بالكانا أو اختر خيار الحروف اللاتينية؛ أسماء الكانجي تحتاج إلى قراءتها.",lEn:"اسم إنجليزي",lJa:"اسم ياباني (بالحروف اللاتينية)",jpn:"النطق الياباني",hzMissing:"بعض الأحرف غير موجودة في البيانات: ",kana:"الأسماء اليابانية غير مدعومة بعد. اكتب بالأحرف الصينية أو اللاتينية.",title:"كيف يُكتب اسمك بالكورية؟",lead:"اكتب اسمك بالأحرف العربية أو اللاتينية، وسنكتبه كما ينطقه الكوريون.",inputLabel:"اسمك (مثال: محمد أحمد أو Emma Smith)",placeholder:"اكتب اسمك…",try:"جرّب:",resultLabel:"اسمك بالكورية",speak:"🔊 استمع",copy:"نسخ",copied:"تم النسخ!",save:"حفظ كصورة",dict:"اسم شائع",rule:"بقواعد النطق",unsupported:"يدعم الموقع حاليًا الأحرف اللاتينية (A–Z) والعربية فقط.",already:"هذا مكتوب بالكورية بالفعل! اكتب اسمك بحروف عربية أو لاتينية.",cantConvert:"تعذّر التحويل. تحقق من الإملاء.",note:"يُحوَّل الاسم حسب نطقه وفق قواعد الكتابة الكورية للأسماء الأجنبية. الأسماء الشائعة من قائمة مدمجة، وغيرها بقواعد النطق وقد يختلف عن الكتابة الفعلية. للتسلية والاسترشاد فقط.",cardTitle:"MY KOREAN NAME"},
+ ja:{hzm:"中国語の発音",hzh:"韓国の漢字音",hzNote:"現代の中国人の名前は通常、中国語の発音で表記します（王小明 → 왕샤오밍）。日本人の名前は、かなで入力するか、ローマ字オプションを選んでください。漢字の名前は読み方が必要です。",lEn:"英語の名前",lJa:"日本人の名前（ローマ字）",jpn:"日本語の読み",hzMissing:"データにない文字があります：",kana:"日本語の名前にはまだ対応していません。漢字（中国語）かアルファベットで入力してください。",title:"あなたの名前を韓国語（ハングル）で",lead:"アルファベットで名前を入力してください。韓国の人が読む音に合わせて表記します。",inputLabel:"名前（例：Emma Smith）",placeholder:"名前を入力…",try:"例：",resultLabel:"ハングルの名前",speak:"🔊 発音を聞く",copy:"コピー",copied:"コピーしました",save:"画像で保存",dict:"よくある名前",rule:"発音ルール",unsupported:"現在はアルファベット（A–Z）の名前のみ対応しています。",already:"すでにハングルです。アルファベットで入力してください。",cantConvert:"変換できませんでした。綴りを確認してください。",note:"外来語表記のルールに沿って音で変換します。一般的な名前は内蔵リスト、その他は発音ルールを使うため、実際の表記と異なる場合があります。参考としてお楽しみください。",cardTitle:"MY KOREAN NAME"},
+ zh:{hzm:"按中文读音",hzh:"韩国汉字音",hzNote:"现代中国人名通常按普通话读音标记（王小明 → 왕샤오밍）。日本人名请输入假名，或选择罗马字选项；汉字姓名需要读音。",lEn:"英文名",lJa:"日本人名（罗马字）",jpn:"日语读音",hzMissing:"数据中没有这些字：",kana:"暂不支持日文姓名，请输入汉字（中文）或英文字母。",title:"你的名字用韩文怎么写？",lead:"请用英文字母输入名字，我们会按韩国人的读音写出来。",inputLabel:"名字（例如 Emma Smith）",placeholder:"输入你的名字…",try:"试试：",resultLabel:"你的韩文名字",speak:"🔊 听发音",copy:"复制",copied:"已复制！",save:"保存为图片",dict:"常见名字",rule:"发音规则",unsupported:"目前只支持英文字母（A–Z）的名字。",already:"这已经是韩文了！请用英文字母输入。",cantConvert:"无法转换，请检查拼写。",note:"按外来语标记规则根据发音转换。常见名字来自内置名单，其他名字按发音规则转换，可能与实际写法不同。仅供娱乐参考。",cardTitle:"MY KOREAN NAME"}
 };
 let lang=(()=>{try{const s=localStorage.getItem('namekr-lang');if(s&&T[s])return s}catch(e){}
   const nl=navigator.language||'en';if(/^zh-(TW|HK|MO|Hant)/i.test(nl))return 'tw';const n=nl.slice(0,2);return T[n]?n:'en'})();
@@ -402,6 +403,7 @@ function applyLang(){
   el.name.placeholder=s.placeholder;
   document.querySelectorAll('#langs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===lang));
   try{localStorage.setItem('namekr-lang',lang)}catch(e){}
+  applyModes();renderChips();
   update();
 }
 
@@ -425,7 +427,7 @@ function update(){
   const isHz=/[㐀-鿿]/.test(raw),isKana=/[぀-ヿ]/.test(raw),isAr=/[؀-ۿ]/.test(raw);
   const isLat=!isHz&&!isKana&&!isAr;
   $('grpLat').classList.toggle('dim',!isLat);
-  $('grpHz').classList.toggle('dim',!isHz);
+  $('grpHz').classList.toggle('dim',!isHz&&lang!=='zh'&&lang!=='tw');
   if(isKana){
     const toks=raw.split(/[\s\-_.·・]+/).filter(Boolean);
     const res=toks.map(kanaToHangul);
@@ -468,11 +470,36 @@ function finish(res,eng,setEmpty){
   [el.speak,el.copy,el.save].forEach(b=>b.disabled=false);
 }
 
-/* examples: [text, latin mode to switch to] */
-[['王小明'],['陳大文'],['やまだ たろう'],['Sato Yuki','ja'],['محمد أحمد'],['فاطمة'],['Emma Smith','en'],['Michael Jordan','en'],['Sophie','en'],['Alexander','en'],['Christopher Brown','en'],['Kate','en'],['Frank','en'],['Hannah','en']].forEach(([n,m])=>{
-  const b=document.createElement('button');b.type='button';b.textContent=n;
-  b.onclick=()=>{if(m){latinMode=m;syncMode()}el.name.value=n;update()};$('chips').appendChild(b);
-});
+/* examples per UI language: [text, latin mode to switch to] */
+const CHIPS={
+  en:[['Oliver Smith'],['Michael Jordan'],['Amara Okafor'],['Carlos Garcia']],   // UK / US / Africa (Nigeria) / Spain
+  ja:[['やまだ たろう'],['Sato Yuki']],
+  zh:[['王小明'],['刘芳']],
+  tw:[['陳大文'],['張美玲']],
+  ar:[['محمد'],['فاطمة']]                                                         // male / female
+};
+function renderChips(){
+  const box=$('chips');box.querySelectorAll('button').forEach(b=>b.remove());
+  (CHIPS[lang]||CHIPS.en).forEach(([n])=>{
+    const b=document.createElement('button');b.type='button';b.textContent=n;
+    b.onclick=()=>{el.name.value=n;update()};box.appendChild(b);
+  });
+}
+
+/* which mode buttons each UI language gets:
+   en  → English name only          ja → Japanese name (romaji) only
+   zh/tw → Chinese-reading buttons  ar → none */
+const MODES={en:{lat:'en'},ja:{lat:'ja'},zh:{hz:true},tw:{hz:true},ar:{}};
+function applyModes(){
+  const c=MODES[lang]||MODES.en;
+  latinMode=c.lat||(lang==='ja'?'ja':'en');
+  $('grpLat').hidden=!c.lat;
+  document.querySelectorAll('#grpLat button').forEach(b=>b.hidden=b.dataset.m!==c.lat);
+  $('grpHz').hidden=!c.hz;
+  document.querySelector('#mode small').hidden=!c.hz;
+  $('mode').hidden=!c.lat&&!c.hz;
+  syncMode();
+}
 
 el.name.addEventListener('input',update);
 document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{
