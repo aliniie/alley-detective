@@ -458,12 +458,17 @@ button{cursor:pointer}
 
 /* ---------------- 엔딩: 남매 이미지 ---------------- */
 #legacy{background:#000;flex-direction:column;align-items:center;justify-content:center;padding:0;gap:0;}
-#legacy-imgwrap{position:relative;width:100%;flex:1;min-height:0;}
+#legacy-imgwrap{position:relative;width:100%;flex:none;aspect-ratio:1472/704;}
 #legacy-img1,#legacy-img2{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
 #legacy-img2{opacity:0;transition:opacity 2.6s ease;}
+#legacy{cursor:pointer;}
+#legacy-next{
+  position:absolute;left:0;right:0;bottom:22px;text-align:center;
+  font-size:18px;color:var(--gold);opacity:0;transition:opacity .3s;animation:dlgArrowBob 1s infinite;
+}
 #legacy-caption{
   flex:none;font-size:10.5px;line-height:1.6;color:#cfc7b8;text-align:center;
-  max-width:540px;padding:14px 24px 20px;opacity:0;transition:opacity .8s ease;
+  max-width:540px;padding:14px 24px 20px;opacity:0;transition:opacity .8s ease;white-space:pre-line;
 }
 
 /* ---------------- 엔딩: 미션 컴플리트 ---------------- */
@@ -652,6 +657,7 @@ button{cursor:pointer}
       <img id="legacy-img1" alt="">
       <img id="legacy-img2" alt="">
     </div>
+    <div id="legacy-next">▼</div>
     <p id="legacy-caption">'잃어버린 소포'는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.</p>
   </div>
 
@@ -888,7 +894,7 @@ en: {
     "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "What is below the purple, to the left of the white, and across from the navy blue? (You can also enter the number where the item is placed!)",
     "정수의 누나가 일하던 곳을 알아내셨나요?":  "Did you find out where Jung-soo\u0027s older sister used to work?",
     "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "Don\u0027t rush. If you take another look at the exhibits one by one, you\u0027ll see it.",
-    "맞아요, 고무신… 아니, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.":  "That\u0027s right, rubber shoes… or rather, it was a factory that made rubber shoes. Back then, the refugees would work at the rubber shoe factory beyond that mountain road, or carry loads as porters—each getting through the day however they could, wherever they were.",
+    "맞아요, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.":  "That\u0027s right, it was a factory that made rubber shoes. Back then, the refugees would work at the rubber shoe factory beyond that mountain road, or carry loads as porters—each getting through the day however they could, wherever they were.",
     "이제 거의 모든 정보를 모으신 것 같은데요. 지금까지 찾은 단서를 가지고, 의뢰인인 김초량 소장님이 있는 명란브랜드연구소로 가보세요.":  "It looks like you\u0027ve gathered almost all the information now. Take the clues you’ve found and head to the Myeongnan Brand Research Institute, where your client, Director Kim Cho-ryang, is waiting.",
     "명란브랜드연구소로 가기":  "Go to the Myeongnan Brand Research Institute",
     "명란브랜드연구소":  "Myeongnan Brand Research Institute",
@@ -1094,7 +1100,7 @@ ja: {
     "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫の下、白の左側、そして紺色の反対側にあるものは何でしょうか？（物が置かれている番号を入力してもOKです！）",
     "정수의 누나가 일하던 곳을 알아내셨나요?":  "ジョンソの姉さんが働いていた場所を突き止めましたか？",
     "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "急がないでください。展示物を一つずつ改めてご覧になれば、きっとお分かりになるはずです。",
-    "맞아요, 고무신… 아니, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.":  "そうですね、ゴム靴……いえ、ゴム靴を作っていた工場でした。あの頃、避難民たちはあの山腹道路の向こうにあるゴム靴工場で働いたり、荷担ぎとして荷物を運んだりしながら、それぞれの場所でなんとか一日をやり過ごしていたんです。",
+    "맞아요, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.":  "そうですね、ゴム靴を作っていた工場でした。あの頃、避難民たちはあの山腹道路の向こうにあるゴム靴工場で働いたり、荷担ぎとして荷物を運んだりしながら、それぞれの場所でなんとか一日をやり過ごしていたんです。",
     "이제 거의 모든 정보를 모으신 것 같은데요. 지금까지 찾은 단서를 가지고, 의뢰인인 김초량 소장님이 있는 명란브랜드연구소로 가보세요.":  "もうほとんどの情報が集まったようですね。これまで見つけた手がかりを持って、依頼人であるキム・チョリャン所長がいる明太子ブランド研究所へ行ってみてください。",
     "명란브랜드연구소로 가기":  "明太子ブランド研究所へ行く",
     "명란브랜드연구소":  "明太子ブランド研究所",
@@ -1300,7 +1306,7 @@ cn: {
     "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫色下面、白色左边，以及深蓝色对面的是什么呢？（也可以输入物品所在的编号！）",
     "정수의 누나가 일하던 곳을 알아내셨나요?":  "您查到正秀姐姐以前工作的地方了吗？",
     "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "请别着急。如果您逐一重新仔细观察展品，就会发现其中的奥妙。",
-    "맞아요, 고무신… 아니, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.":  "没错，是橡胶鞋……不，是曾经生产橡胶鞋的工厂。那个年代，难民们有的在那条山麓公路对面的橡胶鞋工厂工作，有的当挑夫搬运货物……每个人都在自己的岗位上，想方设法熬过每一天。",
+    "맞아요, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.":  "没错，那是生产橡胶鞋的工厂。那个年代，难民们有的在那条山麓公路对面的橡胶鞋工厂工作，有的当挑夫搬运货物……每个人都在自己的岗位上，想方设法熬过每一天。",
     "이제 거의 모든 정보를 모으신 것 같은데요. 지금까지 찾은 단서를 가지고, 의뢰인인 김초량 소장님이 있는 명란브랜드연구소로 가보세요.":  "现在看来几乎所有信息都收集齐了呢。带着目前找到的线索，去委托人金初良所长所在的明兰品牌研究所看看吧。",
     "명란브랜드연구소로 가기":  "前往明兰品牌研究所",
     "명란브랜드연구소":  "明兰品牌研究所",
@@ -1506,7 +1512,7 @@ tw: {
     "보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)":  "紫色下方、白色左側，以及深藍色對面的是什麼呢？（也可以輸入物品所在的編號！）",
     "정수의 누나가 일하던 곳을 알아내셨나요?":  "您查出正秀的姊姊以前工作的地方了嗎？",
     "서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.":  "請別著急。如果您逐一重新仔細端詳展品，就會發現了。",
-    "맞아요, 고무신… 아니, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.":  "沒錯，是橡膠鞋……不，是曾經生產橡膠鞋的工廠。那時候的避難民，有的在那條山麓道路彼端的橡膠鞋工廠工作，有的則當挑夫搬運貨物……大家都在各自的崗位上，想方設法撐過每一天。",
+    "맞아요, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.":  "沒錯，那是生產橡膠鞋的工廠。那時候的避難民，有的在那條山麓道路彼端的橡膠鞋工廠工作，有的則當挑夫搬運貨物……大家都在各自的崗位上，想方設法撐過每一天。",
     "이제 거의 모든 정보를 모으신 것 같은데요. 지금까지 찾은 단서를 가지고, 의뢰인인 김초량 소장님이 있는 명란브랜드연구소로 가보세요.":  "現在看來幾乎所有資訊都蒐集齊全了呢。請帶著目前找到的線索，前往委託人金初良所長所在的明蘭品牌研究所看看吧。",
     "명란브랜드연구소로 가기":  "前往明蘭品牌研究所",
     "명란브랜드연구소":  "明蘭品牌研究所",
@@ -1773,7 +1779,7 @@ const STEPS = [
     answers:['고무신','고무신 공장','고무신공장','1','1번','gomusin','gomushin'],
     confirmQ:'정수의 누나가 일하던 곳을 알아내셨나요?',
     confirmNo:['서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.'],
-    solvedLines:['맞아요, 고무신… 아니, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.','이제 거의 모든 정보를 모으신 것 같은데요. 지금까지 찾은 단서를 가지고, 의뢰인인 김초량 소장님이 있는 명란브랜드연구소로 가보세요.']
+    solvedLines:['맞아요, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.','이제 거의 모든 정보를 모으신 것 같은데요. 지금까지 찾은 단서를 가지고, 의뢰인인 김초량 소장님이 있는 명란브랜드연구소로 가보세요.']
   },
   nextLabel:'명란브랜드연구소로 가기'
 },
@@ -1927,7 +1933,9 @@ function applyStaticI18n(){
   $('credit-producer-label').textContent = tr('제작');
   $('complete-replay').textContent = tr('처음부터 다시하기');
   $('new-quest-toast').textContent = tr('새로운 퀘스트');
-  $('legacy-caption').textContent = tr("'잃어버린 소포'는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.");
+  $('legacy-caption').textContent = (LANG==='ko')
+    ? "'잃어버린 소포'는 평양에서 부산으로 피난와\n가족과 생이별을 해야했던\n피난민의 실제 사연을 각색해 재구성하였습니다."
+    : tr("'잃어버린 소포'는 평양에서 부산으로 피난와 가족과 생이별을 해야했던 피난민의 실제 사연을 각색해 재구성하였습니다.");
 }
 
 const langMenu = $('lang-menu');
@@ -2740,28 +2748,37 @@ function showLegacy(){
   void legacyImg2.offsetWidth;
   legacyImg2.style.transition='opacity 2.6s ease';
   legacyCaption.style.transition='opacity .8s ease';
+  legacyNext.style.opacity='0';
+  legacyStage=0;
   requestAnimationFrame(()=>{ legacyCaption.style.opacity='1'; });
-  setTimeout(()=>{
-    legacyCaption.style.opacity='0';
-    legacyImg2.style.opacity='1';
-    setTimeout(()=>{
-      legacyEl.style.transition='opacity 1.4s ease';
-      legacyEl.style.opacity='0';
-      setTimeout(()=>{
-        showComplete();
-        legacyEl.style.transition='';
-        legacyEl.style.opacity='';
-      },1400);
-    },4800);
-  },2800);
+  setTimeout(()=>{ if(legacyStage===0) legacyNext.style.opacity='1'; },1200);
 }
+
+let legacyStage=0;
+const legacyNext=$('legacy-next');
+legacyEl.addEventListener('click',()=>{
+  if(legacyStage!==0) return;
+  legacyStage=1;
+  legacyNext.style.opacity='0';
+  legacyCaption.style.opacity='0';
+  legacyImg2.style.opacity='1';
+  setTimeout(()=>{
+    legacyEl.style.transition='opacity 1.4s ease';
+    legacyEl.style.opacity='0';
+    setTimeout(()=>{
+      showComplete();
+      legacyEl.style.transition='';
+      legacyEl.style.opacity='';
+    },1400);
+  },4800);
+});
 
 function showComplete(){
   showScreen(completeEl);
   clearProgress();
 }
 
-$('survey-btn').addEventListener('click',()=>{ window.open('https://walla.my/a/lost.parcel','_blank'); });
+$('survey-btn').addEventListener('click',()=>{ window.open('https://escape.dawoom.io/sbwc/survey/','_blank'); });
 $('spots-btn').addEventListener('click',()=>{ window.open('https://escape.dawoom.io/busan.spots.html','_blank'); });
 $('other-escape-btn').addEventListener('click',()=>{ window.open('https://escape.dawoom.io','_blank'); });
 $('complete-replay').addEventListener('click',()=>{
