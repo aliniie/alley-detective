@@ -124,25 +124,67 @@ button{cursor:pointer}
   border:3px solid var(--navy);border-radius:14px;box-shadow:0 0 0 3px var(--navy-deep),0 16px 34px rgba(0,0,0,.5);
   padding:16px 20px;color:#2b2018;
 }
-#card h2{text-align:center;font-size:19px;color:var(--navy);letter-spacing:.08em;margin-bottom:2px}
-#reg-notice{text-align:center;font-size:10.5px;color:var(--ink-soft);line-height:1.5;margin-bottom:10px}
-#card .badge-stamp{width:48px;height:48px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center}
-#card .badge-stamp img{width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 3px 8px rgba(0,0,0,.3))}
-#fields{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 10px}
-.field{flex:1 1 150px;min-width:130px;display:flex;flex-direction:column;gap:4px}
-.field span{font-size:11px;color:var(--navy)}
+#card h2{text-align:right;font-size:11px;font-weight:400;color:var(--navy);letter-spacing:.14em;opacity:.75;margin-bottom:4px}
+#fields{display:flex;flex-direction:column;gap:14px;margin:14px 0 12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field span{font-size:14px;font-weight:700;color:var(--navy)}
 .field input{
-  border:1.5px solid var(--gray);border-radius:8px;padding:8px 10px;font-family:'DosMyungjo';
-  font-size:13px;background:#fff;color:var(--ink);
+  border:1.5px solid var(--gray);border-radius:8px;padding:11px 12px;font-family:'DosMyungjo';
+  font-size:16px;background:#fff;color:var(--ink);
 }
 .field input:focus{outline:none;border-color:var(--blue)}
-#consent-box{background:#fff8ea;border:1.5px dashed var(--gold);border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.7;color:#5c4a30;margin-bottom:8px}
-#consent-box .ttl{font-size:12px;font-weight:700;color:var(--sepia);margin-bottom:3px}
-.chk{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:12px;color:var(--navy);cursor:pointer}
-.chk input{width:15px;height:15px}
-#tip{font-size:11px;color:var(--sepia);margin-bottom:10px}
-#register-btn{width:100%;border-radius:10px;font-size:15px;letter-spacing:.04em;padding:11px}
+#name-hint{display:flex;align-items:center;gap:12px;margin:4px 0 2px}
+#name-hint img{width:60px;height:60px;flex:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+#name-hint em{font-style:normal;font-size:17px;line-height:1.4;color:var(--sepia);font-weight:700;text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere}
+.field select{
+  border:1.5px solid var(--gray);border-radius:8px;padding:11px 8px;font-family:'DosMyungjo';
+  font-size:16px;background:#fff;color:var(--ink);width:100%;min-width:0;
+}
+.field select:focus{outline:none;border-color:var(--blue)}
+.field select:disabled{background:#eceef2;color:#9aa0ab}
+#addr-sel{display:flex;gap:6px}
+#addr-sel select{flex:1}
+#addr-sel.single #f-sub{display:none}
+#consent-box{background:#fff8ea;border:1.5px dashed var(--gold);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.7;color:#5c4a30;margin-bottom:8px}
+#consent-box .ttl{font-size:13.5px;font-weight:700;color:var(--sepia);margin-bottom:3px}
+.chk{display:flex;align-items:center;gap:7px;margin-top:7px;font-size:13.5px;color:var(--navy);cursor:pointer}
+.chk input{width:18px;height:18px}
+#tip{font-size:12.5px;color:var(--sepia);margin-bottom:10px}
+#register-btn{width:100%;border-radius:10px;font-size:17px;letter-spacing:.04em;padding:13px}
 #register-btn:disabled{background:#b8a99a;border-color:#8a7d6a}
+
+/* 등록 창 — 도트 게임 팝업 스킨 (크림색 판 + 갈색 나무 테두리 + 초록 버튼) */
+#card{
+  background:#f7e9c6;
+  border:4px solid #3b2410;border-radius:8px;
+  box-shadow:
+    inset 0 0 0 3px #d9ad6a,
+    inset 0 0 0 6px #8a5a2b,
+    inset 0 -10px 0 rgba(138,90,43,.10),
+    0 6px 0 #2a190b,
+    0 18px 30px rgba(0,0,0,.5);
+  padding:22px 22px 18px;
+}
+#card h2{color:#8a5a2b}
+.field span{color:#5a3a1e}
+#name-hint em{color:#7a3b1d}
+.field input,.field select{
+  border:2.5px solid #8a5a2b;border-radius:6px;background:#fffaf0;color:#3b2410;
+  box-shadow:inset 0 2px 0 rgba(138,90,43,.18);
+}
+.field input:focus,.field select:focus{border-color:#3f9b4a}
+.field select:disabled{background:#efe3c8;color:#a99877;border-color:#c9b48c}
+#consent-box{background:#fff3d6;border:2px dashed #b98a45;color:#5a3a1e}
+#consent-box .ttl{color:#7a3b1d}
+.chk{color:#5a3a1e}
+#tip{color:#7a3b1d}
+#register-btn{
+  background:#46a64f;color:#fff;border:3px solid #1d5a2a;border-radius:8px;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -4px 0 rgba(0,0,0,.15),0 4px 0 #1d5a2a;
+  text-shadow:0 2px 0 #1d5a2a;margin-bottom:4px;
+}
+#register-btn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.25),inset 0 -4px 0 rgba(0,0,0,.15),0 1px 0 #1d5a2a}
+#register-btn:disabled{background:#c9b48c;border-color:#8a7650;color:#f3ead4;text-shadow:0 2px 0 #8a7650;box-shadow:inset 0 3px 0 rgba(255,255,255,.3),0 4px 0 #8a7650;transform:none}
 
 /* ---------------- 게임 화면 (닌텐도DS풍 상/하 듀얼스크린) ---------------- */
 #game{padding:0;flex-direction:column;background:#f0e7d5}
@@ -474,7 +516,7 @@ button{cursor:pointer}
 /* ---------------- 엔딩: 미션 컴플리트 ---------------- */
 #complete{background:#faf6ec;color:#2b2018;align-items:center;justify-content:center;text-align:center;padding:26px;overflow:auto;}
 #complete-inner{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:520px}
-#complete-miyo{width:66px;height:66px;image-rendering:pixelated;filter:drop-shadow(0 6px 12px rgba(0,0,0,.25))}
+#complete-miyo{width:66px;height:66px;filter:drop-shadow(0 6px 12px rgba(0,0,0,.25))}
 #complete h2{font-size:19px;letter-spacing:.04em;color:var(--sepia);font-family:'DosMyungjo'}
 #complete-desc{font-size:12px;line-height:1.6;color:#5c4a30;background:#fff8ea;border:1.5px dashed var(--gold);
   border-radius:10px;padding:10px 13px;margin-bottom:4px}
@@ -487,6 +529,44 @@ button{cursor:pointer}
   box-shadow:2px 2px 0 var(--wood);
 }
 #complete-replay:active{box-shadow:0 0 0 var(--wood)}
+
+/* 엔딩 화면 — 도트 게임 팝업 스킨 (등록 창과 같은 크림색 판 + 갈색 나무 테두리) */
+#complete{
+  background:radial-gradient(circle at 30% 20%,rgba(65,105,225,.15),transparent 55%),linear-gradient(180deg,#1c2740,#0c1219);
+  align-items:flex-start;justify-content:center;padding:18px;
+}
+#complete-inner{
+  margin:auto;width:min(94%,560px);max-width:none;gap:12px;
+  background:#f7e9c6;border:4px solid #3b2410;border-radius:8px;
+  box-shadow:inset 0 0 0 3px #d9ad6a,inset 0 0 0 6px #8a5a2b,0 6px 0 #2a190b,0 18px 30px rgba(0,0,0,.5);
+  padding:24px 22px 20px;
+}
+#complete-stars{display:flex;align-items:flex-end;justify-content:center;gap:6px;line-height:1;margin-bottom:-2px}
+#complete-stars span{color:#ffc93c;-webkit-text-stroke:2px #5a3410;paint-order:stroke fill;text-shadow:0 3px 0 #8a5a2b;font-size:32px;transform:translateY(4px)}
+#complete-stars span:nth-child(2){font-size:50px;transform:none}
+#complete-miyo{width:96px;height:96px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.28))}
+#complete h2{
+  font-size:21px;letter-spacing:.05em;color:#fff4d6;text-shadow:0 2px 0 #3b2410;
+  background:#a8743a;border:3px solid #3b2410;border-radius:6px;padding:7px 20px;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.28),0 3px 0 #3b2410;
+}
+#complete-desc{background:#fff3d6;border:2px dashed #b98a45;color:#5a3a1e;font-size:13.5px;line-height:1.65;padding:12px 14px;text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere}
+.complete-btn .cb-sub{text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere}
+.complete-btn{border-radius:8px;padding:14px 12px;border:3px solid #3b2410;text-shadow:0 2px 0 rgba(0,0,0,.35);
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.32),inset 0 -4px 0 rgba(0,0,0,.14),0 4px 0 #3b2410}
+.complete-btn:active{transform:translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.22),inset 0 -4px 0 rgba(0,0,0,.14),0 1px 0 #3b2410}
+.complete-btn .cb-title{font-size:16px}
+.complete-btn .cb-sub{font-size:11.5px;line-height:1.55;opacity:1}
+#gift-btn{background:#46a64f;border-color:#1d5a2a;text-shadow:0 2px 0 #1d5a2a;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -4px 0 rgba(0,0,0,.15),0 4px 0 #1d5a2a}
+#gift-btn:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.25),inset 0 -4px 0 rgba(0,0,0,.15),0 1px 0 #1d5a2a}
+#survey-btn{background:#e9a23a;border-color:#7a4a12;text-shadow:0 2px 0 #7a4a12;box-shadow:inset 0 3px 0 rgba(255,255,255,.38),inset 0 -4px 0 rgba(0,0,0,.14),0 4px 0 #7a4a12}
+#survey-btn:active{box-shadow:inset 0 3px 0 rgba(255,255,255,.25),inset 0 -4px 0 rgba(0,0,0,.14),0 1px 0 #7a4a12}
+#spots-btn,#other-escape-btn{background:#a8743a;border-color:#3b2410}
+#complete-replay{background:#efe1bd;color:#5a3a1e;border:3px solid #8a5a2b;border-radius:8px;font-size:14px;padding:10px 24px;margin-top:4px;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.5),0 3px 0 #8a5a2b;text-shadow:none}
+#complete-replay:active{transform:translateY(2px);box-shadow:inset 0 3px 0 rgba(255,255,255,.4),0 1px 0 #8a5a2b}
+#credit-block{border-top:2px dashed #b98a45}
+.credit-group b{font-size:12px;color:#7a5a36}
 
 /* 기념품 코드 팝업 */
 #gift-modal{position:absolute;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
@@ -512,6 +592,9 @@ button{cursor:pointer}
 #gift-msg{font-size:11px;min-height:15px;color:#9b2a1d}
 #gift-msg.ok{color:#1f6b33}
 #gift-close{border-radius:10px;padding:9px 28px;font-size:13px}
+#gift-card{background:#f7e9c6;border:4px solid #3b2410;border-radius:8px;padding:24px 20px 18px;
+  box-shadow:inset 0 0 0 3px #d9ad6a,inset 0 0 0 6px #8a5a2b,0 6px 0 #2a190b,0 18px 30px rgba(0,0,0,.5)}
+#gift-code{background:#fff3d6;border-color:#b98a45}
 
 #credit-block{margin-top:12px;padding-top:12px;border-top:1.5px dashed var(--gray);width:100%}
 .credit-group{margin-top:10px;text-align:center}
@@ -545,12 +628,13 @@ button{cursor:pointer}
   <!-- ===== 탐정등록증 ===== -->
   <div id="register" class="screen">
     <div id="card">
-      <div class="badge-stamp"><img src="assets/ui/detective.svg" alt="탐정"></div>
       <h2 id="reg-h2">탐 정 방 문 기 록</h2>
-      <p id="reg-notice">정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.</p>
       <div id="fields">
-        <div class="field"><span id="label-name">탐정명</span><input id="f-name" placeholder="예: 홍길동" maxlength="12"></div>
-        <div class="field"><span id="label-addr">사는곳</span><input id="f-addr" placeholder="예: 부산 동구" maxlength="20"></div>
+        <div class="field"><div id="name-hint"><img src="assets/characters/miyo/portrait_256.png" alt=""><em id="name-hint-text"></em></div><input id="f-name" placeholder="예: 홍길동 또는 미요" maxlength="12" autocomplete="off"></div>
+        <div class="field"><span id="label-addr">사는곳</span>
+          <div id="addr-sel"><select id="f-sido"></select><select id="f-sub"></select></div>
+          <input id="f-addr" type="hidden">
+        </div>
       </div>
       <div id="consent-box">
         <div class="ttl" id="consent-ttl">※ 개인정보 수집 및 이용 안내</div>
@@ -689,7 +773,8 @@ button{cursor:pointer}
   <!-- ===== 엔딩 3: 미션 컴플리트 ===== -->
   <div id="complete" class="screen">
     <div id="complete-inner">
-      <img id="complete-miyo" src="assets/characters/miyo/portrait.png" alt="미요">
+      <div id="complete-stars" aria-hidden="true"><span>★</span><span>★</span><span>★</span></div>
+      <img id="complete-miyo" src="assets/characters/miyo/portrait_400.png" alt="미요">
       <h2>Mission Complete</h2>
       <p id="complete-desc">아래 버튼으로 기념품 코드를 확인하고<br>명란스토리지 직원에게 보여주세요.</p>
       <button id="gift-btn" class="rbtn rbtn--primary complete-btn">
@@ -2023,14 +2108,103 @@ function withRo(word){
   return (jong===0||jong===8) ? word+'로' : word+'으로';
 }
 
+/* ---------- 사는곳 드롭다운 / 이름 안내 ---------- */
+const REGIONS = {
+  '서울':['종로구','중구','용산구','성동구','광진구','동대문구','중랑구','성북구','강북구','도봉구','노원구','은평구','서대문구','마포구','양천구','강서구','구로구','금천구','영등포구','동작구','관악구','서초구','강남구','송파구','강동구'],
+  '부산':['중구','서구','동구','영도구','부산진구','동래구','남구','북구','해운대구','사하구','금정구','강서구','연제구','수영구','사상구','기장군'],
+  '대구':['중구','동구','서구','남구','북구','수성구','달서구','달성군','군위군'],
+  '인천':['중구','동구','미추홀구','연수구','남동구','부평구','계양구','서구','강화군','옹진군'],
+  '광주':['동구','서구','남구','북구','광산구'],
+  '대전':['동구','중구','서구','유성구','대덕구'],
+  '울산':['중구','남구','동구','북구','울주군'],
+  '세종':['세종시'],
+  '경기':['수원시','성남시','의정부시','안양시','부천시','광명시','평택시','동두천시','안산시','고양시','과천시','구리시','남양주시','오산시','시흥시','군포시','의왕시','하남시','용인시','파주시','이천시','안성시','김포시','화성시','광주시','양주시','포천시','여주시','연천군','가평군','양평군'],
+  '강원':['춘천시','원주시','강릉시','동해시','태백시','속초시','삼척시','홍천군','횡성군','영월군','평창군','정선군','철원군','화천군','양구군','인제군','고성군','양양군'],
+  '충북':['청주시','충주시','제천시','보은군','옥천군','영동군','증평군','진천군','괴산군','음성군','단양군'],
+  '충남':['천안시','공주시','보령시','아산시','서산시','논산시','계룡시','당진시','금산군','부여군','서천군','청양군','홍성군','예산군','태안군'],
+  '전북':['전주시','군산시','익산시','정읍시','남원시','김제시','완주군','진안군','무주군','장수군','임실군','순창군','고창군','부안군'],
+  '전남':['목포시','여수시','순천시','나주시','광양시','담양군','곡성군','구례군','고흥군','보성군','화순군','장흥군','강진군','해남군','영암군','무안군','함평군','영광군','장성군','완도군','진도군','신안군'],
+  '경북':['포항시','경주시','김천시','안동시','구미시','영주시','영천시','상주시','문경시','경산시','의성군','청송군','영양군','영덕군','청도군','고령군','성주군','칠곡군','예천군','봉화군','울진군','울릉군'],
+  '경남':['창원시','진주시','통영시','사천시','김해시','밀양시','거제시','양산시','의령군','함안군','창녕군','고성군','남해군','하동군','산청군','함양군','거창군','합천군'],
+  '제주':['제주시','서귀포시']
+};
+/* [한국어(시트 저장값), English, 日本語, 简体, 繁體] */
+const COUNTRIES = [
+  ['미국','United States','アメリカ','美国','美國'],['캐나다','Canada','カナダ','加拿大','加拿大'],
+  ['중국','China','中国','中国','中國'],['일본','Japan','日本','日本','日本'],
+  ['대만','Taiwan','台湾','台湾','台灣'],['홍콩','Hong Kong','香港','香港','香港'],['마카오','Macao','マカオ','澳门','澳門'],
+  ['싱가포르','Singapore','シンガポール','新加坡','新加坡'],['말레이시아','Malaysia','マレーシア','马来西亚','馬來西亞'],
+  ['태국','Thailand','タイ','泰国','泰國'],['베트남','Vietnam','ベトナム','越南','越南'],
+  ['필리핀','Philippines','フィリピン','菲律宾','菲律賓'],['인도네시아','Indonesia','インドネシア','印度尼西亚','印尼'],
+  ['인도','India','インド','印度','印度'],['몽골','Mongolia','モンゴル','蒙古','蒙古'],['러시아','Russia','ロシア','俄罗斯','俄羅斯'],
+  ['영국','United Kingdom','イギリス','英国','英國'],['프랑스','France','フランス','法国','法國'],['독일','Germany','ドイツ','德国','德國'],
+  ['이탈리아','Italy','イタリア','意大利','義大利'],['스페인','Spain','スペイン','西班牙','西班牙'],
+  ['네덜란드','Netherlands','オランダ','荷兰','荷蘭'],['스위스','Switzerland','スイス','瑞士','瑞士'],['스웨덴','Sweden','スウェーデン','瑞典','瑞典'],
+  ['튀르키예','Türkiye','トルコ','土耳其','土耳其'],['이스라엘','Israel','イスラエル','以色列','以色列'],['아랍에미리트','United Arab Emirates','アラブ首長国連邦','阿联酋','阿聯酋'],
+  ['호주','Australia','オーストラリア','澳大利亚','澳洲'],['뉴질랜드','New Zealand','ニュージーランド','新西兰','紐西蘭'],
+  ['멕시코','Mexico','メキシコ','墨西哥','墨西哥'],['브라질','Brazil','ブラジル','巴西','巴西'],['남아프리카공화국','South Africa','南アフリカ','南非','南非'],
+  ['기타','Other','その他','其他','其他']
+];
+const COUNTRY_COL = { ko:0, en:1, ja:2, cn:3, tw:4 };
+const ADDR_UI = {
+  ko:{ sido:'시·도 선택', sub:'시·군·구 선택', country:'국가 선택',
+       nameHint:'저는 미요예요!<br>탐정님 이름을 알려주세요.', namePh:'예: 홍길동 (별명도 좋아요)' },
+  en:{ country:'Select country',
+       nameHint:'I’m Miyo!<br>What’s your name, Detective?', namePh:'e.g. John Smith (a nickname is fine)' },
+  ja:{ country:'国を選択',
+       nameHint:'ミヨです！<br>探偵さんのお名前を<br>教えてください。', namePh:'例：山田太郎（ニックネームも可）' },
+  cn:{ country:'选择国家',
+       nameHint:'我是米娅！<br>请告诉我您的名字，侦探。', namePh:'例：张伟（昵称也可以）' },
+  tw:{ country:'選擇國家',
+       nameHint:'我是米婭！<br>請告訴我您的名字，偵探。', namePh:'例：陳大文（暱稱也可以）' }
+};
+function fillSelect(sel, placeholder, items){
+  sel.innerHTML='';
+  const p=document.createElement('option'); p.value=''; p.textContent=placeholder; sel.appendChild(p);
+  items.forEach(([v,t])=>{ const o=document.createElement('option'); o.value=v; o.textContent=t; sel.appendChild(o); });
+}
+function koCountryItems(){ return COUNTRIES.map(c=>[c[0],c[0]]); }
+function buildAddrUI(){
+  const ui=ADDR_UI[LANG]||ADDR_UI.en, sido=$('f-sido'), sub=$('f-sub'), box=$('addr-sel');
+  if(LANG==='ko'){
+    box.classList.remove('single');
+    fillSelect(sido, ui.sido, Object.keys(REGIONS).map(k=>[k,k]).concat([['해외','해외']]));
+    fillSelect(sub, ui.sub, []); sub.disabled=true;
+  } else {
+    box.classList.add('single');
+    const col=COUNTRY_COL[LANG]||1;
+    fillSelect(sido, ui.country, COUNTRIES.map(c=>[c[0],c[col]]));
+    fillSelect(sub, '', []);
+  }
+  $('f-addr').value='';
+  $('name-hint-text').innerHTML = ui.nameHint;
+  $('f-name').placeholder = ui.namePh;
+  $('f-name').setAttribute('aria-label', ui.nameHint.replace('<br>',' '));
+}
+function resetAddrUI(){ buildAddrUI(); }
+function syncAddr(){
+  const a=$('f-sido').value, b=$('f-sub').value;
+  let v='';
+  if(LANG==='ko'){ v = a==='세종' ? (b ? '세종시' : '') : ((a && b) ? a+' '+b : ''); }
+  else v = a;                         // 시트에는 한국어 국가명으로 저장 → 언어와 무관하게 통계 집계 가능
+  const f=$('f-addr'); f.value=v; f.dispatchEvent(new Event('input'));
+}
+$('f-sido').addEventListener('change',()=>{
+  if(LANG==='ko'){
+    const a=$('f-sido').value, sub=$('f-sub');
+    if(!a){ fillSelect(sub, ADDR_UI.ko.sub, []); sub.disabled=true; }
+    else if(a==='해외'){ fillSelect(sub, ADDR_UI.ko.country, koCountryItems()); sub.disabled=false; }
+    else { fillSelect(sub, ADDR_UI.ko.sub, REGIONS[a].map(x=>[x,x])); sub.disabled=false; }
+  }
+  syncAddr();
+});
+$('f-sub').addEventListener('change',syncAddr);
+
 function applyStaticI18n(){
   document.title = tr('잃어버린 소포');
+  buildAddrUI();
   $('reg-h2').textContent = tr('탐 정 방 문 기 록');
-  $('reg-notice').textContent = tr('정확한 참여자 통계 집계를 위해 실제 참여하시는 분의 정보를 정확히 기입해 주세요.');
-  $('label-name').textContent = tr('탐정명');
   $('label-addr').textContent = tr('사는곳');
-  $('f-name').placeholder = tr('예: 홍길동');
-  $('f-addr').placeholder = tr('예: 부산 동구');
   $('consent-ttl').textContent = tr('※ 개인정보 수집 및 이용 안내');
   $('consent-text').textContent = tr('본 프로그램은 결과 보고(KPI) 통계 작성을 위해 이름 및 거주지를 수집하며, 종료 후 1개월 이내 파기합니다. 동의를 거부할 수 있으나 이 경우 참여가 제한될 수 있습니다.');
   $('consent-label').textContent = tr('위 내용을 확인했으며 동의합니다');
@@ -2102,7 +2276,14 @@ langMenu.querySelectorAll('.lang-opt').forEach(btn=>{
 applyStaticI18n();
 
 const fName=$('f-name'), fAddr=$('f-addr'), fConsent=$('f-consent'), regBtn=$('register-btn');
-function refreshRegBtn(){ regBtn.disabled = !(fName.value.trim() && fAddr.value.trim() && fConsent.checked); }
+/* 이름: 글자·숫자·공백·. ' - · 만 허용(이모지·하트 등 제거), 2글자 이상, 자음/모음만으로는 불가 */
+function cleanName(s){ return s.replace(/[^\p{L}\p{M}\p{N} .'\-·]/gu,'').replace(/ {2,}/g,' '); }
+function nameOk(s){ const t=s.trim(); return t.replace(/\s/g,'').length>=2 && !/^[ㄱ-ㆎ\s]+$/.test(t); }
+let nameComposing=false;
+fName.addEventListener('compositionstart',()=>{ nameComposing=true; });
+fName.addEventListener('compositionend',()=>{ nameComposing=false; const c=cleanName(fName.value); if(c!==fName.value) fName.value=c; refreshRegBtn(); });
+fName.addEventListener('input',()=>{ if(nameComposing) return; const c=cleanName(fName.value); if(c!==fName.value) fName.value=c; });
+function refreshRegBtn(){ regBtn.disabled = !(nameOk(fName.value) && fAddr.value.trim() && fConsent.checked); }
 [fName,fAddr,fConsent].forEach(el=>el.addEventListener('input',refreshRegBtn));
 fConsent.addEventListener('change',refreshRegBtn);
 const REGISTER_SHEET_URL='https://script.google.com/macros/s/AKfycbzoD9sjrqEWHLLOcTyy9XUcaVfgXx-UbTenogosP_1kcnuq9KYD2GefB6P9FVzRSLxgXQ/exec';
@@ -2198,6 +2379,7 @@ function playGreetLine(s){
   dlgTitle.textContent=tr(s.location);
   dlgName.textContent=tr(s.greetNpcName || s.npcName);
   dlgPortrait.style.backgroundImage="url('"+(s.greetPortrait || ('assets/characters/'+s.npc+'/south.png'))+"')";
+  dlgPortrait.style.imageRendering = s.greetPortrait ? 'auto' : '';   // 미요는 고해상도 일러스트라 픽셀 보존 옵션을 끔
   if(s.greetHideNpc){
     npcImg.style.display='none';
     npcShadow.style.display='none';
@@ -2250,6 +2432,7 @@ function openDialogue(){
   dlgEl.classList.add('on');
   dlgName.textContent = tr(s.npcName);
   dlgPortrait.style.backgroundImage = "url('assets/characters/"+s.npc+"/south.png')";
+  dlgPortrait.style.imageRendering = '';
   dlgConfirmMode=false; dlgCustomLines=null;
   dlgChoices.classList.remove('show');
   dlgReplyPending=null;
@@ -2327,6 +2510,7 @@ function applyLineVisuals(lines, ln){
       const sp=cfg.lineSpeaker[ln];
       dlgName.textContent=tr(sp.name);
       dlgPortrait.style.backgroundImage="url('assets/characters/"+sp.npc+"/south.png')";
+      dlgPortrait.style.imageRendering='';
     }
   }
 }
@@ -2776,7 +2960,7 @@ homeBtn.addEventListener('click',()=>{
   dlgPausedAtQuestMark = false;
   openingQuest = false;
   clearProgress();
-  fName.value=''; fAddr.value=''; fConsent.checked=false; refreshRegBtn();
+  fName.value=''; fAddr.value=''; resetAddrUI(); fConsent.checked=false; refreshRegBtn();
   PLAYER.name=''; PLAYER.addr=''; PLAYER.code='';
   clearGift();
   showScreen(titleEl);
@@ -2998,7 +3182,7 @@ $('complete-replay').addEventListener('click',()=>{
   clearProgress();
   solved = STEPS.map(()=>false); dlgSeenOnce = STEPS.map(()=>false);
   openingQuest=false;
-  fName.value=''; fAddr.value=''; fConsent.checked=false; refreshRegBtn();
+  fName.value=''; fAddr.value=''; resetAddrUI(); fConsent.checked=false; refreshRegBtn();
   PLAYER.name=''; PLAYER.addr=''; PLAYER.code='';
   clearGift();
   giftModal.classList.remove('on');
