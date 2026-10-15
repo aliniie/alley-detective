@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>기념품 수령 확인 · 직원용</title>
+<link rel="icon" href="../assets/ui/busan_station.png">
+<style>
+:root{--blue:#4169E1;--blue-deep:#2f4fb8;--red:#e1332e;--ink:#1f2430;--bg:#f3f4f7;--card:#fff;--line:#dfe2e8;--ok:#1f8a3f;--warn:#c4281f}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);
+  min-height:100dvh;padding:max(16px,env(safe-area-inset-top)) 16px 32px;display:flex;justify-content:center}
+main{width:100%;max-width:440px;display:flex;flex-direction:column;gap:14px}
+h1{margin:6px 0 0;font-size:18px}
+h1 small{display:block;font-size:12px;font-weight:400;color:#6b7280;margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+label{display:block;font-size:12px;color:#6b7280;margin-bottom:6px}
+input{width:100%;font:inherit;font-size:20px;padding:13px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+input:focus{outline:none;border-color:var(--blue)}
+#code{text-align:center;letter-spacing:.14em;font-weight:700;text-transform:uppercase}
+button{font:inherit;font-weight:700;font-size:16px;border:none;border-radius:10px;padding:14px;width:100%;background:var(--blue);color:#fff;cursor:pointer;margin-top:10px}
+button:active{background:var(--blue-deep)}
+button:disabled{opacity:.5}
+button.ghost{background:#eceef3;color:#3a4150;font-weight:600;font-size:13px;padding:9px}
+.err{color:var(--warn);font-size:13px;margin-top:8px;min-height:18px}
+#stats{display:flex;gap:8px}
+#stats div{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px}
+#stats b{display:block;font-size:22px}
+#stats span{font-size:11px;color:#6b7280}
+#stats .p b{color:var(--blue)} #stats .r b{color:var(--ok)}
+.hide{display:none!important}
+#res .big{font-size:26px;font-weight:800;letter-spacing:.1em;text-align:center;margin-bottom:4px}
+#res .who{text-align:center;font-size:15px;color:#4b5563;margin-bottom:10px}
+.badge{display:block;text-align:center;font-weight:800;font-size:15px;padding:10px;border-radius:10px;margin-bottom:2px}
+.badge.ok{background:#e4f5e8;color:var(--ok)}
+.badge.done{background:#fde7e5;color:var(--warn)}
+.badge.none{background:#eceef3;color:#4b5563}
+#redeem{background:var(--ok)}
+#redeem:active{background:#176a31}
+</style>
+</head>
+<body>
+<main>
+  <h1>기념품 수령 확인<small>「잃어버린 소포」 · 직원 전용</small></h1>
+
+  <!-- PIN 로그인 -->
+  <section id="login" class="card">
+    <label for="pin">직원 PIN</label>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••••">
+    <button id="login-btn" type="button">입장</button>
+    <div class="err" id="login-err"></div>
+  </section>
+
+  <!-- 본 화면 -->
+  <section id="app" class="hide" style="display:flex;flex-direction:column;gap:14px">
+    <div id="stats">
+      <div><b id="s-total">-</b><span>등록</span></div>
+      <div class="r"><b id="s-red">-</b><span>수령</span></div>
+      <div class="p"><b id="s-pend">-</b><span>미수령</span></div>
+    </div>
+
+    <div class="card">
+      <label for="code">참가자가 보여준 기념품 코드</label>
+      <input id="code" type="text" inputmode="text" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="ABC-123" maxlength="7">
+      <button id="find-btn" type="button">조회</button>
+      <div class="err" id="find-err"></div>
+    </div>
+
+    <div class="card hide" id="res">
+      <div class="big" id="r-code"></div>
+      <div class="who" id="r-who"></div>
+      <span class="badge" id="r-badge"></span>
+      <button id="redeem" type="button">수령 처리 (기념품 전달)</button>
+    </div>
+
+    <button class="ghost" id="logout" type="button">로그아웃</button>
+  </section>
+</main>
+
+<script>
+"use strict";
+// 참가자 앱(sbwc/index.html)의 REGISTER_SHEET_URL 과 같은 주소
+const SHEET_URL='https://script.google.com/macros/s/AKfycbzoD9sjrqEWHLLOcTyy9XUcaVfgXx-UbTenogosP_1kcnuq9KYD2GefB6P9FVzRSLxgXQ/exec';
+const $=id=>document.getElementById(id);
+let PIN='';
+try{ PIN=sessionStorage.getItem('staff_pin')||''; }catch(e){}
+
+function api(payload){
+  return fetch(SHEET_URL,{method:'POST',body:JSON.stringify(Object.assign({pin:PIN},payload))}).then(r=>r.json());
+}
+function pinError(r){
+  return r==='badpin' ? 'PIN이 올바르지 않아요.' : r==='locked' ? '시도가 너무 많아요. 10분 뒤에 다시 해주세요.' : null;
+}
+
+function showApp(on){
+  $('login').classList.toggle('hide',on);
+  $('app').classList.toggle('hide',!on);
+  if(on){ loadStats(); $('code').focus(); }
+}
+function loadStats(){
+  api({action:'stats'}).then(d=>{
+    if(d.result!=='ok') return;
+    $('s-total').textContent=d.total; $('s-red').textContent=d.redeemed; $('s-pend').textContent=d.pending;
+  }).catch(()=>{});
+}
+
+function login(){
+  PIN=$('pin').value.trim();
+  if(!PIN) return;
+  $('login-err').textContent='확인 중…'; $('login-btn').disabled=true;
+  api({action:'stats'}).then(d=>{
+    const e=pinError(d.result);
+    if(e){ $('login-err').textContent=e; return; }
+    if(d.result!=='ok'){ $('login-err').textContent='서버 설정이 아직 반영되지 않았어요. (Apps Script 새 버전 배포 확인)'; return; }
+    try{ sessionStorage.setItem('staff_pin',PIN); }catch(e){}
+    $('login-err').textContent=''; $('pin').value='';
+    showApp(true);
+  }).catch(()=>{ $('login-err').textContent='연결에 실패했어요. 인터넷을 확인해 주세요.'; })
+    .finally(()=>{ $('login-btn').disabled=false; });
+}
+$('login-btn').onclick=login;
+$('pin').addEventListener('keydown',e=>{ if(e.key==='Enter') login(); });
+
+$('logout').onclick=()=>{
+  PIN=''; try{ sessionStorage.removeItem('staff_pin'); }catch(e){}
+  $('res').classList.add('hide'); $('code').value='';
+  showApp(false);
+};
+
+/* 코드 입력: 대문자 + 3자리 뒤 자동 하이픈 */
+$('code').addEventListener('input',()=>{
+  let s=$('code').value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+  if(s.length>3) s=s.slice(0,3)+'-'+s.slice(3);
+  $('code').value=s;
+  $('res').classList.add('hide'); $('find-err').textContent='';
+});
+$('code').addEventListener('keydown',e=>{ if(e.key==='Enter') find(); });
+$('find-btn').onclick=find;
+
+let current=null;
+function find(){
+  const code=$('code').value;
+  $('find-err').textContent=''; $('res').classList.add('hide');
+  if(code.replace('-','').length!==6){ $('find-err').textContent='코드 6자리를 입력해 주세요.'; return; }
+  $('find-btn').disabled=true;
+  api({action:'lookup',code}).then(d=>{
+    const e=pinError(d.result);
+    if(e){ $('find-err').textContent=e; if(d.result==='badpin') showApp(false); return; }
+    if(d.result==='unknown'){ $('find-err').textContent='등록되지 않은 코드예요. 스크린샷·가짜 코드일 수 있어요.'; return; }
+    if(d.result!=='ok'){ $('find-err').textContent='조회하지 못했어요. 다시 시도해 주세요.'; return; }
+    current=d; renderResult(d);
+  }).catch(()=>{ $('find-err').textContent='연결에 실패했어요. 인터넷을 확인해 주세요.'; })
+    .finally(()=>{ $('find-btn').disabled=false; });
+}
+function renderResult(d){
+  $('r-code').textContent=d.code;
+  $('r-who').textContent=[d.name,d.addr].filter(Boolean).join(' · ');
+  const b=$('r-badge');
+  if(d.status==='redeemed'){
+    b.className='badge done'; b.textContent='⚠ 이미 수령한 코드예요'+(d.redeemedAt?' ('+d.redeemedAt+')':'');
+    $('redeem').classList.add('hide');
+  } else {
+    b.className='badge ok'; b.textContent='✓ 수령 가능 (미수령)';
+    $('redeem').classList.remove('hide');
+  }
+  $('res').classList.remove('hide');
+}
+
+$('redeem').onclick=()=>{
+  if(!current) return;
+  if(!confirm(current.code+' ('+current.name+')\n기념품을 전달하고 수령 처리할까요?\n처리 후에는 되돌릴 수 없어요.')) return;
+  $('redeem').disabled=true;
+  api({action:'redeem',code:current.code}).then(d=>{
+    if(d.result==='ok'||d.result==='already'){
+      current.status='redeemed';
+      renderResult(current);
+      if(d.result==='ok'){ $('r-badge').className='badge ok'; $('r-badge').textContent='✓ 수령 처리 완료'; }
+      loadStats();
+    } else {
+      $('find-err').textContent=pinError(d.result)||'처리하지 못했어요. 다시 시도해 주세요.';
+    }
+  }).catch(()=>{ $('find-err').textContent='연결에 실패했어요. 다시 시도해 주세요.'; })
+    .finally(()=>{ $('redeem').disabled=false; });
+};
+
+if(PIN){ api({action:'stats'}).then(d=>{ if(d.result==='ok') showApp(true); else { PIN=''; } }).catch(()=>{}); }
+</script>
+</body>
+</html>
