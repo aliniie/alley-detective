@@ -488,6 +488,31 @@ button{cursor:pointer}
 }
 #complete-replay:active{box-shadow:0 0 0 var(--wood)}
 
+/* 기념품 코드 팝업 */
+#gift-modal{position:absolute;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+  background:rgba(30,20,10,.72);padding:20px;overflow:auto}
+#gift-modal.on{display:flex}
+#gift-card{width:100%;max-width:340px;background:#faf6ec;color:#2b2018;border:2px solid var(--wood-deep);
+  border-radius:14px;box-shadow:4px 4px 0 var(--wood-deep);padding:22px 18px 16px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:10px}
+#gift-ttl{font-size:15px;font-weight:700;color:var(--sepia)}
+#gift-code{width:100%;font-family:'DosMyungjo',monospace;font-size:34px;font-weight:700;letter-spacing:.12em;
+  color:var(--red);background:#fff8ea;border:2px dashed var(--gold);border-radius:10px;padding:12px 8px;user-select:all}
+#gift-status{font-size:13px;font-weight:700;padding:5px 14px;border-radius:99px;background:#efe4cc;color:var(--wood-dark)}
+#gift-status.ok{background:#dff3e0;color:#1f6b33}
+#gift-status.done{background:#e3e3e3;color:#666}
+#gift-status.err{background:#fde3e0;color:#9b2a1d;font-weight:400;font-size:11px;line-height:1.5;border-radius:10px}
+#gift-note{font-size:11px;line-height:1.6;color:#5c4a30}
+#gift-staff-toggle{background:none;border:none;font-size:10.5px;color:#9b8a6c;text-decoration:underline;padding:2px 6px}
+#gift-staff{display:none;width:100%;flex-direction:column;gap:6px;padding-top:4px;border-top:1px dashed var(--gold)}
+#gift-staff.on{display:flex}
+#gift-pin{width:100%;padding:9px 10px;font-size:15px;text-align:center;letter-spacing:.2em;border:1.5px solid var(--wood);
+  border-radius:8px;background:#fff;color:#2b2018;font-family:inherit}
+#gift-redeem{border-radius:10px;padding:9px;font-size:13px}
+#gift-msg{font-size:11px;min-height:15px;color:#9b2a1d}
+#gift-msg.ok{color:#1f6b33}
+#gift-close{border-radius:10px;padding:9px 28px;font-size:13px}
+
 #credit-block{margin-top:12px;padding-top:12px;border-top:1.5px dashed var(--gray);width:100%}
 .credit-group{margin-top:10px;text-align:center}
 .credit-group b{display:block;font-size:10px;font-weight:400;color:var(--ink-soft);letter-spacing:.05em;margin-bottom:6px}
@@ -666,8 +691,11 @@ button{cursor:pointer}
     <div id="complete-inner">
       <img id="complete-miyo" src="assets/characters/miyo/portrait.png" alt="미요">
       <h2>Mission Complete</h2>
-      <p id="complete-desc">이 화면을 명란스토리지 직원에게 보여주고<br>완료 기념품을 받으세요.</p>
-      <button id="survey-btn" class="rbtn rbtn--primary complete-btn">
+      <p id="complete-desc">아래 버튼으로 기념품 코드를 확인하고<br>명란스토리지 직원에게 보여주세요.</p>
+      <button id="gift-btn" class="rbtn rbtn--primary complete-btn">
+        <span class="cb-title" id="gift-btn-title">기념품 코드 확인하기</span>
+      </button>
+      <button id="survey-btn" class="rbtn rbtn--secondary complete-btn">
         <span class="cb-title" id="survey-title">만족도조사</span>
         <span class="cb-sub" id="survey-sub">만족도 조사를 완료한 참여자 중<br>총 50분을 추첨하여 소정의 선물을 드립니다.</span>
       </button>
@@ -705,6 +733,23 @@ button{cursor:pointer}
     </div>
   </div>
 
+  <!-- 기념품 코드 팝업 -->
+  <div id="gift-modal">
+    <div id="gift-card">
+      <div id="gift-ttl">기념품 코드</div>
+      <div id="gift-code">---</div>
+      <div id="gift-status"></div>
+      <div id="gift-note"></div>
+      <button id="gift-staff-toggle" type="button">직원 확인</button>
+      <div id="gift-staff">
+        <input id="gift-pin" type="password" inputmode="numeric" autocomplete="off" placeholder="직원 PIN">
+        <button id="gift-redeem" type="button" class="rbtn rbtn--secondary">수령 처리</button>
+        <div id="gift-msg"></div>
+      </div>
+      <button id="gift-close" type="button" class="rbtn rbtn--wood">닫기</button>
+    </div>
+  </div>
+
   <div id="new-quest-toast">새로운 퀘스트</div>
 
   <div id="img-lightbox"><img id="img-lightbox-img" alt=""></div>
@@ -714,7 +759,7 @@ button{cursor:pointer}
 <script>
 "use strict";
 
-const PLAYER = { name:'', addr:'' };
+const PLAYER = { name:'', addr:'', code:'' };
 
 /* ---- 다국어(i18n) ---- */
 const TR = {
@@ -914,7 +959,7 @@ en: {
     "황영숙 할머니의 아버지인 것같아요.":  "I think he\u0027s Grandma Hwang Young-sook\u0027s father.",
     "잊혀진 이름, 누나의 이름은 뭘까요?":  "A Forgotten Name: What Was My Sister\u0027s Name?",
     "피난민증명서의 빈 칸을 마저 채워보세요.":  "Please fill in the remaining blanks on the refugee certificate.",
-    "이제 남매의 정체를 전부 알아내셨나요?":  "Have you figured out the siblings\u0027 true identities yet?",
+    "이제 할아버지의 누나 이름을 알아내셨나요?":  "Have you figured out the name of the grandfather's older sister yet?",
     "천천히 살펴보도록해요.":  "Let\u0027s take a look at it slowly.",
     "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "...Hwang Jeong-wol—so this is the older sister my grandfather longed for his whole life.",
     "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "To think that this package... wasn\u0027t a lost package at all, but one you couldn\u0027t bring yourself to send and had buried in the soil of Choryang...",
@@ -1120,7 +1165,7 @@ ja: {
     "황영숙 할머니의 아버지인 것같아요.":  "ファン・ヨンスクおばあさんの父親のようです。",
     "잊혀진 이름, 누나의 이름은 뭘까요?":  "忘れられた名前、お姉さんの名前は何でしょうか？",
     "피난민증명서의 빈 칸을 마저 채워보세요.":  "避難民証明書の空欄をすべて記入してください。",
-    "이제 남매의 정체를 전부 알아내셨나요?":  "これで、兄妹の正体をすべて突き止められましたか？",
+    "이제 할아버지의 누나 이름을 알아내셨나요?":  "おじいさんのお姉さんの名前、もう突き止められましたか？",
     "천천히 살펴보도록해요.":  "じっくり見ていきましょう。",
     "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "…ファン・ジョンウォル、この方が、おじいさんが生涯、あれほど慕っていたお姉さんだったのですね。",
     "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "この小包が……紛失した小包ではなく、どうしても送る勇気がなく、草梁の土の中に埋めておいたものだったとは……",
@@ -1326,7 +1371,7 @@ cn: {
     "황영숙 할머니의 아버지인 것같아요.":  "看来是黄英淑老奶奶的父亲。",
     "잊혀진 이름, 누나의 이름은 뭘까요?":  "被遗忘的名字，姐姐的名字是什么呢？",
     "피난민증명서의 빈 칸을 마저 채워보세요.":  "请将避难证明书上剩余的空白处填好。",
-    "이제 남매의 정체를 전부 알아내셨나요?":  "现在您已经完全查明这对兄妹的真实身份了吗？",
+    "이제 할아버지의 누나 이름을 알아내셨나요?":  "现在您已经查明爷爷姐姐的名字了吗？",
     "천천히 살펴보도록해요.":  "我们慢慢来看看吧。",
     "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "……黄正月，这位就是爷爷一辈子都如此思念的姐姐啊。",
     "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "原来这个包裹……并不是丢失的包裹，而是您不忍心寄出，便将其埋在了草梁的泥土里啊……",
@@ -1532,7 +1577,7 @@ tw: {
     "황영숙 할머니의 아버지인 것같아요.":  "看來是黃英淑阿嬤的父親。",
     "잊혀진 이름, 누나의 이름은 뭘까요?":  "被遺忘的名字，姐姐的名字是什麼呢？",
     "피난민증명서의 빈 칸을 마저 채워보세요.":  "請將「避難證明書」的空白處填寫完畢。",
-    "이제 남매의 정체를 전부 알아내셨나요?":  "現在您已經完全查明這對兄妹的真實身分了嗎？",
+    "이제 할아버지의 누나 이름을 알아내셨나요?":  "現在您已經查明爺爺姊姊的名字了嗎？",
     "천천히 살펴보도록해요.":  "我們來慢慢看看吧。",
     "...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.":  "……黃正月，這位就是爺爺這輩子一直如此思念的姐姐了。",
     "이 소포가... 잃어버린 소포가 아닌, 차마 부치지 못하고 초량의 흙 속에 묻어두셨던 거였다니...":  "這件包裹……原來並非那件遺失的包裹，而是您不忍寄出，便將它埋藏在草梁的泥土裡了……",
@@ -1543,6 +1588,87 @@ tw: {
     "오른쪽 위에서 새로운 퀘스트를 확인해보세요!":  "請查看右上角的新任務吧！"
 }
 };
+/* 기념품 코드 화면 문구 */
+const GIFT_TR = {
+  en: {
+    "아래 버튼으로 기념품 코드를 확인하고<br>명란스토리지 직원에게 보여주세요.": "Tap the button below to check your gift code<br>and show it to a Myeongnan Storage employee.",
+    "기념품 코드 확인하기": "Check Gift Code",
+    "기념품 코드": "Gift Code",
+    "확인 중…": "Checking…",
+    "미수령": "Not yet claimed",
+    "수령 완료": "Claimed",
+    "코드를 확인하지 못했어요.<br>잠시 후 다시 열어 주세요.": "Couldn't verify the code.<br>Please reopen this window in a moment.",
+    "이 코드를 명란스토리지 직원에게 보여주세요.<br>코드 1개당 기념품은 1회만 받을 수 있어요.": "Show this code to a Myeongnan Storage employee.<br>Each code can be redeemed for a gift only once.",
+    "직원 확인": "Staff only",
+    "직원 PIN": "Staff PIN",
+    "수령 처리": "Mark as claimed",
+    "수령 처리할까요? 처리 후에는 되돌릴 수 없어요.": "Mark this gift as claimed? This can't be undone.",
+    "수령 처리되었어요.": "Marked as claimed.",
+    "이미 수령 처리된 코드예요.": "This code has already been claimed.",
+    "PIN이 올바르지 않아요.": "Incorrect PIN.",
+    "시도가 너무 많아요. 잠시 후 다시 해주세요.": "Too many attempts. Please try again later.",
+    "처리하지 못했어요. 다시 시도해 주세요.": "Couldn't process. Please try again."
+  },
+  ja: {
+    "아래 버튼으로 기념품 코드를 확인하고<br>명란스토리지 직원에게 보여주세요.": "下のボタンで記念品コードを確認し、<br>Myeongnan Storageのスタッフに見せてください。",
+    "기념품 코드 확인하기": "記念品コードを確認する",
+    "기념품 코드": "記念品コード",
+    "확인 중…": "確認中…",
+    "미수령": "未受取",
+    "수령 완료": "受取済み",
+    "코드를 확인하지 못했어요.<br>잠시 후 다시 열어 주세요.": "コードを確認できませんでした。<br>しばらくしてからもう一度開いてください。",
+    "이 코드를 명란스토리지 직원에게 보여주세요.<br>코드 1개당 기념품은 1회만 받을 수 있어요.": "このコードをMyeongnan Storageのスタッフに見せてください。<br>コード1つにつき、記念品は1回のみ受け取れます。",
+    "직원 확인": "スタッフ用",
+    "직원 PIN": "スタッフPIN",
+    "수령 처리": "受取済みにする",
+    "수령 처리할까요? 처리 후에는 되돌릴 수 없어요.": "受取済みにしますか？この操作は元に戻せません。",
+    "수령 처리되었어요.": "受取済みにしました。",
+    "이미 수령 처리된 코드예요.": "このコードはすでに受取済みです。",
+    "PIN이 올바르지 않아요.": "PINが正しくありません。",
+    "시도가 너무 많아요. 잠시 후 다시 해주세요.": "試行回数が多すぎます。しばらくしてからもう一度お試しください。",
+    "처리하지 못했어요. 다시 시도해 주세요.": "処理できませんでした。もう一度お試しください。"
+  },
+  cn: {
+    "아래 버튼으로 기념품 코드를 확인하고<br>명란스토리지 직원에게 보여주세요.": "点击下方按钮查看纪念品代码，<br>并出示给Myeongnan Storage的工作人员。",
+    "기념품 코드 확인하기": "查看纪念品代码",
+    "기념품 코드": "纪念品代码",
+    "확인 중…": "确认中…",
+    "미수령": "未领取",
+    "수령 완료": "已领取",
+    "코드를 확인하지 못했어요.<br>잠시 후 다시 열어 주세요.": "无法确认代码。<br>请稍后重新打开。",
+    "이 코드를 명란스토리지 직원에게 보여주세요.<br>코드 1개당 기념품은 1회만 받을 수 있어요.": "请向Myeongnan Storage的工作人员出示此代码。<br>每个代码只能领取一次纪念品。",
+    "직원 확인": "工作人员专用",
+    "직원 PIN": "工作人员PIN",
+    "수령 처리": "标记为已领取",
+    "수령 처리할까요? 처리 후에는 되돌릴 수 없어요.": "要标记为已领取吗？此操作无法撤销。",
+    "수령 처리되었어요.": "已标记为已领取。",
+    "이미 수령 처리된 코드예요.": "此代码已被领取。",
+    "PIN이 올바르지 않아요.": "PIN不正确。",
+    "시도가 너무 많아요. 잠시 후 다시 해주세요.": "尝试次数过多，请稍后再试。",
+    "처리하지 못했어요. 다시 시도해 주세요.": "处理失败，请重试。"
+  },
+  tw: {
+    "아래 버튼으로 기념품 코드를 확인하고<br>명란스토리지 직원에게 보여주세요.": "點擊下方按鈕查看紀念品代碼，<br>並出示給Myeongnan Storage的員工。",
+    "기념품 코드 확인하기": "查看紀念品代碼",
+    "기념품 코드": "紀念品代碼",
+    "확인 중…": "確認中…",
+    "미수령": "未領取",
+    "수령 완료": "已領取",
+    "코드를 확인하지 못했어요.<br>잠시 후 다시 열어 주세요.": "無法確認代碼。<br>請稍後重新開啟。",
+    "이 코드를 명란스토리지 직원에게 보여주세요.<br>코드 1개당 기념품은 1회만 받을 수 있어요.": "請向Myeongnan Storage的員工出示此代碼。<br>每個代碼只能領取一次紀念品。",
+    "직원 확인": "員工專用",
+    "직원 PIN": "員工PIN",
+    "수령 처리": "標記為已領取",
+    "수령 처리할까요? 처리 후에는 되돌릴 수 없어요.": "要標記為已領取嗎？此操作無法復原。",
+    "수령 처리되었어요.": "已標記為已領取。",
+    "이미 수령 처리된 코드예요.": "此代碼已被領取。",
+    "PIN이 올바르지 않아요.": "PIN不正確。",
+    "시도가 너무 많아요. 잠시 후 다시 해주세요.": "嘗試次數過多，請稍後再試。",
+    "처리하지 못했어요. 다시 시도해 주세요.": "處理失敗，請重試。"
+  }
+};
+Object.keys(GIFT_TR).forEach(l=>Object.assign(TR[l], GIFT_TR[l]));
+
 let LANG = 'ko';
 try{ LANG = localStorage.getItem('busan_lang') || 'ko'; }catch(e){}
 
@@ -1811,7 +1937,7 @@ const STEPS = [
     type:'text', q:'잊혀진 이름, 누나의 이름은 뭘까요?',
     hint:'피난민증명서의 빈 칸을 마저 채워보세요.',
     answers:['정월','jeongwol'],
-    confirmQ:'이제 남매의 정체를 전부 알아내셨나요?',
+    confirmQ:'이제 할아버지의 누나 이름을 알아내셨나요?',
     confirmNo:['천천히 살펴보도록해요.'],
     solvedLines:[
       '...황정월, 이 분이 바로 할아버지가 평생 그토록 그리워하던 누나군요.',
@@ -1918,7 +2044,14 @@ function applyStaticI18n(){
   document.querySelector('#quest-modal h3').textContent = tr('퀘스트 목록');
   $('pz-input').placeholder = tr('정답 입력');
   $('pz-submit').textContent = tr('확인');
-  $('complete-desc').innerHTML = tr('이 화면을 명란스토리지 직원에게 보여주고<br>완료 기념품을 받으세요.');
+  $('complete-desc').innerHTML = tr('아래 버튼으로 기념품 코드를 확인하고<br>명란스토리지 직원에게 보여주세요.');
+  $('gift-btn-title').textContent = tr('기념품 코드 확인하기');
+  $('gift-ttl').textContent = tr('기념품 코드');
+  $('gift-note').innerHTML = tr('이 코드를 명란스토리지 직원에게 보여주세요.<br>코드 1개당 기념품은 1회만 받을 수 있어요.');
+  $('gift-staff-toggle').textContent = tr('직원 확인');
+  $('gift-pin').placeholder = tr('직원 PIN');
+  $('gift-redeem').textContent = tr('수령 처리');
+  $('gift-close').textContent = tr('닫기');
   $('survey-title').textContent = tr('만족도조사');
   if(LANG==='ko'){
     $('survey-sub').innerHTML = '만족도 조사를 완료한 참여자 중<br>총 50분을 추첨하여 소정의 선물을 드립니다.';
@@ -1972,18 +2105,37 @@ const fName=$('f-name'), fAddr=$('f-addr'), fConsent=$('f-consent'), regBtn=$('r
 function refreshRegBtn(){ regBtn.disabled = !(fName.value.trim() && fAddr.value.trim() && fConsent.checked); }
 [fName,fAddr,fConsent].forEach(el=>el.addEventListener('input',refreshRegBtn));
 fConsent.addEventListener('change',refreshRegBtn);
-const REGISTER_SHEET_URL='https://script.google.com/macros/s/AKfycbzfkUVLYTSHc4yJBeAqX-qurV-mOd8mUEWigHolaKySoO-rluWTX_3pmBdlGLwSqxXj/exec';
+const REGISTER_SHEET_URL='https://script.google.com/macros/s/AKfycbzoD9sjrqEWHLLOcTyy9XUcaVfgXx-UbTenogosP_1kcnuq9KYD2GefB6P9FVzRSLxgXQ/exec';
 function sendRegistrationToSheet(){
   try{
     fetch(REGISTER_SHEET_URL, {
       method:'POST',
-      body: JSON.stringify({ name:PLAYER.name, addr:PLAYER.addr, consent:fConsent.checked })
+      body: JSON.stringify({ name:PLAYER.name, addr:PLAYER.addr, consent:true, code:PLAYER.code })
     }).catch(()=>{});
   }catch(e){}
 }
 
+/* ---------- 기념품 코드: 등록 시 발급 → 시트에 저장 → 완료 화면에서 확인 / 직원 수령 처리 ---------- */
+const GIFT_KEY='busan_gift_v1';
+const CODE_CHARS='ABCDEFGHJKMNPQRSTUVWXYZ23456789';   // 헷갈리는 I, L, O, 0, 1 제외
+function makeGiftCode(){
+  const a=new Uint32Array(6);
+  try{ crypto.getRandomValues(a); }catch(e){ for(let i=0;i<6;i++) a[i]=Math.floor(Math.random()*4294967296); }
+  let s=''; for(let i=0;i<6;i++) s+=CODE_CHARS[a[i]%CODE_CHARS.length];
+  return s.slice(0,3)+'-'+s.slice(3);
+}
+function saveGift(done){
+  try{ localStorage.setItem(GIFT_KEY, JSON.stringify({ code:PLAYER.code, name:PLAYER.name, addr:PLAYER.addr, done:!!done })); }catch(e){}
+}
+function loadGift(){
+  try{ const g=JSON.parse(localStorage.getItem(GIFT_KEY)||'null'); return (g && g.code) ? g : null; }catch(e){ return null; }
+}
+function clearGift(){ try{ localStorage.removeItem(GIFT_KEY); }catch(e){} }
+
 regBtn.onclick=()=>{
   PLAYER.name=fName.value.trim(); PLAYER.addr=fAddr.value.trim();
+  PLAYER.code=makeGiftCode();
+  saveGift(false);
   sendRegistrationToSheet();
   showScreen(gameEl); showOpeningQuest();
 };
@@ -2625,7 +2777,8 @@ homeBtn.addEventListener('click',()=>{
   openingQuest = false;
   clearProgress();
   fName.value=''; fAddr.value=''; fConsent.checked=false; refreshRegBtn();
-  PLAYER.name=''; PLAYER.addr='';
+  PLAYER.name=''; PLAYER.addr=''; PLAYER.code='';
+  clearGift();
   showScreen(titleEl);
 });
 
@@ -2774,9 +2927,69 @@ legacyEl.addEventListener('click',()=>{
 });
 
 function showComplete(){
+  if(!PLAYER.code){   // 코드 도입 전에 시작한 진행분 → 지금 발급해서 시트에 등록
+    PLAYER.code=makeGiftCode();
+    sendRegistrationToSheet();
+  }
+  saveGift(true);     // 새로고침해도 완료 화면(과 코드)이 유지되도록
   showScreen(completeEl);
   clearProgress();
 }
+
+/* ----- 기념품 코드 팝업 ----- */
+const giftModal=$('gift-modal'), giftCodeEl=$('gift-code'), giftStatus=$('gift-status');
+const giftStaff=$('gift-staff'), giftPin=$('gift-pin'), giftMsg=$('gift-msg');
+function setGiftStatus(kind){
+  giftStatus.className = kind==='ok' ? 'ok' : kind==='done' ? 'done' : kind==='err' ? 'err' : '';
+  if(kind==='checking') giftStatus.textContent = tr('확인 중…');
+  else if(kind==='ok') giftStatus.textContent = tr('미수령');
+  else if(kind==='done') giftStatus.textContent = '✓ '+tr('수령 완료');
+  else giftStatus.innerHTML = tr('코드를 확인하지 못했어요.<br>잠시 후 다시 열어 주세요.');
+  $('gift-staff-toggle').style.display = (kind==='done') ? 'none' : '';
+  if(kind==='done') giftStaff.classList.remove('on');
+}
+function fetchGiftStatus(retry){
+  setGiftStatus('checking');
+  fetch(REGISTER_SHEET_URL+'?code='+encodeURIComponent(PLAYER.code))
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.status==='redeemed') setGiftStatus('done');
+      else if(d.status==='unredeemed') setGiftStatus('ok');
+      else if(!retry){            // 등록 전송이 실패했을 수 있음 → 한 번 더 등록하고 재확인
+        sendRegistrationToSheet();
+        setTimeout(()=>fetchGiftStatus(true),2500);
+      } else setGiftStatus('err');
+    })
+    .catch(()=>setGiftStatus('err'));
+}
+$('gift-btn').addEventListener('click',()=>{
+  giftCodeEl.textContent = PLAYER.code || '---';
+  giftStaff.classList.remove('on'); giftPin.value=''; giftMsg.textContent=''; giftMsg.className='';
+  giftModal.classList.add('on');
+  fetchGiftStatus(false);
+});
+$('gift-close').addEventListener('click',()=>giftModal.classList.remove('on'));
+$('gift-staff-toggle').addEventListener('click',()=>{
+  giftStaff.classList.toggle('on');
+  if(giftStaff.classList.contains('on')) giftPin.focus();
+});
+$('gift-redeem').addEventListener('click',()=>{
+  const pin=giftPin.value.trim();
+  if(!pin) return;
+  if(!confirm(tr('수령 처리할까요? 처리 후에는 되돌릴 수 없어요.'))) return;
+  giftMsg.className=''; giftMsg.textContent=tr('확인 중…');
+  fetch(REGISTER_SHEET_URL,{ method:'POST', body:JSON.stringify({ action:'redeem', code:PLAYER.code, pin }) })
+    .then(r=>r.json())
+    .then(d=>{
+      giftPin.value='';
+      if(d.result==='ok'){ giftMsg.className='ok'; giftMsg.textContent=tr('수령 처리되었어요.'); setGiftStatus('done'); }
+      else if(d.result==='already'){ giftMsg.textContent=tr('이미 수령 처리된 코드예요.'); setGiftStatus('done'); }
+      else if(d.result==='badpin') giftMsg.textContent=tr('PIN이 올바르지 않아요.');
+      else if(d.result==='locked') giftMsg.textContent=tr('시도가 너무 많아요. 잠시 후 다시 해주세요.');
+      else giftMsg.textContent=tr('처리하지 못했어요. 다시 시도해 주세요.');
+    })
+    .catch(()=>{ giftMsg.textContent=tr('처리하지 못했어요. 다시 시도해 주세요.'); });
+});
 
 $('survey-btn').addEventListener('click',()=>{ window.open('https://escape.dawoom.io/sbwc/survey/','_blank'); });
 $('spots-btn').addEventListener('click',()=>{ window.open('https://escape.dawoom.io/busan.spots.html','_blank'); });
@@ -2786,15 +2999,22 @@ $('complete-replay').addEventListener('click',()=>{
   solved = STEPS.map(()=>false); dlgSeenOnce = STEPS.map(()=>false);
   openingQuest=false;
   fName.value=''; fAddr.value=''; fConsent.checked=false; refreshRegBtn();
-  PLAYER.name=''; PLAYER.addr='';
+  PLAYER.name=''; PLAYER.addr=''; PLAYER.code='';
+  clearGift();
+  giftModal.classList.remove('on');
   showScreen(titleEl);
 });
 
 (function tryResume(){
   const save = loadSavedProgress();
-  if(!save) return;
+  if(!save){
+    const g = loadGift();   // 게임은 끝났고 새로고침만 한 경우 → 완료 화면으로 복귀
+    if(g && g.done){ PLAYER.name=g.name||''; PLAYER.addr=g.addr||''; PLAYER.code=g.code; showScreen(completeEl); }
+    return;
+  }
   PLAYER.name = save.player && save.player.name || '';
   PLAYER.addr = save.player && save.player.addr || '';
+  PLAYER.code = save.player && save.player.code || '';
   solved = save.solved;
   dlgSeenOnce = (Array.isArray(save.dlgSeenOnce) && save.dlgSeenOnce.length===STEPS.length) ? save.dlgSeenOnce : STEPS.map(()=>false);
   openingQuest = false;
