@@ -489,6 +489,22 @@
   .hint-body .cipher-slot img{ width:100%; }
   .hint-body .hint-answer{ color:var(--ink); font-weight:600; }
   .hint-body .hint-answer b{ color:var(--red); }
+  .reveal-btn{
+    display:block;
+    margin:14px auto 0;
+    border:1.5px solid var(--red);
+    background:#fff;
+    color:var(--red-deep);
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:700;
+    padding:8px 18px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .reveal-btn:hover{background:#FDECEC;}
+  .hint-body .reveal-answer{ margin-top:12px; color:var(--ink); font-weight:600; }
+  .hint-body .reveal-answer b{ color:var(--red); letter-spacing:.04em; }
 
   /* sponsor banner : full-bleed strip at the very bottom, shown once the case is solved */
   #view-attach .promo{display:none; margin:28px -18px -40px;}
@@ -794,6 +810,8 @@
           <p data-i18n="hintIntro">암호가 어렵나요? 암호표는 이렇게 읽어요. 예를 들어 이 기호는…</p>
           <div class="cipher-slot"><img src="assets/vip.svg" alt="VIP" /></div>
           <p class="hint-answer" data-i18n-html="hintAnswer">…<b>VIP</b> 라고 읽어요!</p>
+          <button type="button" class="reveal-btn" id="revealBtn" onclick="revealAnswer()" data-i18n="revealBtn">정답 보기</button>
+          <p class="reveal-answer" id="revealAnswer" hidden data-i18n-html="revealText">정답은 <b>ZIMCARRY</b> 예요!</p>
         </div>
       </div>
 
@@ -1097,6 +1115,13 @@
     }
   };
 
+  // 힌트 안의 "정답 보기" 문구
+  Object.assign(I18N.ko, {revealBtn:'정답 보기', revealText:'정답은 <b>ZIMCARRY</b> 예요!'});
+  Object.assign(I18N.en, {revealBtn:'Show answer', revealText:'The answer is <b>ZIMCARRY</b>!'});
+  Object.assign(I18N.ja, {revealBtn:'答えを見る', revealText:'答えは <b>ZIMCARRY</b> だよ！'});
+  Object.assign(I18N['zh-Hans'], {revealBtn:'查看答案', revealText:'答案是 <b>ZIMCARRY</b>！'});
+  Object.assign(I18N['zh-Hant'], {revealBtn:'查看答案', revealText:'答案是 <b>ZIMCARRY</b>！'});
+
   // 예약 링크 : 한국어는 네이버 스마트플레이스, 그 외 언어는 외국인 예약 페이지
   const SMARTPLACE_URL = 'https://booking.naver.com/booking/5/bizes/1747798';   // ← 스마트플레이스 예약 링크를 여기에 넣으세요
   function updateBookLink(){
@@ -1209,6 +1234,10 @@
   function backToEmail(){
     show('email');
     document.getElementById('hojong').classList.add('show');
+  }
+  function revealAnswer(){
+    document.getElementById('revealAnswer').hidden = false;
+    document.getElementById('revealBtn').hidden = true;
   }
   function toggleHint(){
     const body = document.getElementById('hintBody');
