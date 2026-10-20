@@ -422,6 +422,95 @@
     border-radius: 0 12px 0 0;
   }
 
+  /* ── QUICK BOOKING ── */
+  .quick-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 12px 8px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'SchoolSafetyRoundedSmile', 'Presentation', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .quick-btn:hover {
+    background: var(--accent-bright);
+  }
+
+  /* ── LANGUAGE SWITCH ── */
+  .lang-switch {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+  }
+
+  .lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .lang-btn:hover {
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+  }
+
+  .lang-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 10;
+    min-width: 140px;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .lang-menu.open {
+    display: flex;
+  }
+
+  .lang-opt {
+    padding: 9px 12px;
+    background: none;
+    border: 0;
+    border-radius: 8px;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .lang-opt:hover {
+    background: var(--surface-hover);
+  }
+
+  .lang-opt.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
   /* ── FOOTER ── */
   .footer {
     margin-top: 48px;
@@ -569,10 +658,21 @@
 
 <div class="container">
 
+  <div class="lang-switch" id="langSwitch">
+    <button type="button" class="lang-btn" id="langBtn" aria-haspopup="true" aria-label="Language">🌐 <span id="langCur">한국어</span></button>
+    <div class="lang-menu" id="langMenu">
+      <button type="button" class="lang-opt" data-lang="ko">한국어</button>
+      <button type="button" class="lang-opt" data-lang="en">English</button>
+      <button type="button" class="lang-opt" data-lang="ja">日本語</button>
+      <button type="button" class="lang-opt" data-lang="zh-Hans">简体中文</button>
+      <button type="button" class="lang-opt" data-lang="zh-Hant">繁體中文</button>
+    </div>
+  </div>
+
   <header class="header">
     <div class="eyebrow">Urban Escape Program</div>
-    <h1 class="header-title">부산을 무대로 한<br><span>방탈출</span> 프로그램</h1>
-    <p class="header-desc">도시 곳곳을 탐험하는 몰입형 야외 방탈출 시리즈<br>링크를 통해 예약 및 정보를 확인하세요.</p>
+    <h1 class="header-title" data-i18n-html="headTitle">부산을 무대로 한<br><span>방탈출</span> 프로그램</h1>
+    <p class="header-desc" data-i18n-html="headDesc">도시 곳곳을 탐험하는 몰입형 야외 방탈출 시리즈<br>링크를 통해 예약 및 정보를 확인하세요.</p>
   </header>
 
   <ul class="card-list" role="list" style="list-style:none; padding:0;">
@@ -584,46 +684,48 @@
         <div class="card-icon" aria-hidden="true">🏚️</div>
         <div class="card-body">
           <span class="card-tag card-tag--sold">06.09.~11.30.</span>
-          <div class="card-title">소막마을 대탐험</div>
-          <div class="card-sub">부산 소막마을 일원</div>
+          <div class="card-title" data-i18n="c1Title">소막마을 대탐험</div>
+          <div class="card-sub" data-i18n="c1Sub">부산 소막마을 일원</div>
         </div>
-        <span class="card-stamp" aria-label="매진">SOLD OUT</span>
+        <span class="card-stamp">SOLD OUT</span>
         <span class="card-arrow" aria-hidden="true">→</span>
       </div>
     </li>
 
     <!-- 2. 부산대자율상권 -->
     <li>
-      <a class="card" href="https://escape.dawoom.io/alley.prologue.html" aria-label="부산대자율상권구역 골목 탐정단">
+      <a class="card" href="https://escape.dawoom.io/alley.prologue.html" data-i18n-aria="c2Title" aria-label="부산대자율상권 방탈출 : 골목 탐정단">
         <span class="card-number">02</span>
         <div class="card-icon" aria-hidden="true">🔍</div>
         <div class="card-body">
           <span class="card-tag card-tag--open">9.12.~12.6.</span>
-          <div class="card-title">부산대자율상권구역 골목 탐정단</div>
-          <div class="card-sub">부산대 자율상권 일원 · 프롤로그</div>
+          <div class="card-title" data-i18n="c2Title">부산대자율상권 방탈출 : 골목 탐정단</div>
+          <div class="card-sub" data-i18n="c2Sub">부산대 자율상권 일원 · 프롤로그</div>
         </div>
         <span class="card-arrow" aria-hidden="true">→</span>
       </a>
+      <a class="quick-btn" href="https://booking.naver.com/booking/5/bizes/1732889/" target="_blank" rel="noopener" data-i18n="book">프롤로그 없이 바로 예약하기 →</a>
     </li>
 
     <!-- 3. 피란수도 -->
     <li>
-      <a class="card" href="https://escape.dawoom.io/lostparcel/" aria-label="피란수도 부산 : 잃어버린 소포 프롤로그">
+      <a class="card" href="https://escape.dawoom.io/lostparcel/" data-i18n-aria="c3Title" aria-label="피란수도 부산 : 잃어버린 소포 프롤로그">
         <span class="card-number">03</span>
         <div class="card-icon" aria-hidden="true">📦</div>
         <div class="card-body">
           <span class="card-tag card-tag--open">10.8.~12.4.</span>
-          <div class="card-title">피란수도 부산 : 잃어버린 소포</div>
-          <div class="card-sub">부산 피란수도 유산 일원 · 프롤로그</div>
+          <div class="card-title" data-i18n="c3Title">피란수도 부산 : 잃어버린 소포</div>
+          <div class="card-sub" data-i18n="c3Sub">부산 피란수도 유산 일원 · 프롤로그</div>
         </div>
         <span class="card-arrow" aria-hidden="true">→</span>
       </a>
+      <a class="quick-btn" href="https://booking.naver.com/booking/5/bizes/1747798" data-href-intl="https://escape.dawoom.io/lostparcel/reserve/" target="_blank" rel="noopener" data-i18n="book">프롤로그 없이 바로 예약하기 →</a>
     </li>
 
   </ul>
 
   <footer class="footer">
-    <p>도시와 사람을 잇는 로컬 콘텐츠, 다움</p>
+    <p data-i18n="footer">도시와 사람을 잇는 로컬 콘텐츠, 다움</p>
   </footer>
 
 </div>
@@ -631,36 +733,223 @@
 <div class="popup" id="notice" role="dialog" aria-modal="true" aria-labelledby="notice-title" hidden>
   <div class="popup-box">
     <div class="popup-body">
-      <h1 class="popup-title" id="notice-title">야외 방탈출 프로그램<br>매진 및 추가 예약 안내</h1>
-      <p>도시와 사람을 잇는 로컬 콘텐츠, 다움입니다.</p>
-      <p>여러분의 많은 관심과 성원에 힘입어 부산대·부산역 야외 방탈출 프로그램의 예약 티켓이 모두 소진되었습니다. 진심으로 감사드립니다.</p>
+      <h1 class="popup-title" id="notice-title" data-i18n-html="pTitle">야외 방탈출 프로그램<br>매진 및 추가 예약 안내</h1>
+      <p data-i18n="p1">도시와 사람을 잇는 로컬 콘텐츠, 다움입니다.</p>
+      <p data-i18n="p2">여러분의 많은 관심과 성원에 힘입어 부산대·부산역 야외 방탈출 프로그램의 예약 티켓이 모두 소진되었습니다. 진심으로 감사드립니다.</p>
 
-      <h2>[예약 페이지 이용 안내]</h2>
-      <p>기존 예약자의 취소로 잔여 티켓이 발생할 경우 예약 페이지가 다시 활성화될 수 있습니다.</p>
-      <p>예약 페이지로 연결되지 않는 경우, 현재 예약 가능한 티켓이 모두 소진된 상태입니다.</p>
+      <h2 data-i18n="h1">[예약 페이지 이용 안내]</h2>
+      <p data-i18n="p3">기존 예약자의 취소로 잔여 티켓이 발생할 경우 예약 페이지가 다시 활성화될 수 있습니다.</p>
+      <p data-i18n="p4">예약 페이지로 연결되지 않는 경우, 현재 예약 가능한 티켓이 모두 소진된 상태입니다.</p>
 
-      <h2>[부산역 야외 방탈출 추가 예약 안내]</h2>
-      <p>보다 많은 분들께 체험 기회를 제공하고자, 예약 취소분과 추가 확보 수량을 매주 나누어 오픈할 예정입니다.</p>
+      <h2 data-i18n="h2">[부산역 야외 방탈출 추가 예약 안내]</h2>
+      <p data-i18n="p5">보다 많은 분들께 체험 기회를 제공하고자, 예약 취소분과 추가 확보 수량을 매주 나누어 오픈할 예정입니다.</p>
       <ul class="popup-list">
-        <li>예약 오픈 : 매주 목요일 오후 2시</li>
-        <li>체험 일정 : 매주 금·토·일요일</li>
-        <li>오픈 수량 : 회차별 소량씩 순차 오픈</li>
-        <li>대상 프로그램 : 부산역 야외 방탈출 〈잃어버린 소포〉</li>
+        <li data-i18n="li1">예약 오픈 : 매주 목요일 오후 2시</li>
+        <li data-i18n="li2">체험 일정 : 매주 금·토·일요일</li>
+        <li data-i18n="li3">오픈 수량 : 회차별 소량씩 순차 오픈</li>
+        <li data-i18n="li4">대상 프로그램 : 부산역 야외 방탈출 〈잃어버린 소포〉</li>
       </ul>
-      <p class="popup-note">추가 예약은 한정된 수량으로 진행되며, 오픈 후 조기 마감될 수 있습니다.</p>
+      <p class="popup-note" data-i18n="note">추가 예약은 한정된 수량으로 진행되며, 오픈 후 조기 마감될 수 있습니다.</p>
+      <p class="popup-note" data-i18n="note2">준비된 수량이 모두 소진될 경우 프로그램이 당초 일정보다 일찍 종료될 수 있습니다.</p>
 
-      <p>앞으로도 다움의 로컬 콘텐츠에 많은 관심 부탁드립니다. 감사합니다.</p>
-      <p class="popup-sign">커뮤니케이션 다움 드림</p>
+      <p data-i18n="p6">앞으로도 다움의 로컬 콘텐츠에 많은 관심 부탁드립니다. 감사합니다.</p>
+      <p class="popup-sign" data-i18n="sign">커뮤니케이션 다움 드림</p>
     </div>
     <div class="popup-actions">
-      <button type="button" id="notice-hide">오늘 하루 보지 않기</button>
-      <button type="button" id="notice-close">닫기</button>
+      <button type="button" id="notice-hide" data-i18n="hide">오늘 하루 보지 않기</button>
+      <button type="button" id="notice-close" data-i18n="close">닫기</button>
     </div>
   </div>
 </div>
 
 <script>
   (function () {
+    var I18N = {
+      ko: {
+        title: '부산 야외 방탈출 프로그램',
+        headTitle: '부산을 무대로 한<br><span>방탈출</span> 프로그램',
+        headDesc: '도시 곳곳을 탐험하는 몰입형 야외 방탈출 시리즈<br>링크를 통해 예약 및 정보를 확인하세요.',
+        c1Title: '소막마을 대탐험', c1Sub: '부산 소막마을 일원',
+        c2Title: '부산대자율상권 방탈출 : 골목 탐정단', c2Sub: '부산대 자율상권 일원 · 프롤로그',
+        c3Title: '피란수도 부산 : 잃어버린 소포', c3Sub: '부산 피란수도 유산 일원 · 프롤로그',
+        book: '프롤로그 없이 바로 예약하기 →',
+        footer: '도시와 사람을 잇는 로컬 콘텐츠, 다움',
+        pTitle: '야외 방탈출 프로그램<br>매진 및 추가 예약 안내',
+        p1: '도시와 사람을 잇는 로컬 콘텐츠, 다움입니다.',
+        p2: '여러분의 많은 관심과 성원에 힘입어 부산대·부산역 야외 방탈출 프로그램의 예약 티켓이 모두 소진되었습니다. 진심으로 감사드립니다.',
+        h1: '[예약 페이지 이용 안내]',
+        p3: '기존 예약자의 취소로 잔여 티켓이 발생할 경우 예약 페이지가 다시 활성화될 수 있습니다.',
+        p4: '예약 페이지로 연결되지 않는 경우, 현재 예약 가능한 티켓이 모두 소진된 상태입니다.',
+        h2: '[부산역 야외 방탈출 추가 예약 안내]',
+        p5: '보다 많은 분들께 체험 기회를 제공하고자, 예약 취소분과 추가 확보 수량을 매주 나누어 오픈할 예정입니다.',
+        li1: '예약 오픈 : 매주 목요일 오후 2시',
+        li2: '체험 일정 : 매주 금·토·일요일',
+        li3: '오픈 수량 : 회차별 소량씩 순차 오픈',
+        li4: '대상 프로그램 : 부산역 야외 방탈출 〈잃어버린 소포〉',
+        note: '추가 예약은 한정된 수량으로 진행되며, 오픈 후 조기 마감될 수 있습니다.',
+        note2: '준비된 수량이 모두 소진될 경우 프로그램이 당초 일정보다 일찍 종료될 수 있습니다.',
+        p6: '앞으로도 다움의 로컬 콘텐츠에 많은 관심 부탁드립니다. 감사합니다.',
+        sign: '커뮤니케이션 다움 드림',
+        hide: '오늘 하루 보지 않기', close: '닫기'
+      },
+      en: {
+        title: 'Busan Outdoor Escape Game',
+        headTitle: 'An Outdoor<br><span>Escape Game</span> Set in Busan',
+        headDesc: 'An immersive outdoor escape series exploring the city.<br>Use the links below to book and find out more.',
+        c1Title: 'Somak Village Grand Expedition', c1Sub: 'Around Somak Village, Busan',
+        c2Title: 'Pusan National Univ. Commercial District Escape: Alley Detectives', c2Sub: 'Pusan National Univ. Commercial District · Prologue',
+        c3Title: 'Sites of the Busan Wartime Capital: The Lost Parcel', c3Sub: 'Around the Sites of the Busan Wartime Capital · Prologue',
+        book: 'Skip the prologue — Book now →',
+        footer: 'Local content connecting cities and people — Dawoom',
+        pTitle: 'Outdoor Escape Game<br>Sold Out &amp; Additional Booking Notice',
+        p1: 'This is Dawoom, connecting cities and people through local content.',
+        p2: 'Thanks to your overwhelming interest, all tickets for the Pusan National University and Busan Station outdoor escape games are sold out. We sincerely thank you.',
+        h1: '[About the Booking Page]',
+        p3: 'If tickets are freed up by cancellations, the booking page may become active again.',
+        p4: 'If the booking page does not open, all currently available tickets have been taken.',
+        h2: '[Additional Booking for the Busan Station Escape Game]',
+        p5: 'To give more people the chance to play, we will release cancelled tickets and extra capacity in small batches every week.',
+        li1: 'Booking opens: every Thursday at 2 PM (KST)',
+        li2: 'Play dates: every Friday, Saturday and Sunday',
+        li3: 'Tickets: released in small batches per time slot',
+        li4: 'Program: Busan Station Outdoor Escape Game "The Lost Parcel"',
+        note: 'Additional tickets are limited and may sell out soon after release.',
+        note2: 'Once all prepared tickets are gone, the program may end earlier than originally scheduled.',
+        p6: 'Thank you for your continued interest in Dawoom\'s local content.',
+        sign: 'Dawoom Communications Team',
+        hide: 'Don\'t show today', close: 'Close'
+      },
+      ja: {
+        title: '釜山 野外脱出ゲームプログラム',
+        headTitle: '釜山を舞台にした<br><span>脱出ゲーム</span>プログラム',
+        headDesc: '街の各所を探検する没入型の野外脱出ゲームシリーズ<br>リンクから予約・詳細をご確認ください。',
+        c1Title: 'ソマク村 大探検', c1Sub: '釜山 ソマク村一帯',
+        c2Title: '釜山大学自律商圏 脱出ゲーム：路地探偵団', c2Sub: '釜山大学自律商圏一帯 · プロローグ',
+        c3Title: '釜山の避難首都遺産：失われた小包', c3Sub: '釜山の避難首都遺産一帯 · プロローグ',
+        book: 'プロローグなしで今すぐ予約 →',
+        footer: '都市と人をつなぐローカルコンテンツ、Dawoom（다움）',
+        pTitle: '野外脱出ゲームプログラム<br>完売および追加予約のご案内',
+        p1: '都市と人をつなぐローカルコンテンツ、Dawoom（다움）です。',
+        p2: '皆さまの多大なるご関心とご支援により、釜山大学・釜山駅の野外脱出ゲームの予約チケットがすべて完売いたしました。心より感謝申し上げます。',
+        h1: '【予約ページのご利用について】',
+        p3: '既存のご予約者のキャンセルにより残席が出た場合、予約ページが再び有効になることがあります。',
+        p4: '予約ページに接続できない場合は、現在ご予約可能なチケットがすべて売り切れの状態です。',
+        h2: '【釜山駅 野外脱出ゲーム 追加予約のご案内】',
+        p5: 'より多くの方に体験の機会をご提供するため、キャンセル分と追加確保分を毎週に分けてオープンする予定です。',
+        li1: '予約オープン：毎週木曜日 午後2時（韓国時間）',
+        li2: '体験日程：毎週 金・土・日曜日',
+        li3: 'オープン数量：各回少数ずつ順次オープン',
+        li4: '対象プログラム：釜山駅 野外脱出ゲーム〈失われた小包〉',
+        note: '追加予約は数量限定で、オープン後すぐに締め切られる場合があります。',
+        note2: '用意した数量がすべて終了した場合、プログラムは当初の予定より早く終了することがあります。',
+        p6: '今後もDawoomのローカルコンテンツにご注目ください。ありがとうございます。',
+        sign: 'Dawoom コミュニケーションチーム',
+        hide: '今日は表示しない', close: '閉じる'
+      },
+      'zh-Hans': {
+        title: '釜山户外密室逃脱项目',
+        headTitle: '以釜山为舞台的<br><span>密室逃脱</span>项目',
+        headDesc: '探索城市各处的沉浸式户外密室逃脱系列<br>请通过链接预约并查看详情。',
+        c1Title: '牛幕村大探险', c1Sub: '釜山牛幕村一带',
+        c2Title: '釜山大学自律商圈密室逃脱：小巷侦探团', c2Sub: '釜山大学自律商圈一带 · 序章',
+        c3Title: '釜山战时首都遗址：遗失的包裹', c3Sub: '釜山战时首都遗址一带 · 序章',
+        book: '跳过序章，直接预约 →',
+        footer: '连接城市与人的在地内容，Dawoom（다움）',
+        pTitle: '户外密室逃脱项目<br>售罄及追加预约通知',
+        p1: '我们是连接城市与人的在地内容品牌——Dawoom（다움）。',
+        p2: '承蒙大家的关注与支持，釜山大学、釜山站户外密室逃脱项目的预约门票已全部售罄，在此衷心感谢。',
+        h1: '【预约页面使用说明】',
+        p3: '若有已预约者取消而产生余票，预约页面可能会重新开放。',
+        p4: '若无法进入预约页面，表示目前可预约的门票已全部售罄。',
+        h2: '【釜山站户外密室逃脱追加预约说明】',
+        p5: '为了让更多人有机会体验，我们将每周分批开放取消的名额及新增名额。',
+        li1: '预约开放：每周四下午2点（韩国时间）',
+        li2: '体验日期：每周五、周六、周日',
+        li3: '开放数量：每个场次分批少量开放',
+        li4: '适用项目：釜山站户外密室逃脱〈遗失的包裹〉',
+        note: '追加预约数量有限，开放后可能很快约满。',
+        note2: '若准备的数量全部售完，项目可能会比原定日程提前结束。',
+        p6: '期待您继续关注Dawoom的在地内容，谢谢。',
+        sign: 'Dawoom 传播团队 敬上',
+        hide: '今天不再显示', close: '关闭'
+      },
+      'zh-Hant': {
+        title: '釜山戶外密室逃脫專案',
+        headTitle: '以釜山為舞台的<br><span>密室逃脫</span>專案',
+        headDesc: '探索城市各處的沉浸式戶外密室逃脫系列<br>請透過連結預約並查看詳情。',
+        c1Title: '牛幕村大探險', c1Sub: '釜山牛幕村一帶',
+        c2Title: '釜山大學自律商圈密室逃脫：小巷偵探團', c2Sub: '釜山大學自律商圈一帶 · 序章',
+        c3Title: '釜山戰時首都遺址：遺失的包裹', c3Sub: '釜山戰時首都遺址一帶 · 序章',
+        book: '跳過序章，直接預約 →',
+        footer: '連結城市與人的在地內容，Dawoom（다움）',
+        pTitle: '戶外密室逃脫專案<br>售罄及追加預約通知',
+        p1: '我們是連結城市與人的在地內容品牌——Dawoom（다움）。',
+        p2: '承蒙大家的關注與支持，釜山大學、釜山站戶外密室逃脫專案的預約門票已全數售罄，在此衷心感謝。',
+        h1: '【預約頁面使用說明】',
+        p3: '若有已預約者取消而產生餘票，預約頁面可能會重新開放。',
+        p4: '若無法進入預約頁面，表示目前可預約的門票已全數售罄。',
+        h2: '【釜山站戶外密室逃脫追加預約說明】',
+        p5: '為了讓更多人有機會體驗，我們將每週分批開放取消的名額及新增名額。',
+        li1: '預約開放：每週四下午2點（韓國時間）',
+        li2: '體驗日期：每週五、週六、週日',
+        li3: '開放數量：每個場次分批少量開放',
+        li4: '適用專案：釜山站戶外密室逃脫〈遺失的包裹〉',
+        note: '追加預約數量有限，開放後可能很快額滿。',
+        note2: '若準備的數量全部售完，專案可能會比原定日程提前結束。',
+        p6: '期待您持續關注Dawoom的在地內容，謝謝。',
+        sign: 'Dawoom 傳播團隊 敬上',
+        hide: '今天不再顯示', close: '關閉'
+      }
+    };
+    var LANG_KEY = 'demoLang';
+    var LANG_NAMES = { ko: '한국어', en: 'English', ja: '日本語', 'zh-Hans': '简体中文', 'zh-Hant': '繁體中文' };
+
+    function detectLang() {
+      var l = (navigator.language || 'ko').toLowerCase();
+      if (l.indexOf('ko') === 0) return 'ko';
+      if (l.indexOf('ja') === 0) return 'ja';
+      if (l.indexOf('zh') === 0) return /tw|hk|mo|hant/.test(l) ? 'zh-Hant' : 'zh-Hans';
+      if (l.indexOf('en') === 0) return 'en';
+      return 'ko';
+    }
+
+    function applyLang(lang) {
+      if (!I18N[lang]) lang = 'ko';
+      var dict = I18N[lang];
+      function t(k) { return dict[k] != null ? dict[k] : I18N.ko[k]; }
+      document.documentElement.lang = lang;
+      document.title = t('title');
+      document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-html]').forEach(function (el) { el.innerHTML = t(el.dataset.i18nHtml); });
+      document.querySelectorAll('[data-i18n-aria]').forEach(function (el) { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+      document.querySelectorAll('.lang-opt').forEach(function (o) { o.classList.toggle('active', o.dataset.lang === lang); });
+      document.querySelectorAll('[data-href-intl]').forEach(function (a) {
+        if (!a.dataset.hrefKo) a.dataset.hrefKo = a.getAttribute('href');
+        a.setAttribute('href', lang === 'ko' ? a.dataset.hrefKo : a.dataset.hrefIntl);
+      });
+      document.getElementById('langCur').textContent = LANG_NAMES[lang];
+      curLang = lang;
+      // the sold-out notice only applies to Korean-language bookings
+      if (lang !== 'ko' && popup) close();
+      try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+    }
+
+    var langMenu = document.getElementById('langMenu');
+    document.getElementById('langBtn').addEventListener('click', function (e) {
+      e.stopPropagation();
+      langMenu.classList.toggle('open');
+    });
+    document.querySelectorAll('.lang-opt').forEach(function (o) {
+      o.addEventListener('click', function () {
+        applyLang(o.dataset.lang);
+        langMenu.classList.remove('open');
+      });
+    });
+    document.addEventListener('click', function (e) {
+      if (!document.getElementById('langSwitch').contains(e.target)) langMenu.classList.remove('open');
+    });
+
+    var curLang = 'ko';
     var popup = document.getElementById('notice');
     var KEY = 'notice-hide-until';
 
@@ -682,7 +971,11 @@
 
     var hidden = false;
     try { hidden = localStorage.getItem(KEY) === today(); } catch (e) {}
-    if (!hidden) open();
+
+    var savedLang = null;
+    try { savedLang = localStorage.getItem(LANG_KEY); } catch (e) {}
+    applyLang(savedLang || detectLang());
+    if (!hidden && curLang === 'ko') open();
 
     document.getElementById('notice-close').addEventListener('click', close);
     document.getElementById('notice-hide').addEventListener('click', function () {
