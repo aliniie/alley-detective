@@ -349,6 +349,15 @@
     color: var(--tag-sold-text);
   }
 
+  .card-soldout {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    color: var(--sold-out-text);
+    margin-bottom: 4px;
+  }
+
   .card-title {
     font-family: 'SchoolSafetyRoundedSmile', 'Presentation', sans-serif;
     font-size: 17px;
@@ -426,6 +435,115 @@
     opacity: 1;
   }
 
+  /* ── POPUP ── */
+  .popup {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(5, 8, 14, 0.7);
+  }
+
+  .popup.is-open {
+    display: flex;
+  }
+
+  .popup-box {
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-radius: 14px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+  }
+
+  .popup-body {
+    padding: 28px 24px 20px;
+    overflow-y: auto;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    word-break: keep-all;
+  }
+
+  .popup-title {
+    font-family: 'SchoolSafetyRoundedSmile', 'Presentation', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+  }
+
+  .popup-body p + p {
+    margin-top: 8px;
+  }
+
+  .popup-body h2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-bright);
+    margin: 20px 0 6px;
+  }
+
+  .popup-list {
+    list-style: none;
+    margin: 10px 0;
+    padding: 12px 14px;
+    background: var(--accent-glow);
+    border-radius: 8px;
+    color: var(--text-primary);
+  }
+
+  .popup-list li + li {
+    margin-top: 2px;
+  }
+
+  .popup-note {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .popup-sign {
+    margin-top: 18px;
+    text-align: right;
+  }
+
+  .popup-actions {
+    display: flex;
+    border-top: 1px solid var(--border);
+  }
+
+  .popup-actions button {
+    flex: 1;
+    padding: 14px 8px;
+    background: none;
+    border: 0;
+    font: inherit;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  .popup-actions button + button {
+    border-left: 1px solid var(--border);
+    font-weight: 700;
+    color: var(--accent-bright);
+  }
+
+  .popup-actions button:hover {
+    background: var(--surface-hover);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .card, .card-arrow, .card-icon {
       transition: none;
@@ -457,9 +575,10 @@
         <span class="card-number">01</span>
         <div class="card-icon" aria-hidden="true">🏚️</div>
         <div class="card-body">
-          <span class="card-tag card-tag--sold">매진 마감</span>
+          <span class="card-soldout">SOLD OUT</span>
+          <span class="card-tag card-tag--sold">06.06.~11.30.</span>
           <div class="card-title">소막마을 방탈출</div>
-          <div class="card-sub">부산 소막마을 일원 · 종료된 프로그램</div>
+          <div class="card-sub">부산 소막마을 일원</div>
         </div>
         <span class="card-arrow" aria-hidden="true">→</span>
       </div>
@@ -500,3 +619,69 @@
   </footer>
 
 </div>
+
+<div class="popup" id="notice" role="dialog" aria-modal="true" aria-labelledby="notice-title" hidden>
+  <div class="popup-box">
+    <div class="popup-body">
+      <h1 class="popup-title" id="notice-title">야외 방탈출 프로그램<br>매진 및 추가 예약 안내</h1>
+      <p>도시와 사람을 잇는 로컬 콘텐츠, 다움입니다.</p>
+      <p>여러분의 많은 관심과 성원에 힘입어 부산대·부산역 야외 방탈출 프로그램의 예약 티켓이 모두 소진되었습니다. 진심으로 감사드립니다.</p>
+
+      <h2>[예약 페이지 이용 안내]</h2>
+      <p>기존 예약자의 취소로 잔여 티켓이 발생할 경우 예약 페이지가 다시 활성화될 수 있습니다.</p>
+      <p>예약 페이지로 연결되지 않는 경우, 현재 예약 가능한 티켓이 모두 소진된 상태입니다.</p>
+
+      <h2>[부산역 야외 방탈출 추가 예약 안내]</h2>
+      <p>보다 많은 분들께 체험 기회를 제공하고자, 예약 취소분과 추가 확보 수량을 매주 나누어 오픈할 예정입니다.</p>
+      <ul class="popup-list">
+        <li>예약 오픈 : 매주 목요일 오후 5시</li>
+        <li>체험 일정 : 매주 금·토·일요일</li>
+        <li>오픈 수량 : 회차별 소량씩 순차 오픈</li>
+        <li>대상 프로그램 : 부산역 야외 방탈출 〈잃어버린 소포〉</li>
+      </ul>
+      <p class="popup-note">추가 예약은 한정된 수량으로 진행되며, 오픈 후 조기 마감될 수 있습니다.</p>
+
+      <p>앞으로도 다움의 로컬 콘텐츠에 많은 관심 부탁드립니다. 감사합니다.</p>
+      <p class="popup-sign">커뮤니케이션 다움 드림</p>
+    </div>
+    <div class="popup-actions">
+      <button type="button" id="notice-hide">오늘 하루 보지 않기</button>
+      <button type="button" id="notice-close">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var popup = document.getElementById('notice');
+    var KEY = 'notice-hide-until';
+
+    function today() {
+      var d = new Date();
+      return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    }
+
+    function open() {
+      popup.hidden = false;
+      popup.classList.add('is-open');
+      document.getElementById('notice-close').focus();
+    }
+
+    function close() {
+      popup.classList.remove('is-open');
+      popup.hidden = true;
+    }
+
+    var hidden = false;
+    try { hidden = localStorage.getItem(KEY) === today(); } catch (e) {}
+    if (!hidden) open();
+
+    document.getElementById('notice-close').addEventListener('click', close);
+    document.getElementById('notice-hide').addEventListener('click', function () {
+      try { localStorage.setItem(KEY, today()); } catch (e) {}
+      close();
+    });
+    popup.addEventListener('click', function (e) { if (e.target === popup) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  })();
+</script>
