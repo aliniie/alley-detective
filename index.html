@@ -349,13 +349,21 @@
     color: var(--tag-sold-text);
   }
 
-  .card-soldout {
-    display: block;
-    font-size: 12px;
+  .card-stamp {
+    position: absolute;
+    right: 18px;
+    bottom: 14px;
+    transform: rotate(-8deg);
+    padding: 4px 10px;
+    border: 2px solid #e1332e;
+    border-radius: 8px;
+    color: #e1332e;
+    font-size: 13px;
     font-weight: 800;
-    letter-spacing: 0.2em;
-    color: var(--sold-out-text);
-    margin-bottom: 4px;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    background: rgba(225, 51, 46, 0.08);
+    pointer-events: none;
   }
 
   .card-title {
@@ -575,23 +583,23 @@
         <span class="card-number">01</span>
         <div class="card-icon" aria-hidden="true">🏚️</div>
         <div class="card-body">
-          <span class="card-soldout">SOLD OUT</span>
-          <span class="card-tag card-tag--sold">06.06.~11.30.</span>
-          <div class="card-title">소막마을 방탈출</div>
+          <span class="card-tag card-tag--sold">06.09.~11.30.</span>
+          <div class="card-title">소막마을 대탐험</div>
           <div class="card-sub">부산 소막마을 일원</div>
         </div>
+        <span class="card-stamp" aria-label="매진">SOLD OUT</span>
         <span class="card-arrow" aria-hidden="true">→</span>
       </div>
     </li>
 
     <!-- 2. 부산대자율상권 -->
     <li>
-      <a class="card" href="https://escape.dawoom.io/alley.prologue.html" aria-label="부산대자율상권구역 방탈출 — 09.11.">
+      <a class="card" href="https://escape.dawoom.io/alley.prologue.html" aria-label="부산대자율상권 방탈출 : 골목 탐정단">
         <span class="card-number">02</span>
         <div class="card-icon" aria-hidden="true">🔍</div>
         <div class="card-body">
           <span class="card-tag card-tag--open">9.12.~12.6.</span>
-          <div class="card-title">부산대자율상권구역 방탈출</div>
+          <div class="card-title">부산대자율상권 방탈출 : 골목 탐정단</div>
           <div class="card-sub">부산대 자율상권 일원 · 프롤로그</div>
         </div>
         <span class="card-arrow" aria-hidden="true">→</span>
