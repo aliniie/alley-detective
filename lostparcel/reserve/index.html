@@ -68,6 +68,14 @@
     text-decoration:none;
   }
 
+  .topbar .check-mini{
+    color:#fff; border:1px solid rgba(255,255,255,0.45);
+    font-size:12.5px; font-weight:700;
+    padding:7px 12px; border-radius:999px;
+    text-decoration:none; white-space:nowrap;
+  }
+  .topbar .check-mini:hover{background:rgba(255,255,255,0.14);}
+
   .lang-switch{position:relative;}
   .lang-globe{
     height:32px; padding:0 11px;
@@ -423,6 +431,7 @@
     <div class="topbar">
       <a class="back" id="backLink" href="../" data-i18n="back">‹ Back</a>
       <div class="right">
+        <a class="check-mini" href="#manage" data-i18n="ctaCheck">My booking</a>
         <div class="lang-switch" id="langSwitch">
           <button class="lang-globe" type="button" onclick="toggleLangMenu(event)" aria-label="Language">🌐 <span id="langLabel">English</span></button>
           <div class="lang-menu" id="langMenu">
@@ -576,11 +585,7 @@
         </div>
 
         <div class="field" id="f-contact">
-          <div class="label"><span data-i18n="contactLabel">Contact</span><span class="req">*</span></div>
-          <div class="seg" role="radiogroup">
-            <label><input type="radio" name="ctype" value="email" checked><span data-i18n="email">Email</span></label>
-            <label><input type="radio" name="ctype" value="phone"><span data-i18n="phone">Phone</span></label>
-          </div>
+          <div class="label"><span data-i18n="email">Email</span><span class="req">*</span></div>
           <input type="email" id="contact" autocomplete="email" inputmode="email">
           <div class="help" id="contactHelp"></div>
           <div class="err" id="contactErr"></div>
@@ -590,7 +595,7 @@
           <div class="consent">
             <div class="consent-title" data-i18n="cTitle">※ Collection and use of personal information</div>
             <dl>
-              <dt data-i18n="cItemsT">Collected</dt><dd data-i18n="cItems">Name, place of residence, contact (email or phone number)</dd>
+              <dt data-i18n="cItemsT">Collected</dt><dd data-i18n="cItems">Name, place of residence, email address</dd>
               <dt data-i18n="cPurposeT">Purpose</dt><dd data-i18n="cPurpose">Result report (KPI) statistics, reservation confirmation, game kit distribution</dd>
               <dt data-i18n="cKeepT">Retention</dt><dd data-i18n="cKeep">Destroyed within 1 month after the program ends</dd>
             </dl>
@@ -622,7 +627,7 @@
     <div id="pageManage" hidden>
     <section class="sec">
       <div class="sec-head"><h2 data-i18n="mTitle">My Booking</h2></div>
-      <p class="book-sub" data-i18n="mLead">Enter your booking code and the email address or phone number you booked with.</p>
+      <p class="book-sub" data-i18n="mLead">Enter your booking code and the email address you booked with.</p>
       <form id="lookupForm" novalidate>
         <div class="field" id="m-code">
           <label for="mCode" data-i18n="mCodeLabel">Booking code</label>
@@ -630,9 +635,9 @@
           <div class="err" data-i18n="mCodeErr">Please enter your booking code.</div>
         </div>
         <div class="field" id="m-contact">
-          <label for="mContact" data-i18n="mContactLabel">Email or phone used to book</label>
-          <input type="text" id="mContact" autocomplete="off" autocapitalize="none" spellcheck="false" data-i18n-ph="mContactPh" placeholder="name@example.com / +1 555 123 4567">
-          <div class="err" data-i18n="mContactErr">Please enter the email or phone number you booked with.</div>
+          <label for="mContact" data-i18n="mContactLabel">Email used to book</label>
+          <input type="text" id="mContact" autocomplete="off" autocapitalize="none" spellcheck="false" data-i18n-ph="mContactPh" placeholder="name@example.com">
+          <div class="err" data-i18n="mContactErr">Please enter the email you booked with.</div>
         </div>
         <button class="submit" type="submit" id="lookupBtn" data-i18n="mFind">Find my booking</button>
         <div class="form-msg" id="lookupMsg" role="alert"></div>
@@ -765,16 +770,12 @@
       peopleUnit1:'1 person',
       contactLabel:'Contact',
       email:'Email',
-      phone:'Phone',
       emailPh:'name@example.com',
-      phonePh:'+1 555 123 4567',
       emailHelp:'We’ll send your confirmation to this address.',
-      phoneHelp:'Include the country code (e.g. +86, +81). Messenger-reachable numbers are best.',
       emailErr:'Please enter a valid email address.',
-      phoneErr:'Please enter a phone number with country code.',
       cItemsT:'Collected',
       cTitle:'※ Collection and use of personal information',
-      cItems:'Name, place of residence, contact (email or phone number)',
+      cItems:'Name, place of residence, email address',
       cPurposeT:'Purpose',
       cPurpose:'Result report (KPI) statistics, reservation confirmation, game kit distribution',
       cKeepT:'Retention',
@@ -869,16 +870,12 @@
       peopleUnit:'{n}名',
       contactLabel:'連絡先',
       email:'メール',
-      phone:'電話番号',
-      emailPh:'name@example.com',
-      phonePh:'+81 90 1234 5678',
+emailPh:'name@example.com',
       emailHelp:'予約確認をこのアドレスにお送りします。',
-      phoneHelp:'国番号（例：+81）から入力してください。',
       emailErr:'正しいメールアドレスを入力してください。',
-      phoneErr:'国番号付きの電話番号を入力してください。',
       cItemsT:'収集項目',
       cTitle:'※ 個人情報の収集・利用について',
-      cItems:'氏名、居住地、連絡先（メールアドレスまたは電話番号）',
+      cItems:'氏名、居住地、メールアドレス',
       cPurposeT:'利用目的',
       cPurpose:'成果報告（KPI）の統計作成、予約の確認、ゲームキットの配布',
       cKeepT:'保管期間',
@@ -973,16 +970,12 @@
       peopleUnit:'{n}人',
       contactLabel:'联系方式',
       email:'邮箱',
-      phone:'电话',
       emailPh:'name@example.com',
-      phonePh:'+86 138 0000 0000',
       emailHelp:'预约确认将发送到此邮箱。',
-      phoneHelp:'请包含国家代码（如 +86）。',
       emailErr:'请输入有效的邮箱地址。',
-      phoneErr:'请输入带国家代码的电话号码。',
       cItemsT:'收集项目',
       cTitle:'※ 个人信息收集及使用说明',
-      cItems:'姓名、居住地、联系方式（邮箱或电话号码）',
+      cItems:'姓名、居住地、邮箱',
       cPurposeT:'使用目的',
       cPurpose:'编制成果报告（KPI）统计、确认预约、发放游戏道具包',
       cKeepT:'保存期限',
@@ -1077,16 +1070,12 @@
       peopleUnit:'{n}人',
       contactLabel:'聯絡方式',
       email:'電子郵件',
-      phone:'電話',
       emailPh:'name@example.com',
-      phonePh:'+886 912 345 678',
       emailHelp:'預約確認將寄送至此信箱。',
-      phoneHelp:'請包含國碼（如 +886、+852）。',
       emailErr:'請輸入有效的電子郵件地址。',
-      phoneErr:'請輸入含國碼的電話號碼。',
       cItemsT:'蒐集項目',
       cTitle:'※ 個人資料蒐集及使用說明',
-      cItems:'姓名、居住地、聯絡方式（電子郵件或電話號碼）',
+      cItems:'姓名、居住地、電子郵件',
       cPurposeT:'使用目的',
       cPurpose:'編製成果報告（KPI）統計、確認預約、發放遊戲道具包',
       cKeepT:'保存期限',
@@ -1109,19 +1098,20 @@
   // Check / change / cancel a booking
   Object.assign(I18N.en, {
     manageLink:'Already booked? Check, change or cancel ›',
+    ctaCheck:'My booking',
     mTitle:'My Booking',
-    mLead:'Enter your booking code and the email address or phone number you booked with.',
+    mLead:'Enter your booking code and the email address you booked with.',
     mCodeLabel:'Booking code',
     mCodeErr:'Please enter your booking code.',
-    mContactLabel:'Email or phone used to book',
-    mContactPh:'name@example.com / +1 555 123 4567',
-    mContactErr:'Please enter the email or phone number you booked with.',
+    mContactLabel:'Email used to book',
+    mContactPh:'name@example.com',
+    mContactErr:'Please enter the email you booked with.',
     mFind:'Find my booking',
     mFinding:'Searching…',
     statusBooked:'Confirmed',
     statusCancelled:'Cancelled',
     codeLabel:'Booking code',
-    codeNote:'Save this code. You’ll need it, together with your email or phone number, to check, change or cancel your booking. If you gave an email address, we’ve also sent it there.',
+    codeNote:'Save this code. You’ll need it, together with your email address, to check, change or cancel your booking. We’ve also sent it to that address.',
     checkBooking:'Check or change this booking ›',
     editBtn:'Change date / people',
     cancelBtn:'Cancel booking',
@@ -1140,19 +1130,20 @@
   });
   Object.assign(I18N.ja, {
     manageLink:'予約済みの方：確認・変更・キャンセル ›',
+    ctaCheck:'予約確認',
     mTitle:'予約の確認',
-    mLead:'予約番号と、予約時に入力したメールアドレスまたは電話番号を入力してください。',
+    mLead:'予約番号と、予約時に入力したメールアドレスを入力してください。',
     mCodeLabel:'予約番号',
     mCodeErr:'予約番号を入力してください。',
-    mContactLabel:'予約時のメールアドレスまたは電話番号',
-    mContactPh:'name@example.com / +81 90 1234 5678',
-    mContactErr:'予約時のメールアドレスまたは電話番号を入力してください。',
+    mContactLabel:'予約時のメールアドレス',
+    mContactPh:'name@example.com',
+    mContactErr:'予約時のメールアドレスを入力してください。',
     mFind:'予約を探す',
     mFinding:'検索中…',
     statusBooked:'予約確定',
     statusCancelled:'キャンセル済み',
     codeLabel:'予約番号',
-    codeNote:'この番号は大切に保管してください。予約の確認・変更・キャンセルには、この番号とメールアドレスまたは電話番号が必要です。メールアドレスを入力された場合は、同じ内容をメールでもお送りしています。',
+    codeNote:'この番号は大切に保管してください。予約の確認・変更・キャンセルには、この番号とメールアドレスが必要です。同じ内容をそのメールアドレスにもお送りしています。',
     checkBooking:'この予約を確認・変更する ›',
     editBtn:'日付・人数を変更',
     cancelBtn:'予約をキャンセル',
@@ -1171,19 +1162,20 @@
   });
   Object.assign(I18N['zh-Hans'], {
     manageLink:'已预约？查询、修改或取消 ›',
+    ctaCheck:'查询预约',
     mTitle:'我的预约',
-    mLead:'请输入预约编号，以及预约时填写的邮箱或电话号码。',
+    mLead:'请输入预约编号，以及预约时填写的邮箱。',
     mCodeLabel:'预约编号',
     mCodeErr:'请输入预约编号。',
-    mContactLabel:'预约时填写的邮箱或电话',
-    mContactPh:'name@example.com / +86 138 0000 0000',
-    mContactErr:'请输入预约时填写的邮箱或电话号码。',
+    mContactLabel:'预约时填写的邮箱',
+    mContactPh:'name@example.com',
+    mContactErr:'请输入预约时填写的邮箱。',
     mFind:'查询预约',
     mFinding:'查询中…',
     statusBooked:'预约成功',
     statusCancelled:'已取消',
     codeLabel:'预约编号',
-    codeNote:'请保存此编号。查询、修改或取消预约时，需要此编号和您的邮箱或电话号码。如果您填写了邮箱，我们也已将其发送到该邮箱。',
+    codeNote:'请保存此编号。查询、修改或取消预约时，需要此编号和您的邮箱。我们也已将其发送到该邮箱。',
     checkBooking:'查询或修改此预约 ›',
     editBtn:'修改日期 / 人数',
     cancelBtn:'取消预约',
@@ -1202,19 +1194,20 @@
   });
   Object.assign(I18N['zh-Hant'], {
     manageLink:'已預約？查詢、修改或取消 ›',
+    ctaCheck:'查詢預約',
     mTitle:'我的預約',
-    mLead:'請輸入預約編號，以及預約時填寫的電子郵件或電話號碼。',
+    mLead:'請輸入預約編號，以及預約時填寫的電子郵件。',
     mCodeLabel:'預約編號',
     mCodeErr:'請輸入預約編號。',
-    mContactLabel:'預約時填寫的電子郵件或電話',
-    mContactPh:'name@example.com / +886 912 345 678',
-    mContactErr:'請輸入預約時填寫的電子郵件或電話號碼。',
+    mContactLabel:'預約時填寫的電子郵件',
+    mContactPh:'name@example.com',
+    mContactErr:'請輸入預約時填寫的電子郵件。',
     mFind:'查詢預約',
     mFinding:'查詢中…',
     statusBooked:'預約成功',
     statusCancelled:'已取消',
     codeLabel:'預約編號',
-    codeNote:'請保存此編號。查詢、修改或取消預約時，需要此編號及您的電子郵件或電話號碼。如果您填寫了電子郵件，我們也已將其寄到該信箱。',
+    codeNote:'請保存此編號。查詢、修改或取消預約時，需要此編號及您的電子郵件。我們也已將其寄到該信箱。',
     checkBooking:'查詢或修改此預約 ›',
     editBtn:'修改日期 / 人數',
     cancelBtn:'取消預約',
@@ -1335,18 +1328,10 @@
   document.getElementById('calNext').addEventListener('click', ()=>{ calM++; if(calM > 11){ calM = 0; calY++; } renderCalendar(); });
 
   /* ==================== language ==================== */
-  function contactType(){
-    return document.querySelector('input[name=ctype]:checked').value;
-  }
   function applyContactType(){
-    const input = document.getElementById('contact');
-    const isEmail = contactType() === 'email';
-    input.type = isEmail ? 'email' : 'tel';
-    input.autocomplete = isEmail ? 'email' : 'tel';
-    input.inputMode = isEmail ? 'email' : 'tel';
-    input.placeholder = t(isEmail ? 'emailPh' : 'phonePh');
-    document.getElementById('contactHelp').textContent = t(isEmail ? 'emailHelp' : 'phoneHelp');
-    document.getElementById('contactErr').textContent = t(isEmail ? 'emailErr' : 'phoneErr');
+    document.getElementById('contact').placeholder = t('emailPh');
+    document.getElementById('contactHelp').textContent = t('emailHelp');
+    document.getElementById('contactErr').textContent = t('emailErr');
   }
 
   function applyLang(lang){
@@ -1382,11 +1367,6 @@
   });
 
   /* ==================== form ==================== */
-  document.querySelectorAll('input[name=ctype]').forEach(r=>r.addEventListener('change', ()=>{
-    document.getElementById('contact').value = '';
-    document.getElementById('f-contact').classList.remove('invalid');
-    applyContactType();
-  }));
 
   let people = 1;
   function setPeople(n){
@@ -1412,9 +1392,7 @@
       'f-name': /^[A-Za-z][A-Za-z .'\-]*$/.test(nameInput.value.trim()),
       'f-country': !!document.getElementById('country').value,
       'f-date': !!selectedDate && isBookable(selectedDate),
-      'f-contact': contactType() === 'email'
-        ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)
-        : /^\+?[0-9][0-9\s\-()]{6,19}$/.test(contact),
+      'f-contact': /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact),
       'f-consent': document.getElementById('consent').checked
     };
     let first = null;
@@ -1439,7 +1417,7 @@
       [t('countryLabel'), regionName(b.country, curLang)],
       [t('dateLabel'), fmtDate(b.date, true)],
       [t('peopleLabel'), peopleText(b.people)],
-      [t(b.contactType === 'email' ? 'email' : 'phone'), b.contact]
+      [t('email'), b.contact]
     ];
     const dl = document.getElementById('summary');
     dl.innerHTML = '';
@@ -1462,7 +1440,6 @@
       countryName: regionName(country, 'en'),
       date: selectedDate,
       people,
-      contactType: contactType(),
       contact: document.getElementById('contact').value.trim(),
       lang: curLang,
       submittedAt: new Date().toISOString(),
@@ -1565,7 +1542,7 @@
       [t('countryLabel'), regionName(b.country, curLang)],
       [t('dateLabel'), fmtDate(b.date, true)],
       [t('peopleLabel'), peopleText(b.people)],
-      [t(b.contactType === 'email' ? 'email' : 'phone'), b.contact]
+      [t('email'), b.contact]
     ];
     const dl = $('foundSummary');
     dl.innerHTML = '';
@@ -1617,11 +1594,9 @@
     calY = d.getFullYear(); calM = d.getMonth();
     if(calY * 12 + calM < firstMonth.getFullYear() * 12 + firstMonth.getMonth()){ calY = firstMonth.getFullYear(); calM = firstMonth.getMonth(); }
     setPeople(b.people);
-    document.querySelector('input[name=ctype][value=' + b.contactType + ']').checked = true;
     applyContactType();
     $('contact').value = b.contact;
     $('contact').disabled = true;                 // the contact is the key to the booking
-    document.querySelectorAll('input[name=ctype]').forEach(r=>r.disabled = true);
     $('consent').checked = true;
     $('f-consent').hidden = true;
     $('submitBtn').dataset.i18n = 'saveChanges';
@@ -1636,8 +1611,6 @@
     $('country').value = '';
     selectedDate = '';
     setPeople(1);
-    document.querySelector('input[name=ctype][value=email]').checked = true;
-    document.querySelectorAll('input[name=ctype]').forEach(r=>r.disabled = false);
     $('contact').disabled = false;
     $('contact').value = '';
     applyContactType();
@@ -1674,6 +1647,7 @@
     document.getElementById('pageBook').hidden = !book;
     document.getElementById('pageManage').hidden = !manage;
     document.querySelector('.cta-mini').hidden = book || manage;
+    document.querySelector('.check-mini').hidden = manage;
     if(book) enterBook();
     if(manage) enterManage();
     window.scrollTo({top:0, behavior:'instant'});   // jump (html has smooth scrolling)
