@@ -371,6 +371,30 @@
   }
   .done a.home{display:inline-block; margin-top:22px; color:var(--blue); font-size:13px; font-weight:700; text-decoration:none;}
 
+  /* ---- Manage booking ---- */
+  [hidden]{display:none !important;}
+  .manage-link{display:block; text-align:center; margin-top:16px; font-size:13px; font-weight:700; color:var(--blue); text-decoration:none;}
+  #mCode{text-transform:uppercase;}
+  #mCode::placeholder{text-transform:none;}
+  .code-box{margin-top:18px; background:var(--blue); color:#fff; border-radius:12px; padding:14px 16px;}
+  .code-box span{display:block; font-size:11.5px; font-weight:600; opacity:.85;}
+  .code-box b{display:block; margin-top:4px; font-size:26px; font-weight:900; letter-spacing:.12em; user-select:all;}
+  .done .code-note{margin-top:10px; text-align:left; font-size:12px; line-height:1.6; color:var(--ink-soft);}
+  .done a.manage{display:inline-block; margin-top:18px; color:var(--blue); font-size:13px; font-weight:700; text-decoration:none;}
+  .found{margin-top:26px; padding-bottom:40px;}
+  .status-chip{display:inline-block; padding:5px 12px; border-radius:999px; font-size:12px; font-weight:800; background:var(--blue-soft); color:var(--blue);}
+  .status-chip.cancelled{background:var(--red-soft); color:#C42723;}
+  .found .summary{margin-top:12px;}
+  .manage-actions{display:flex; gap:8px; margin-top:14px;}
+  .manage-actions button{
+    flex:1; font-family:inherit; font-size:14px; font-weight:800;
+    padding:13px 0; border-radius:12px; cursor:pointer;
+    background:#fff; border:1.5px solid var(--blue); color:var(--blue);
+  }
+  .manage-actions button.danger{border-color:var(--red); color:#C42723;}
+  .manage-actions button:disabled{opacity:.6; cursor:wait;}
+  .manage-note{margin-top:12px; font-size:12.5px; line-height:1.6; color:var(--ink-soft); background:var(--panel); border-radius:12px; padding:12px 14px;}
+
   .promo{display:block;}
   .promo img{display:block; width:100%; height:auto;}
 
@@ -498,6 +522,7 @@
 
     <div class="book-cta">
       <a class="cta-big" href="#book" data-i18n="cta">Book now</a>
+      <a class="manage-link" href="#manage" data-i18n="manageLink">Already booked? Check, change or cancel ›</a>
     </div>
 
     </div><!-- /pageInfo -->
@@ -505,7 +530,7 @@
     <!-- ============ PAGE 2 : booking form (shown at #book) ============ -->
     <div id="pageBook" hidden>
     <section class="sec" id="bookSec">
-      <div class="sec-head"><h2 data-i18n="s5">Book</h2></div>
+      <div class="sec-head"><h2 id="bookHeading" data-i18n="s5">Book</h2></div>
       <p class="book-sub"><b data-i18n="heroTitle">The Lost Parcel</b> · <span data-i18n="iPeriod">Oct 8 – Dec 4, 2026</span> · 10:00 — 17:00</p>
 
       <form id="reserveForm" novalidate>
@@ -581,14 +606,50 @@
 
       <div class="done" id="done">
         <img src="assets/miyo.png" alt="">
-        <h2 data-i18n="doneTitle">Your reservation is in!</h2>
+        <h2 id="doneTitle" data-i18n="doneTitle">Your reservation is in!</h2>
         <p data-i18n="doneDesc">We'll contact you using the details below. See you at Busan Station, Detective!</p>
+        <div class="code-box"><span data-i18n="codeLabel">Booking code</span><b id="doneCode"></b></div>
+        <p class="code-note" data-i18n="codeNote">Save this code.</p>
         <dl class="summary" id="summary"></dl>
         <div class="pickup" data-i18n="donePickup">On your reservation date, come to ZIMCARRY Busan Station between 10:00 and 17:00 to pick up your game kit.</div>
+        <a class="manage" href="#manage" data-i18n="checkBooking">Check or change this booking ›</a><br>
         <a class="home" href="../" data-i18n="home">‹ Back to the start</a>
       </div>
     </section>
     </div><!-- /pageBook -->
+
+    <!-- ============ PAGE 3 : check / change / cancel (shown at #manage) ============ -->
+    <div id="pageManage" hidden>
+    <section class="sec">
+      <div class="sec-head"><h2 data-i18n="mTitle">My Booking</h2></div>
+      <p class="book-sub" data-i18n="mLead">Enter your booking code and the email address or phone number you booked with.</p>
+      <form id="lookupForm" novalidate>
+        <div class="field" id="m-code">
+          <label for="mCode" data-i18n="mCodeLabel">Booking code</label>
+          <input type="text" id="mCode" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="LP-XXXXXX">
+          <div class="err" data-i18n="mCodeErr">Please enter your booking code.</div>
+        </div>
+        <div class="field" id="m-contact">
+          <label for="mContact" data-i18n="mContactLabel">Email or phone used to book</label>
+          <input type="text" id="mContact" autocomplete="off" autocapitalize="none" spellcheck="false" data-i18n-ph="mContactPh" placeholder="name@example.com / +1 555 123 4567">
+          <div class="err" data-i18n="mContactErr">Please enter the email or phone number you booked with.</div>
+        </div>
+        <button class="submit" type="submit" id="lookupBtn" data-i18n="mFind">Find my booking</button>
+        <div class="form-msg" id="lookupMsg" role="alert"></div>
+      </form>
+
+      <div class="found" id="found" hidden>
+        <span class="status-chip" id="foundStatus"></span>
+        <dl class="summary" id="foundSummary"></dl>
+        <div class="manage-actions" id="manageActions">
+          <button type="button" id="editBtn" data-i18n="editBtn">Change date / people</button>
+          <button type="button" id="cancelBtn" class="danger" data-i18n="cancelBtn">Cancel booking</button>
+        </div>
+        <div class="manage-note" id="manageNote" hidden></div>
+        <div class="form-msg" id="manageMsg" role="alert"></div>
+      </div>
+    </section>
+    </div><!-- /pageManage -->
 
     <footer class="credit">
       <div data-i18n="credit">Presented by the Korea Tourism Organization Busan·Ulsan·Gyeongnam Office and Busan Dong-gu Office.</div>
@@ -1045,6 +1106,132 @@
     }
   };
 
+  // Check / change / cancel a booking
+  Object.assign(I18N.en, {
+    manageLink:'Already booked? Check, change or cancel ›',
+    mTitle:'My Booking',
+    mLead:'Enter your booking code and the email address or phone number you booked with.',
+    mCodeLabel:'Booking code',
+    mCodeErr:'Please enter your booking code.',
+    mContactLabel:'Email or phone used to book',
+    mContactPh:'name@example.com / +1 555 123 4567',
+    mContactErr:'Please enter the email or phone number you booked with.',
+    mFind:'Find my booking',
+    mFinding:'Searching…',
+    statusBooked:'Confirmed',
+    statusCancelled:'Cancelled',
+    codeLabel:'Booking code',
+    codeNote:'Save this code. You’ll need it, together with your email or phone number, to check, change or cancel your booking. If you gave an email address, we’ve also sent it there.',
+    checkBooking:'Check or change this booking ›',
+    editBtn:'Change date / people',
+    cancelBtn:'Cancel booking',
+    cancelConfirm:'Cancel this booking? This can’t be undone.',
+    cancelledDone:'Your booking has been cancelled.',
+    lockedNote:'Changes and cancellations close on the day of your reservation. Please contact us if you need help.',
+    cancelledNote:'This booking has been cancelled. You’re welcome to make a new one.',
+    errNotFound:'We couldn’t find a booking with that code and contact. Please check and try again.',
+    errDate:'That date isn’t available. Please pick another date.',
+    errLocked:'This booking can no longer be changed or cancelled online.',
+    errCancelled:'This booking has already been cancelled.',
+    sEdit:'Change Booking',
+    saveChanges:'Save changes',
+    errFull:'Sorry, there aren’t enough spots left for this many people. Try fewer people, or check back later in case of cancellations.',
+    updatedTitle:'Your booking has been updated!'
+  });
+  Object.assign(I18N.ja, {
+    manageLink:'予約済みの方：確認・変更・キャンセル ›',
+    mTitle:'予約の確認',
+    mLead:'予約番号と、予約時に入力したメールアドレスまたは電話番号を入力してください。',
+    mCodeLabel:'予約番号',
+    mCodeErr:'予約番号を入力してください。',
+    mContactLabel:'予約時のメールアドレスまたは電話番号',
+    mContactPh:'name@example.com / +81 90 1234 5678',
+    mContactErr:'予約時のメールアドレスまたは電話番号を入力してください。',
+    mFind:'予約を探す',
+    mFinding:'検索中…',
+    statusBooked:'予約確定',
+    statusCancelled:'キャンセル済み',
+    codeLabel:'予約番号',
+    codeNote:'この番号は大切に保管してください。予約の確認・変更・キャンセルには、この番号とメールアドレスまたは電話番号が必要です。メールアドレスを入力された場合は、同じ内容をメールでもお送りしています。',
+    checkBooking:'この予約を確認・変更する ›',
+    editBtn:'日付・人数を変更',
+    cancelBtn:'予約をキャンセル',
+    cancelConfirm:'この予約をキャンセルしますか？取り消すことはできません。',
+    cancelledDone:'予約をキャンセルしました。',
+    lockedNote:'変更・キャンセルは予約日の前日までです。お困りの場合はお問い合わせください。',
+    cancelledNote:'この予約はキャンセルされました。新しく予約し直すことができます。',
+    errNotFound:'その番号と連絡先の予約が見つかりません。入力内容をご確認ください。',
+    errDate:'その日は予約できません。別の日を選んでください。',
+    errLocked:'この予約は、もうオンラインで変更・キャンセルできません。',
+    errCancelled:'この予約はすでにキャンセルされています。',
+    sEdit:'予約の変更',
+    saveChanges:'変更を保存',
+    errFull:'申し訳ありません。この人数分の空きがありません。人数を減らすか、キャンセルが出るまでしばらくお待ちください。',
+    updatedTitle:'予約を変更しました！'
+  });
+  Object.assign(I18N['zh-Hans'], {
+    manageLink:'已预约？查询、修改或取消 ›',
+    mTitle:'我的预约',
+    mLead:'请输入预约编号，以及预约时填写的邮箱或电话号码。',
+    mCodeLabel:'预约编号',
+    mCodeErr:'请输入预约编号。',
+    mContactLabel:'预约时填写的邮箱或电话',
+    mContactPh:'name@example.com / +86 138 0000 0000',
+    mContactErr:'请输入预约时填写的邮箱或电话号码。',
+    mFind:'查询预约',
+    mFinding:'查询中…',
+    statusBooked:'预约成功',
+    statusCancelled:'已取消',
+    codeLabel:'预约编号',
+    codeNote:'请保存此编号。查询、修改或取消预约时，需要此编号和您的邮箱或电话号码。如果您填写了邮箱，我们也已将其发送到该邮箱。',
+    checkBooking:'查询或修改此预约 ›',
+    editBtn:'修改日期 / 人数',
+    cancelBtn:'取消预约',
+    cancelConfirm:'确定要取消这个预约吗？取消后无法恢复。',
+    cancelledDone:'您的预约已取消。',
+    lockedNote:'预约当天起不能再修改或取消。如需帮助，请联系我们。',
+    cancelledNote:'此预约已取消，您可以重新预约。',
+    errNotFound:'找不到该编号和联系方式对应的预约，请核对后重试。',
+    errDate:'该日期无法预约，请选择其他日期。',
+    errLocked:'此预约已无法在线修改或取消。',
+    errCancelled:'此预约已被取消。',
+    sEdit:'修改预约',
+    saveChanges:'保存修改',
+    errFull:'抱歉，剩余名额不足以容纳这么多人。请减少人数，或稍后再来看看是否有人取消。',
+    updatedTitle:'预约已修改！'
+  });
+  Object.assign(I18N['zh-Hant'], {
+    manageLink:'已預約？查詢、修改或取消 ›',
+    mTitle:'我的預約',
+    mLead:'請輸入預約編號，以及預約時填寫的電子郵件或電話號碼。',
+    mCodeLabel:'預約編號',
+    mCodeErr:'請輸入預約編號。',
+    mContactLabel:'預約時填寫的電子郵件或電話',
+    mContactPh:'name@example.com / +886 912 345 678',
+    mContactErr:'請輸入預約時填寫的電子郵件或電話號碼。',
+    mFind:'查詢預約',
+    mFinding:'查詢中…',
+    statusBooked:'預約成功',
+    statusCancelled:'已取消',
+    codeLabel:'預約編號',
+    codeNote:'請保存此編號。查詢、修改或取消預約時，需要此編號及您的電子郵件或電話號碼。如果您填寫了電子郵件，我們也已將其寄到該信箱。',
+    checkBooking:'查詢或修改此預約 ›',
+    editBtn:'修改日期 / 人數',
+    cancelBtn:'取消預約',
+    cancelConfirm:'確定要取消這筆預約嗎？取消後無法復原。',
+    cancelledDone:'您的預約已取消。',
+    lockedNote:'預約當天起不能再修改或取消。如需協助，請與我們聯絡。',
+    cancelledNote:'此預約已取消，您可以重新預約。',
+    errNotFound:'找不到此編號與聯絡方式對應的預約，請確認後再試。',
+    errDate:'該日期無法預約，請選擇其他日期。',
+    errLocked:'此預約已無法線上修改或取消。',
+    errCancelled:'此預約已被取消。',
+    sEdit:'修改預約',
+    saveChanges:'儲存修改',
+    errFull:'抱歉，剩餘名額不足以容納這麼多人。請減少人數，或稍後再來看看是否有人取消。',
+    updatedTitle:'預約已修改！'
+  });
+
   // ISO 3166-1 alpha-2 (KR left out — Korean visitors book via Smart Place)
   const COUNTRY_CODES = ('AD AE AF AG AI AL AM AO AR AS AT AU AW AZ BA BB BD BE BF BG BH BI BJ BM BN BO BR BS BT BW BY BZ CA CD CF CG CH CI CK CL CM CN CO CR CU CV CW CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FM FO FR GA GB GD GE GH GI GL GM GN GQ GR GT GU GW GY HK HN HR HT HU ID IE IL IN IQ IR IS IT JM JO JP KE KG KH KI KM KN KP KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MG MH MK ML MM MN MO MR MT MU MV MW MX MY MZ NA NC NE NG NI NL NO NP NR NZ OM PA PE PF PG PH PK PL PR PS PT PW PY QA RO RS RU RW SA SB SC SD SE SG SI SK SL SM SN SO SR SS ST SV SY SZ TD TG TH TJ TL TM TN TO TR TT TV TW TZ UA UG US UY UZ VA VC VE VN VU WS YE ZA ZM ZW').split(' ');
 
@@ -1177,6 +1364,7 @@
     document.getElementById('promoImg').src = 'assets/banner-' + lang + '.webp';
     document.getElementById('peopleHelp').textContent = t('peopleHelp').replace('{n}', MAX_PEOPLE);
     if(document.getElementById('done').classList.contains('show')) renderSummary();
+    if(found) renderFound();
     try{ localStorage.setItem('demoLang', lang); }catch(e){}
   }
   function toggleLangMenu(e){
@@ -1277,7 +1465,9 @@
       contactType: contactType(),
       contact: document.getElementById('contact').value.trim(),
       lang: curLang,
-      submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString(),
+      action: editing ? 'update' : 'create',
+      code: editing ? editing.code : newCode()     // proposed by the page, so a retried request can't double-book
     };
 
     const btn = document.getElementById('submitBtn');
@@ -1287,13 +1477,19 @@
     msg.textContent = '';
     try{
       if(ENDPOINT){
-        // Apps Script web apps don't send CORS headers, so post "no-cors" as a simple form.
-        await fetch(ENDPOINT, { method:'POST', mode:'no-cors', body:new URLSearchParams(booking) });
+        const r = await callScript(booking);
+        if(!r.ok){ msg.textContent = apiError(r.error); return; }
+        if(r.booking) booking.code = r.booking.code;
       } else {
         console.warn('[reserve] ENDPOINT is empty — booking was NOT sent anywhere:', booking);
       }
       lastBooking = booking;
+      rememberBooking(booking);
       renderSummary();
+      document.getElementById('doneCode').textContent = booking.code;
+      const doneTitle = document.getElementById('doneTitle');
+      doneTitle.dataset.i18n = editing ? 'updatedTitle' : 'doneTitle';
+      doneTitle.textContent = t(doneTitle.dataset.i18n);
       document.getElementById('reserveForm').style.display = 'none';
       document.getElementById('done').classList.add('show');
       window.scrollTo({top:0, behavior:'smooth'});
@@ -1302,18 +1498,184 @@
       msg.textContent = t('sendErr');
     } finally {
       btn.disabled = false;
-      btn.textContent = t('submit');
+      btn.textContent = t(btn.dataset.i18n);
     }
   });
 
+  /* ==================== check / change / cancel ==================== */
+  // The page proposes the code; the script keeps it unless it is already taken.
+  const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  function newCode(){
+    const a = new Uint8Array(6);
+    crypto.getRandomValues(a);
+    return 'LP-' + Array.from(a, x=>CODE_CHARS[x % CODE_CHARS.length]).join('');
+  }
+  // fetch in normal (cors) mode so the JSON answer can be read; an older script that still
+  // answers plain "ok" is treated as a booking that went through (without a lookup).
+  async function callScript(data){
+    const resp = await fetch(ENDPOINT, { method:'POST', body:new URLSearchParams(data) });
+    const txt = await resp.text();
+    try{ return JSON.parse(txt); }catch(e){ return { ok:true, legacy:true }; }
+  }
+  function apiError(code){
+    return t({notfound:'errNotFound', date:'errDate', locked:'errLocked', cancelled:'errCancelled', full:'errFull'}[code] || 'sendErr');
+  }
+  function rememberBooking(b){
+    try{ localStorage.setItem('lpBooking', JSON.stringify({code:b.code, contact:b.contact})); }catch(e){}
+  }
+
+  let found = null;      // the booking shown on the "my booking" page
+  let editing = null;    // set while the form is being used to change that booking
+  let editModeOn = false;
+  const $ = id => document.getElementById(id);
+
+  $('lookupForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const code = $('mCode').value.trim(), contact = $('mContact').value.trim();
+    $('m-code').classList.toggle('invalid', !code);
+    $('m-contact').classList.toggle('invalid', !contact);
+    if(!code || !contact) return;
+    const btn = $('lookupBtn'), msg = $('lookupMsg');
+    btn.disabled = true; btn.textContent = t('mFinding'); msg.textContent = '';
+    try{
+      if(!ENDPOINT){ msg.textContent = t('sendErr'); return; }
+      const r = await callScript({action:'lookup', code, contact});
+      if(!r.ok || !r.booking){ found = null; $('found').hidden = true; msg.textContent = apiError(r.ok ? 'server' : r.error); return; }
+      found = r.booking;
+      $('manageMsg').textContent = '';
+      renderFound();
+    } catch(err){
+      console.error(err);
+      msg.textContent = t('sendErr');
+    } finally {
+      btn.disabled = false; btn.textContent = t('mFind');
+    }
+  });
+  document.querySelectorAll('#lookupForm .field').forEach(f=>f.addEventListener('input', ()=>f.classList.remove('invalid')));
+
+  function renderFound(){
+    const b = found, cancelled = b.status === 'cancelled';
+    $('found').hidden = false;
+    const chip = $('foundStatus');
+    chip.textContent = t(cancelled ? 'statusCancelled' : 'statusBooked');
+    chip.classList.toggle('cancelled', cancelled);
+    const rows = [
+      [t('codeLabel'), b.code],
+      [t('nameLabel'), b.name],
+      [t('countryLabel'), regionName(b.country, curLang)],
+      [t('dateLabel'), fmtDate(b.date, true)],
+      [t('peopleLabel'), peopleText(b.people)],
+      [t(b.contactType === 'email' ? 'email' : 'phone'), b.contact]
+    ];
+    const dl = $('foundSummary');
+    dl.innerHTML = '';
+    rows.forEach(([k, v])=>{
+      const dt = document.createElement('dt'); dt.textContent = k;
+      const dd = document.createElement('dd'); dd.textContent = v;
+      dl.append(dt, dd);
+    });
+    const closed = cancelled || b.locked;
+    $('manageActions').hidden = closed;
+    const note = $('manageNote');
+    note.hidden = !closed;
+    note.textContent = closed ? t(cancelled ? 'cancelledNote' : 'lockedNote') : '';
+  }
+
+  $('editBtn').addEventListener('click', ()=>{
+    if(!found) return;
+    editing = { code:found.code, b:found };
+    location.hash = '#book';
+  });
+  $('cancelBtn').addEventListener('click', async ()=>{
+    if(!found || !confirm(t('cancelConfirm'))) return;
+    const btns = [$('editBtn'), $('cancelBtn')], msg = $('manageMsg');
+    btns.forEach(b=>b.disabled = true); msg.textContent = '';
+    try{
+      const r = await callScript({action:'cancel', code:found.code, contact:found.contact});
+      if(!r.ok || !r.booking){ msg.textContent = apiError(r.ok ? 'server' : r.error); return; }
+      found = r.booking;
+      renderFound();
+      msg.textContent = t('cancelledDone');
+      msg.style.color = 'var(--blue)';
+    } catch(err){
+      console.error(err);
+      msg.textContent = t('sendErr');
+      msg.style.color = '';
+    } finally {
+      btns.forEach(b=>b.disabled = false);
+    }
+  });
+
+  // Booking form <-> change mode (the same calendar / stepper / checks are reused)
+  function applyEditMode(){
+    const b = editing.b;
+    editModeOn = true;
+    nameInput.value = b.name;
+    $('country').value = b.country;
+    selectedDate = isBookable(b.date) ? b.date : '';
+    const d = parseISO(b.date);
+    calY = d.getFullYear(); calM = d.getMonth();
+    if(calY * 12 + calM < firstMonth.getFullYear() * 12 + firstMonth.getMonth()){ calY = firstMonth.getFullYear(); calM = firstMonth.getMonth(); }
+    setPeople(b.people);
+    document.querySelector('input[name=ctype][value=' + b.contactType + ']').checked = true;
+    applyContactType();
+    $('contact').value = b.contact;
+    $('contact').disabled = true;                 // the contact is the key to the booking
+    document.querySelectorAll('input[name=ctype]').forEach(r=>r.disabled = true);
+    $('consent').checked = true;
+    $('f-consent').hidden = true;
+    $('submitBtn').dataset.i18n = 'saveChanges';
+    $('bookHeading').dataset.i18n = 'sEdit';
+    $('submitBtn').textContent = t('saveChanges');
+    $('bookHeading').textContent = t('sEdit');
+    renderCalendar();
+  }
+  function clearEditMode(){
+    editModeOn = false;
+    nameInput.value = '';
+    $('country').value = '';
+    selectedDate = '';
+    setPeople(1);
+    document.querySelector('input[name=ctype][value=email]').checked = true;
+    document.querySelectorAll('input[name=ctype]').forEach(r=>r.disabled = false);
+    $('contact').disabled = false;
+    $('contact').value = '';
+    applyContactType();
+    $('consent').checked = false;
+    $('f-consent').hidden = false;
+    $('submitBtn').dataset.i18n = 'submit';
+    $('bookHeading').dataset.i18n = 's5';
+    $('submitBtn').textContent = t('submit');
+    $('bookHeading').textContent = t('s5');
+    renderCalendar();
+  }
+  function enterBook(){
+    if(editing) applyEditMode(); else if(editModeOn) clearEditMode();
+    $('reserveForm').style.display = '';
+    $('done').classList.remove('show');
+    $('formMsg').textContent = '';
+  }
+  function enterManage(){
+    $('lookupMsg').textContent = '';
+    if($('mCode').value || $('mContact').value) return;
+    try{
+      const s = JSON.parse(localStorage.getItem('lpBooking') || 'null');
+      if(s){ $('mCode').value = s.code || ''; $('mContact').value = s.contact || ''; }
+    }catch(e){}
+  }
+
   /* ==================== pages : info  <->  booking form (#book) ==================== */
   function showPage(){
-    const book = location.hash === '#book';
-    document.getElementById('pageInfo').hidden = book;
+    const book = location.hash === '#book', manage = location.hash === '#manage';
+    // "Back" : edit form -> my booking, form / my booking -> info page, info page -> prologue
+    document.getElementById('backLink').setAttribute('href', book ? (editing ? '#manage' : '#info') : manage ? '#info' : '../');
+    if(!book) editing = null;
+    document.getElementById('pageInfo').hidden = book || manage;
     document.getElementById('pageBook').hidden = !book;
-    document.querySelector('.cta-mini').hidden = book;
-    // "Back" : from the form -> info page, from the info page -> prologue
-    document.getElementById('backLink').setAttribute('href', book ? '#info' : '../');
+    document.getElementById('pageManage').hidden = !manage;
+    document.querySelector('.cta-mini').hidden = book || manage;
+    if(book) enterBook();
+    if(manage) enterManage();
     window.scrollTo({top:0, behavior:'instant'});   // jump (html has smooth scrolling)
   }
   window.addEventListener('hashchange', showPage);
