@@ -444,71 +444,239 @@
   }
 
   /* ── LANGUAGE SWITCH ── */
-  .lang-switch {
-    position: relative;
+  .lang-wrap {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 16px;
   }
 
-  .lang-btn {
+  .lang-switch {
     display: flex;
-    align-items: center;
     gap: 6px;
-    padding: 8px 12px;
+    padding: 5px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 999px;
-    color: var(--text-secondary);
-    font: inherit;
-    font-size: 13px;
-    cursor: pointer;
-  }
-
-  .lang-btn:hover {
-    border-color: var(--border-hover);
-    color: var(--text-primary);
-  }
-
-  .lang-menu {
-    display: none;
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    z-index: 10;
-    min-width: 140px;
-    flex-direction: column;
-    gap: 2px;
-    padding: 6px;
-    background: var(--surface);
-    border: 1px solid var(--border-hover);
-    border-radius: 12px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
-  }
-
-  .lang-menu.open {
-    display: flex;
   }
 
   .lang-opt {
-    padding: 9px 12px;
-    background: none;
-    border: 0;
-    border-radius: 8px;
-    color: var(--text-primary);
-    font: inherit;
-    font-size: 13px;
-    text-align: left;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: transparent;
+    border: none;
     cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.2s, background 0.2s;
   }
 
-  .lang-opt:hover {
+  .lang-opt img {
+    width: 20px;
+    height: 20px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    box-shadow: 0 0 0 1px rgba(127, 140, 160, 0.25);
+  }
+
+  .lang-opt:hover { opacity: 0.9; background: var(--surface-hover); }
+  .lang-opt.active { opacity: 1; background: var(--accent-glow); box-shadow: inset 0 0 0 1px var(--border-hover); }
+
+  @media (max-width: 520px) {
+    .lang-switch { padding: 4px; }
+    .lang-opt { width: 28px; height: 28px; }
+    .lang-opt img { width: 18px; height: 18px; }
+  }
+
+  [hidden] { display: none !important; }
+
+  /* ── 한국어 전용 홍보 영역 (디지털 관광주민증 · 해운대시장 · 짐캐리) ── */
+  .ko-extras {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .promo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+
+  .promo-card:hover {
     background: var(--surface-hover);
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px var(--accent-glow);
   }
 
-  .lang-opt.active {
+  .promo-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+  .promo-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+  .promo-badge {
+    flex: none;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--tag-open-text);
+    background: var(--tag-open);
+    border-radius: 999px;
+    padding: 3px 9px;
+    white-space: nowrap;
+  }
+
+  .promo-cta {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-bright);
+  }
+
+  /* 해운대시장 아코디언 */
+  .event-acc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .event-acc:hover, .event-acc.open { border-color: var(--border-hover); box-shadow: 0 8px 32px var(--accent-glow); }
+
+  .event-head {
+    width: 100%;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 22px 24px;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+  }
+
+  .event-cta .chev { display: inline-block; margin-left: 4px; transition: transform 0.25s; }
+  .event-acc.open .event-cta .chev { transform: rotate(180deg); }
+
+  .event-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s ease; }
+  .event-acc.open .event-body { grid-template-rows: 1fr; }
+  .event-body-inner { overflow: hidden; min-height: 0; }
+
+  .cardnews { position: relative; margin: 0 16px; border-radius: 10px; overflow: hidden; background: #0B3D91; }
+
+  .cn-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    outline: none;
+  }
+
+  .cn-track::-webkit-scrollbar { display: none; }
+
+  .cn-slide { flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 4 / 5; }
+  .cn-slide img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; -webkit-user-drag: none; }
+
+  .cn-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.88);
+    color: #0D1828;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 3px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    transition: opacity 0.2s;
+  }
+
+  .cn-prev { left: 10px; }
+  .cn-next { right: 10px; }
+  .cn-nav[disabled] { opacity: 0; pointer-events: none; }
+
+  .cn-count {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(7, 9, 15, 0.6);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+
+  .cn-dots { display: flex; justify-content: center; gap: 6px; padding: 14px 0; }
+
+  .cn-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    border: none;
+    padding: 0;
+    background: var(--border-hover);
+    cursor: pointer;
+    transition: width 0.2s, background 0.2s;
+  }
+
+  .cn-dot.active { width: 18px; background: var(--accent); }
+
+  .cn-apply {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 16px 18px;
+    padding: 12px 8px;
+    border-radius: 10px;
     background: var(--accent);
     color: #fff;
+    font-family: 'SchoolSafetyRoundedSmile', 'Presentation', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .cn-apply:hover { background: var(--accent-bright); }
+
+  /* 짐캐리 배너 */
+  .sponsor-banner {
+    display: block;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .sponsor-banner img { display: block; width: 100%; height: auto; }
+  .sponsor-banner:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--accent-glow); }
+
+  @media (max-width: 520px) {
+    .promo-card, .event-head { padding: 18px; gap: 14px; }
+    .cardnews { margin: 0 12px; }
+    .cn-apply { margin: 0 12px 16px; }
   }
 
   /* ── FOOTER ── */
@@ -658,14 +826,13 @@
 
 <div class="container">
 
-  <div class="lang-switch" id="langSwitch">
-    <button type="button" class="lang-btn" id="langBtn" aria-haspopup="true" aria-label="Language">🌐 <span id="langCur">한국어</span></button>
-    <div class="lang-menu" id="langMenu">
-      <button type="button" class="lang-opt" data-lang="ko">한국어</button>
-      <button type="button" class="lang-opt" data-lang="en">English</button>
-      <button type="button" class="lang-opt" data-lang="ja">日本語</button>
-      <button type="button" class="lang-opt" data-lang="zh-Hans">简体中文</button>
-      <button type="button" class="lang-opt" data-lang="zh-Hant">繁體中文</button>
+  <div class="lang-wrap">
+    <div class="lang-switch" id="langSwitch" role="group" aria-label="Language">
+      <button type="button" class="lang-opt" data-lang="ko" title="한국어" aria-label="한국어"><img src="https://flagcdn.com/w40/kr.png" alt=""></button>
+      <button type="button" class="lang-opt" data-lang="en" title="English" aria-label="English"><img src="https://flagcdn.com/w40/us.png" alt=""></button>
+      <button type="button" class="lang-opt" data-lang="zh-Hans" title="简体中文" aria-label="简体中文"><img src="https://flagcdn.com/w40/cn.png" alt=""></button>
+      <button type="button" class="lang-opt" data-lang="zh-Hant" title="繁體中文" aria-label="繁體中文"><img src="https://flagcdn.com/w40/tw.png" alt=""></button>
+      <button type="button" class="lang-opt" data-lang="ja" title="日本語" aria-label="日本語"><img src="https://flagcdn.com/w40/jp.png" alt=""></button>
     </div>
   </div>
 
@@ -723,6 +890,51 @@
     </li>
 
   </ul>
+
+  <!-- 한국어 전용 홍보 영역 -->
+  <section class="ko-extras" id="koExtras" hidden>
+
+    <a class="promo-card" href="https://korean.visitkorea.or.kr/dgtourcard/biz/regn/regnMain.do?mtpcDoCd=26&signguCd=26170" target="_blank" rel="noopener noreferrer">
+      <div class="card-icon" aria-hidden="true">🪪</div>
+      <div class="promo-body">
+        <div class="promo-head">
+          <div class="card-title">디지털 관광주민증</div>
+          <span class="promo-badge">내국인 전용</span>
+        </div>
+        <div class="card-sub">부산 동구의 관광주민이 되어 제휴 관광지·가게 할인 혜택을 받아보세요.</div>
+        <div class="promo-cta">발급하러 가기 ↗</div>
+      </div>
+    </a>
+
+    <section class="event-acc" id="eventAcc">
+      <button type="button" class="event-head" id="eventToggle" aria-expanded="false" aria-controls="eventBody">
+        <div class="card-icon" aria-hidden="true">🛍️</div>
+        <div class="promo-body">
+          <div class="card-title">해운대 시장에서 쇼핑하면 상품권이 따라온다고? 👀</div>
+          <div class="card-sub">1만원 이상 구매하고 5천원 혜택 받는 방법!</div>
+          <div class="promo-cta event-cta"><span id="eventCtaLabel">혜택 확인하기</span><span class="chev">⌄</span></div>
+        </div>
+      </button>
+      <div class="event-body" id="eventBody">
+        <div class="event-body-inner">
+          <div class="cardnews">
+            <div class="cn-track" id="cnTrack" tabindex="0" aria-label="해운대시장 구매인증 이벤트 카드뉴스"></div>
+            <button type="button" class="cn-nav cn-prev" id="cnPrev" aria-label="이전 카드">‹</button>
+            <button type="button" class="cn-nav cn-next" id="cnNext" aria-label="다음 카드">›</button>
+            <span class="cn-count" id="cnCount">1 / 8</span>
+          </div>
+          <div class="cn-dots" id="cnDots"></div>
+          <!-- 카드뉴스 마지막 장 QR 코드 링크 -->
+          <a class="cn-apply" href="https://m.site.naver.com/2iqHy" target="_blank" rel="noopener noreferrer">신청 바로가기 ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <a class="sponsor-banner" href="https://www.zimcarry.net" target="_blank" rel="noopener sponsored">
+      <img src="assets/busan.spots/zimcarry-ko.webp" alt="짐캐리 — 짐 없는 여행의 시작, 부산역에서 숙소까지 한번에 짐배송" width="2000" height="741" loading="lazy">
+    </a>
+
+  </section>
 
   <footer class="footer">
     <p data-i18n="footer">도시와 사람을 잇는 로컬 콘텐츠, 다움</p>
@@ -902,7 +1114,6 @@
       }
     };
     var LANG_KEY = 'demoLang';
-    var LANG_NAMES = { ko: '한국어', en: 'English', ja: '日本語', 'zh-Hans': '简体中文', 'zh-Hant': '繁體中文' };
 
     function detectLang() {
       var l = (navigator.language || 'ko').toLowerCase();
@@ -927,27 +1138,71 @@
         if (!a.dataset.hrefKo) a.dataset.hrefKo = a.getAttribute('href');
         a.setAttribute('href', lang === 'ko' ? a.dataset.hrefKo : a.dataset.hrefIntl);
       });
-      document.getElementById('langCur').textContent = LANG_NAMES[lang];
+      // 디지털 관광주민증 · 해운대시장 · 짐캐리는 한국어에서만 노출
+      document.getElementById('koExtras').hidden = lang !== 'ko';
       curLang = lang;
       // the sold-out notice only applies to Korean-language bookings
       if (lang !== 'ko' && popup) close();
       try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
     }
 
-    var langMenu = document.getElementById('langMenu');
-    document.getElementById('langBtn').addEventListener('click', function (e) {
-      e.stopPropagation();
-      langMenu.classList.toggle('open');
-    });
     document.querySelectorAll('.lang-opt').forEach(function (o) {
-      o.addEventListener('click', function () {
-        applyLang(o.dataset.lang);
-        langMenu.classList.remove('open');
+      o.addEventListener('click', function () { applyLang(o.dataset.lang); });
+    });
+
+    // ── 해운대시장 카드뉴스 (아코디언 + 인스타식 슬라이드) ──
+    (function () {
+      var COUNT = 8;
+      var acc = document.getElementById('eventAcc');
+      var toggle = document.getElementById('eventToggle');
+      var track = document.getElementById('cnTrack');
+      var dots = document.getElementById('cnDots');
+      var prev = document.getElementById('cnPrev');
+      var next = document.getElementById('cnNext');
+      var count = document.getElementById('cnCount');
+      var index = 0;
+
+      for (var i = 1; i <= COUNT; i++) {
+        var n = (i < 10 ? '0' : '') + i;
+        track.insertAdjacentHTML('beforeend',
+          '<div class="cn-slide"><img src="assets/busan.spots/haeundae/card-' + n + '.jpg" alt="해운대시장 구매인증 이벤트 카드뉴스 ' + i + '/' + COUNT + '" loading="lazy" width="1080" height="1350"></div>');
+        dots.insertAdjacentHTML('beforeend', '<button type="button" class="cn-dot" aria-label="' + i + '번째 카드"></button>');
+      }
+
+      function go(i) {
+        i = Math.max(0, Math.min(COUNT - 1, i));
+        track.scrollTo({ left: i * track.clientWidth });
+      }
+
+      function sync() {
+        index = Math.round(track.scrollLeft / (track.clientWidth || 1));
+        count.textContent = (index + 1) + ' / ' + COUNT;
+        prev.disabled = index === 0;
+        next.disabled = index === COUNT - 1;
+        Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle('active', k === index); });
+      }
+
+      toggle.addEventListener('click', function () {
+        var isOpen = acc.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', isOpen);
+        document.getElementById('eventCtaLabel').textContent = isOpen ? '접기' : '혜택 확인하기';
+        if (isOpen) track.querySelectorAll('img').forEach(function (img) { img.loading = 'eager'; });
       });
-    });
-    document.addEventListener('click', function (e) {
-      if (!document.getElementById('langSwitch').contains(e.target)) langMenu.classList.remove('open');
-    });
+
+      prev.addEventListener('click', function () { go(index - 1); });
+      next.addEventListener('click', function () { go(index + 1); });
+      dots.addEventListener('click', function (e) {
+        var d = e.target.closest('.cn-dot');
+        if (d) go(Array.prototype.indexOf.call(dots.children, d));
+      });
+      track.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); go(index - 1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); go(index + 1); }
+      });
+      track.addEventListener('scroll', function () { requestAnimationFrame(sync); }, { passive: true });
+      window.addEventListener('resize', function () { go(index); });
+      sync();
+    })();
 
     var curLang = 'ko';
     var popup = document.getElementById('notice');
