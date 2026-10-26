@@ -77,6 +77,7 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+  [hidden] { display: none !important; }
 
   body {
     background: var(--bg);
@@ -412,6 +413,159 @@
 
   .map-btn:hover { background: var(--accent-glow); border-color: var(--accent); }
 
+  /* ── EVENT ACCORDION + CARD NEWS ── */
+  .event-acc {
+    margin-top: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .event-acc:hover, .event-acc.open { border-color: var(--border-hover); box-shadow: 0 8px 32px var(--accent-glow); }
+
+  .event-head {
+    width: 100%;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 24px;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+  }
+
+  .event-icon {
+    flex: none;
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-glow);
+    border-radius: 12px;
+  }
+
+  .event-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+  .event-title { font-size: 17px; font-weight: 800; line-height: 1.4; letter-spacing: -0.01em; }
+  .event-sub { font-size: 12.5px; font-weight: 300; color: var(--text-secondary); }
+
+  .event-cta {
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent-bright);
+  }
+
+  .event-cta .chev { display: inline-block; font-size: 15px; line-height: 1; transform: translateY(-3px); transition: transform 0.25s; }
+  .event-acc.open .event-cta .chev { transform: translateY(2px) rotate(180deg); }
+
+  /* 0fr → 1fr 로 자연스럽게 펼치기 */
+  .event-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s ease; }
+  .event-acc.open .event-body { grid-template-rows: 1fr; }
+  .event-body-inner { overflow: hidden; min-height: 0; }
+
+  .cardnews { position: relative; margin: 0 16px; border-radius: 12px; overflow: hidden; background: #0B3D91; }
+
+  .cn-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    outline: none;
+  }
+
+  .cn-track::-webkit-scrollbar { display: none; }
+
+  .cn-slide { flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 4 / 5; }
+  .cn-slide img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; -webkit-user-drag: none; }
+
+  .cn-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--text-primary);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 3px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.2s;
+  }
+
+  .cn-prev { left: 10px; }
+  .cn-next { right: 10px; }
+  .cn-nav[disabled] { opacity: 0; pointer-events: none; }
+
+  .cn-count {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(11, 27, 51, 0.6);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+
+  .cn-dots { display: flex; justify-content: center; gap: 6px; padding: 14px 0 20px; }
+
+  .cn-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    border: none;
+    padding: 0;
+    background: var(--border);
+    cursor: pointer;
+    transition: width 0.2s, background 0.2s;
+  }
+
+  .cn-dot.active { width: 18px; background: var(--accent); }
+
+  .cn-apply {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 16px 20px;
+    padding: 13px;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .cn-apply:hover { background: var(--accent-bright); }
+  .cn-dots { padding-bottom: 14px; }
+
+  @media (max-width: 520px) {
+    .event-head { padding: 22px 18px; }
+    .cardnews { margin: 0 12px; }
+  }
+
   /* ── SPONSOR BANNER ── */
   .sponsor-banner {
     display: block;
@@ -504,7 +658,7 @@
       <div class="cat-sub" id="cat2Sub"></div>
       <div class="cat-more"><span id="moreLabel2"></span><span class="arrow">→</span></div>
     </button>
-    <a class="cat-card cat-card--promo" href="https://korean.visitkorea.or.kr/dgtourcard/biz/regn/regnMain.do?mtpcDoCd=26&signguCd=26170" target="_blank" rel="noopener noreferrer">
+    <a class="cat-card cat-card--promo" id="tourCard" href="https://korean.visitkorea.or.kr/dgtourcard/biz/regn/regnMain.do?mtpcDoCd=26&signguCd=26170" target="_blank" rel="noopener noreferrer">
       <div class="cat-head">
         <div class="cat-icon">🪪</div>
         <span class="cat-badge" id="cat3Badge"></span>
@@ -520,6 +674,31 @@
     <h2 class="detail-title" id="detailTitle"></h2>
     <div class="spot-list" id="spotList"></div>
   </div>
+
+  <!-- 해운대시장 구매인증 이벤트 (한국어 페이지 전용) -->
+  <section class="event-acc" id="eventAcc" hidden>
+    <button class="event-head" id="eventToggle" aria-expanded="false" aria-controls="eventBody">
+      <span class="event-icon">🛍️</span>
+      <span class="event-text">
+        <span class="event-title">해운대 시장에서 쇼핑하면 상품권이 따라온다고? 👀</span>
+        <span class="event-sub">1만원 이상 구매하고 5천원 혜택 받는 방법!</span>
+        <span class="event-cta"><span id="eventCtaLabel">혜택 확인하기</span><span class="chev">⌄</span></span>
+      </span>
+    </button>
+    <div class="event-body" id="eventBody">
+      <div class="event-body-inner">
+        <div class="cardnews" id="cardnews">
+          <div class="cn-track" id="cnTrack" tabindex="0" aria-label="해운대시장 구매인증 이벤트 카드뉴스"></div>
+          <button class="cn-nav cn-prev" id="cnPrev" aria-label="이전 카드">‹</button>
+          <button class="cn-nav cn-next" id="cnNext" aria-label="다음 카드">›</button>
+          <span class="cn-count" id="cnCount">1 / 8</span>
+        </div>
+        <div class="cn-dots" id="cnDots"></div>
+        <!-- 카드뉴스 마지막 장 QR 코드 링크 -->
+        <a class="cn-apply" href="https://m.site.naver.com/2iqHy" target="_blank" rel="noopener noreferrer">신청 바로가기 <span>↗</span></a>
+      </div>
+    </div>
+  </section>
 
   <a class="sponsor-banner" href="https://www.zimcarry.net" target="_blank" rel="noopener sponsored">
     <img id="sponsorImg" src="assets/busan.spots/zimcarry-ko.webp" alt="짐캐리 — 짐 없는 여행의 시작" width="2000" height="741">
@@ -866,6 +1045,11 @@
     const catList = document.getElementById('catList');
     const detailView = document.getElementById('detailView');
 
+    // 해운대시장 이벤트는 한국어 첫 화면에서만 노출
+    document.getElementById('eventAcc').hidden = !(state.lang === 'ko' && state.view === 'home');
+    // 디지털 관광주민증은 내국인 전용 → 한국어에서만 노출
+    document.getElementById('tourCard').hidden = state.lang !== 'ko';
+
     if (state.view === 'home') {
       catList.classList.remove('hidden');
       detailView.classList.remove('active');
@@ -933,6 +1117,60 @@
     render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+
+  // ── 해운대시장 카드뉴스 (아코디언 + 인스타식 슬라이드) ──
+  (function () {
+    const COUNT = 8;
+    const acc = document.getElementById('eventAcc');
+    const toggle = document.getElementById('eventToggle');
+    const track = document.getElementById('cnTrack');
+    const dots = document.getElementById('cnDots');
+    const prev = document.getElementById('cnPrev');
+    const next = document.getElementById('cnNext');
+    const count = document.getElementById('cnCount');
+    let index = 0;
+
+    for (let i = 1; i <= COUNT; i++) {
+      const n = String(i).padStart(2, '0');
+      track.insertAdjacentHTML('beforeend',
+        `<div class="cn-slide"><img src="assets/busan.spots/haeundae/card-${n}.jpg" alt="해운대시장 구매인증 이벤트 카드뉴스 ${i}/${COUNT}" loading="lazy" width="1080" height="1350"></div>`);
+      dots.insertAdjacentHTML('beforeend', `<button class="cn-dot" aria-label="${i}번째 카드"></button>`);
+    }
+
+    function go(i) {
+      i = Math.max(0, Math.min(COUNT - 1, i));
+      track.scrollTo({ left: i * track.clientWidth });
+    }
+
+    function sync() {
+      index = Math.round(track.scrollLeft / track.clientWidth) || 0;
+      count.textContent = `${index + 1} / ${COUNT}`;
+      prev.disabled = index === 0;
+      next.disabled = index === COUNT - 1;
+      [...dots.children].forEach((d, i) => d.classList.toggle('active', i === index));
+    }
+
+    toggle.addEventListener('click', () => {
+      const open = acc.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open);
+      document.getElementById('eventCtaLabel').textContent = open ? '접기' : '혜택 확인하기';
+      if (open) track.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+    });
+
+    prev.addEventListener('click', () => go(index - 1));
+    next.addEventListener('click', () => go(index + 1));
+    dots.addEventListener('click', e => {
+      const d = e.target.closest('.cn-dot');
+      if (d) go([...dots.children].indexOf(d));
+    });
+    track.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(index - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(index + 1); }
+    });
+    track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+    window.addEventListener('resize', () => go(index));
+    sync();
+  })();
 
   const toTop = document.getElementById('toTop');
   toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
