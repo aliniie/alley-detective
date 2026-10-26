@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://escape.dawoom.io/sitemap.xml
