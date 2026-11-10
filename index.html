@@ -873,23 +873,10 @@
         <span class="card-stamp">SOLD OUT</span>
         <span class="card-arrow" aria-hidden="true">→</span>
       </div>
-      <!-- 한국어 전용: 추가 소량 오픈 -->
-      <a class="card" id="somakOpen" href="https://booking.naver.com/booking/5/bizes/1650463" target="_blank" rel="noopener" hidden>
-        <span class="card-number">01</span>
-        <div class="card-icon" aria-hidden="true">🏚️</div>
-        <div class="card-body">
-          <span class="card-tag card-tag--open">06.09.~11.30.</span>
-          <div class="card-title">소막마을 대탐험</div>
-          <div class="card-sub">부산 소막마을 일원</div>
-        </div>
-        <span class="card-stamp">마지막 찬스</span>
-        <span class="card-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="quick-btn" id="somakBtn" href="https://booking.naver.com/booking/5/bizes/1650463" target="_blank" rel="noopener" hidden>추가 오픈! 지금 예약하기 →</a>
     </li>
 
-    <!-- 2. 부산대자율상권 -->
-    <li>
+    <!-- 2. 부산대자율상권 (한국어 전용) -->
+    <li id="pnuItem">
       <a class="card" href="https://escape.dawoom.io/alley.prologue.html" data-i18n-aria="c2Title" aria-label="부산대자율상권 방탈출 : 골목 탐정단">
         <span class="card-number">02</span>
         <div class="card-icon" aria-hidden="true">🔍</div>
@@ -898,9 +885,10 @@
           <div class="card-title" data-i18n="c2Title">부산대자율상권 방탈출 : 골목 탐정단</div>
           <div class="card-sub" data-i18n="c2Sub">부산대 자율상권 일원 · 프롤로그</div>
         </div>
+        <span class="card-stamp" data-i18n="stamp2">마지막 찬스</span>
         <span class="card-arrow" aria-hidden="true">→</span>
       </a>
-      <a class="quick-btn" href="https://booking.naver.com/booking/5/bizes/1732889/" target="_blank" rel="noopener" data-i18n="book">프롤로그 없이 바로 예약하기 →</a>
+      <a class="quick-btn" href="https://booking.naver.com/booking/5/bizes/1732889/" target="_blank" rel="noopener" data-i18n="book2">추가 오픈! 지금 예약하기 →</a>
     </li>
 
     <!-- 3. 피란수도 -->
@@ -977,8 +965,8 @@
       <h1 class="popup-title" id="notice-title" data-i18n-html="pTitle">추가 티켓 오픈!</h1>
       <p data-i18n="p1">날씨가 더 추워지기 전에, 티켓을 넉넉히 추가했어요.</p>
       <p data-i18n="p2">지금 바로 예약하실 수 있습니다.</p>
-      <p data-i18n="p3">매진됐던 〈소막마을 대탐험〉도 다시 열었어요.</p>
       <p style="font-weight:700;color:var(--text-primary)" data-i18n="p4">매진되기 전에 서둘러주세요! 🏃‍➡️</p>
+      <p class="popup-note" data-i18n="note">※ 예약 페이지가 열리지 않으면 현재 티켓이 매진된 상태입니다.</p>
       <p class="popup-sign" data-i18n="sign">커뮤니케이션 다움 드림</p>
     </div>
     <div class="popup-actions">
@@ -1000,11 +988,11 @@
         c2Title: '부산대자율상권 방탈출 : 골목 탐정단', c2Sub: '부산대 자율상권 일원 · 프롤로그',
         c3Title: '피란수도 부산 : 잃어버린 소포', c3Sub: '부산 피란수도 유산 일원 · 프롤로그',
         book: '프롤로그 없이 바로 예약하기 →',
+        book2: '추가 오픈! 지금 예약하기 →', stamp2: '마지막 찬스',
         footer: '도시와 사람을 잇는 로컬 콘텐츠, 다움',
         pTitle: '추가 티켓 오픈!',
         p1: '날씨가 더 추워지기 전에, 티켓을 넉넉히 추가했어요.',
         p2: '지금 바로 예약하실 수 있습니다.',
-        p3: '매진됐던 〈소막마을 대탐험〉도 다시 열었어요.',
         p4: '매진되기 전에 서둘러주세요! 🏃‍➡️',
         note: '※ 예약 페이지가 열리지 않으면 현재 티켓이 매진된 상태입니다.',
         sign: '커뮤니케이션 다움 드림',
@@ -1019,6 +1007,7 @@
         c2Title: 'Pusan National Univ. Commercial District Escape: Alley Detectives', c2Sub: 'Pusan National Univ. Commercial District · Prologue',
         c3Title: 'Sites of the Busan Wartime Capital: The Lost Parcel', c3Sub: 'Around the Sites of the Busan Wartime Capital · Prologue',
         book: 'Skip the prologue — Book now →',
+        book2: 'More tickets added! Book now →', stamp2: 'LAST CHANCE',
         footer: 'Local content connecting cities and people — Dawoom',
         pTitle: 'Outdoor Escape Game<br>Sold Out &amp; Additional Booking Notice',
         p1: 'This is Dawoom, connecting cities and people through local content.',
@@ -1047,6 +1036,7 @@
         c2Title: '釜山大学自律商圏 脱出ゲーム：路地探偵団', c2Sub: '釜山大学自律商圏一帯 · プロローグ',
         c3Title: '釜山の避難首都遺産：失われた小包', c3Sub: '釜山の避難首都遺産一帯 · プロローグ',
         book: 'プロローグなしで今すぐ予約 →',
+        book2: '追加オープン！今すぐ予約 →', stamp2: 'ラストチャンス',
         footer: '都市と人をつなぐローカルコンテンツ、Dawoom（다움）',
         pTitle: '野外脱出ゲームプログラム<br>完売および追加予約のご案内',
         p1: '都市と人をつなぐローカルコンテンツ、Dawoom（다움）です。',
@@ -1075,6 +1065,7 @@
         c2Title: '釜山大学自律商圈密室逃脱：小巷侦探团', c2Sub: '釜山大学自律商圈一带 · 序章',
         c3Title: '釜山战时首都遗址：遗失的包裹', c3Sub: '釜山战时首都遗址一带 · 序章',
         book: '跳过序章，直接预约 →',
+        book2: '追加开放！立即预约 →', stamp2: '最后机会',
         footer: '连接城市与人的在地内容，Dawoom（다움）',
         pTitle: '户外密室逃脱项目<br>售罄及追加预约通知',
         p1: '我们是连接城市与人的在地内容品牌——Dawoom（다움）。',
@@ -1103,6 +1094,7 @@
         c2Title: '釜山大學自律商圈密室逃脫：小巷偵探團', c2Sub: '釜山大學自律商圈一帶 · 序章',
         c3Title: '釜山戰時首都遺址：遺失的包裹', c3Sub: '釜山戰時首都遺址一帶 · 序章',
         book: '跳過序章，直接預約 →',
+        book2: '追加開放！立即預約 →', stamp2: '最後機會',
         footer: '連結城市與人的在地內容，Dawoom（다움）',
         pTitle: '戶外密室逃脫專案<br>售罄及追加預約通知',
         p1: '我們是連結城市與人的在地內容品牌——Dawoom（다움）。',
@@ -1182,10 +1174,8 @@
       });
       // 디지털 관광주민증 · 해운대시장 · 짐캐리는 한국어에서만 노출
       document.getElementById('koExtras').hidden = lang !== 'ko';
-      // 소막마을 추가 오픈은 한국어에서만 예약 가능
-      document.getElementById('somakSold').hidden = lang === 'ko';
-      document.getElementById('somakOpen').hidden = lang !== 'ko';
-      document.getElementById('somakBtn').hidden = lang !== 'ko';
+      // 부산대자율상권 방탈출은 외국어 예약이 안 되므로 한국어에서만 노출
+      document.getElementById('pnuItem').hidden = lang !== 'ko';
       curLang = lang;
       // the sold-out notice only applies to Korean-language bookings
       if (lang !== 'ko' && popup) close();
