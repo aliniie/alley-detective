@@ -754,6 +754,9 @@
     word-break: keep-all;
   }
 
+  .popup-body { scrollbar-width: none; }
+  .popup-body::-webkit-scrollbar { display: none; }
+
   .popup-title {
     font-family: 'SchoolSafetyRoundedSmile', 'Presentation', sans-serif;
     font-size: 19px;
@@ -877,18 +880,18 @@
 
     <!-- 2. 부산대자율상권 (한국어 전용) -->
     <li id="pnuItem">
-      <a class="card" href="https://escape.dawoom.io/alley.prologue.html" data-i18n-aria="c2Title" aria-label="부산대자율상권 방탈출 : 골목 탐정단">
+      <div class="card card--disabled" aria-disabled="true" tabindex="0">
         <span class="card-number">02</span>
         <div class="card-icon" aria-hidden="true">🔍</div>
         <div class="card-body">
-          <span class="card-tag card-tag--open">9.12.~12.6.</span>
+          <span class="card-tag card-tag--sold">9.12.~12.6.</span>
           <div class="card-title" data-i18n="c2Title">부산대자율상권 방탈출 : 골목 탐정단</div>
           <div class="card-sub" data-i18n="c2Sub">부산대 자율상권 일원 · 프롤로그</div>
         </div>
-        <span class="card-stamp" data-i18n="stamp2">마지막 찬스</span>
+        <span class="card-stamp">SOLD OUT</span>
         <span class="card-arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="quick-btn" href="https://booking.naver.com/booking/5/bizes/1732889/" target="_blank" rel="noopener" data-i18n="book2">추가 오픈! 지금 예약하기 →</a>
+      </div>
+      <button type="button" class="quick-btn" id="detailBtn" style="width:100%;border:0;cursor:pointer">프로그램 상세 정보 보기</button>
     </li>
 
     <!-- 3. 피란수도 -->
@@ -973,6 +976,15 @@
       <button type="button" id="notice-hide" data-i18n="hide">오늘 하루 보지 않기</button>
       <button type="button" id="notice-close" data-i18n="close">닫기</button>
     </div>
+  </div>
+</div>
+
+<div class="popup" id="detail" role="dialog" aria-modal="true" aria-label="프로그램 상세 정보" hidden>
+  <div class="popup-box" style="max-width:480px;position:relative">
+    <div class="popup-body" style="padding:0">
+      <img src="assets/alley/detail.webp" alt="부산대자율상권 골목 탐정단 프로그램 상세 정보: 2026년 9~12월, 운영시간 10:00~16:00(점심 12:00~13:00), 출발/도착 청년창조발전소 꿈터+ 2층 부산대자율상권조합 사무실, 참가비 무료(네이버예약 필수). 게임키트와 미션 페이지를 따라 골목 곳곳의 단서를 찾는 체험형 야외 방탈출. 등장인물: 곰사장, 치즈, 여울, 앵두, 몽실, 먼지." style="display:block;width:100%;height:auto">
+    </div>
+    <button type="button" id="detail-close" aria-label="닫기" style="position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:999px;border:0;background:rgba(7,9,15,.65);color:#fff;font-size:20px;line-height:1;cursor:pointer">×</button>
   </div>
 </div>
 
@@ -1176,6 +1188,7 @@
       document.getElementById('koExtras').hidden = lang !== 'ko';
       // 부산대자율상권 방탈출은 외국어 예약이 안 되므로 한국어에서만 노출
       document.getElementById('pnuItem').hidden = lang !== 'ko';
+      if (lang !== 'ko') closeDetail();
       curLang = lang;
       // the sold-out notice only applies to Korean-language bookings
       if (lang !== 'ko' && popup) close();
@@ -1241,6 +1254,20 @@
     })();
 
     var curLang = 'ko';
+    var detail = document.getElementById('detail');
+    function openDetail() {
+      detail.hidden = false;
+      detail.classList.add('is-open');
+      detail.querySelector('.popup-body').scrollTop = 0;
+      document.getElementById('detail-close').focus();
+    }
+    function closeDetail() {
+      detail.classList.remove('is-open');
+      detail.hidden = true;
+    }
+    document.getElementById('detailBtn').addEventListener('click', openDetail);
+    document.getElementById('detail-close').addEventListener('click', closeDetail);
+    detail.addEventListener('click', function (e) { if (e.target === detail) closeDetail(); });
     var popup = document.getElementById('notice');
     var KEY = 'notice-hide-until';
 
@@ -1277,7 +1304,7 @@
       close();
     });
     popup.addEventListener('click', function (e) { if (e.target === popup) close(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); closeDetail(); } });
   })();
 </script>
 </body>
