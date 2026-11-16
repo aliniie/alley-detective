@@ -1889,7 +1889,20 @@ const STEPS = [
   puzzle:{
     type:'text', q:'골목에 남겨진 이름은?',
     hint:'노트북에 적힌 규칙을 따라 특정 단어의 글자를 짚어보세요.',
-    answers:['정수','황정수','jeongsoo'],
+    answers:[
+      '정수','황정수',
+      /* 영어 로마자 */
+      'jeongsoo','jeongsu','jungsu','jungsoo','jeongsue','jongsu','jongsoo','jeongsuh',
+      'hwangjeongsoo','hwangjeongsu','hwangjungsu','hwangjungsoo',
+      /* 일본어 */
+      'ジョンス','チョンス','ジョンスー','チョンスー','ジョンスウ','じょんす','ちょんす','ファンジョンス','ファンチョンス',
+      /* 중국어 한자(간체/번체) + 병음 */
+      '贞秀','贞洙','正秀','郑秀','郑洙','貞秀','貞洙','鄭秀','鄭洙','廷秀','政秀',
+      '黄贞秀','黄正秀','黄郑秀','黄贞洙','黃貞秀','黃正秀','黃鄭秀','黃貞洙',
+      'zhengxiu','zhengshou','zhengzhu','zhengsu','zhenxiu','zhenshou','zhenzhu','zhengxiou','zhengsiu','huangzhengxiu','huangzhenxiu',
+      /* 일본어 한자 읽기 */
+      '黄正秀','黄貞秀'
+    ],
     confirmQ:'골목에 남겨진 이름을 벌써 알아낸기가?',
     confirmNo:['천천히 다시 봐봐라, 지나온 길에 이름이 남겨지는 법이지.'],
     lineReply:{0:'(사진을 내민다.)'},
@@ -1991,7 +2004,18 @@ const STEPS = [
   puzzle:{
     type:'text', q:'정수의 누나가 「누나의 길」을 왔다갔다하며 만든 것은 무엇일까요?',
     hint:'보라색 밑에, 흰색 왼쪽에 그리고 남색의 반대편에 있는 것은 무엇일까요? (물건이 놓여진 번호를 입력해도돼요!)',
-    answers:['고무신','고무신 공장','고무신공장','1','1번','gomusin','gomushin'],
+    answers:[
+      '고무신','고무신 공장','고무신공장','1','1번',
+      /* 영어: 로마자 + 뜻풀이 */
+      'gomusin','gomushin','komusin','komushin','gomoosin','gomooshin','gomusin factory','gomushin factory',
+      'rubber shoes','rubber shoe','rubber shoes factory','rubber shoe factory','rubber footwear','rubber sandals','rubber slippers','rubber shoes 1','shoes','shoe',
+      /* 일본어 */
+      'ゴムシン','コムシン','ゴム靴','ゴムぐつ','ゴム靴工場','ゴムシン工場','コムシン工場','ゴム製の靴','ゴム履き','ゴムぐつ工場','ごむしん','こむしん','ゴム靴の工場',
+      /* 중국어 간체/번체 + 병음 */
+      '胶鞋','橡胶鞋','胶鞋厂','橡胶鞋厂','橡胶鞋子','胶底鞋','胶鞋工厂','橡胶鞋工厂','韩式胶鞋','高无新',
+      '膠鞋','橡膠鞋','膠鞋廠','橡膠鞋廠','橡膠鞋子','膠底鞋','膠鞋工廠','橡膠鞋工廠','韓式膠鞋',
+      'jiaoxie','xiangjiaoxie','jiaoxiechang','xiangjiaoxiechang','gaowuxin'
+    ],
     confirmQ:'정수의 누나가 일하던 곳을 알아내셨나요?',
     confirmNo:['서두르지 마세요. 전시물을 하나씩 다시 살펴보시면 보일 거예요.'],
     solvedLines:['맞아요, 고무신을 만들던 공장이었어요. 그 시절 피난민들은 저 산복도로 너머 고무신 공장에서 일하기도 하고, 지게꾼으로 짐을 나르기도 하며 저마다의 자리에서 어떻게든 하루를 버텨냈던 거죠.','이제 거의 모든 정보를 모으신 것 같은데요. 지금까지 찾은 단서를 가지고, 의뢰인인 김초량 소장님이 있는 명란브랜드연구소로 가보세요.']
@@ -2025,7 +2049,18 @@ const STEPS = [
   puzzle:{
     type:'text', q:'잊혀진 이름, 누나의 이름은 뭘까요?',
     hint:'피난민증명서의 빈 칸을 마저 채워보세요.',
-    answers:['정월','jeongwol'],
+    answers:[
+      '정월','황정월',
+      /* 영어 로마자 */
+      'jeongwol','jungwol','jeongweol','jeongwoul','jeongwoel','jongwol','jeongwal',
+      'hwangjeongwol','hwangjungwol',
+      /* 일본어 */
+      'ジョンウォル','チョンウォル','ジョンウォール','チョンウォール','ジョンウォォル','じょんうぉる','ちょんうぉる','ファンジョンウォル','ファンチョンウォル',
+      /* 중국어 한자(간체/번체) + 병음 */
+      '正月','贞月','郑月','貞月','鄭月','贞玥','貞玥','静月','靜月',
+      '黄正月','黄贞月','黄郑月','黃正月','黃貞月','黃鄭月',
+      'zhengyue','zhengyuè','zhenyue','zhenyuè','zhengwol','zhengyve','huangzhengyue','huangzhenyue'
+    ],
     confirmQ:'이제 할아버지의 누나 이름을 알아내셨나요?',
     confirmNo:['천천히 살펴보도록해요.'],
     solvedLines:[
@@ -2736,7 +2771,7 @@ function buildCryptexReels(answer, belowWord){
   });
 }
 
-function normalize(v){ return v.trim().replace(/\s+/g,'').toUpperCase(); }
+function normalize(v){ return v.normalize('NFKC').trim().replace(/[\s\-_·・.,'’]+/g,'').toUpperCase(); }
 function checkTextAnswer(){
   const s=STEPS[idx];
   const v=normalize(pzInput.value);
